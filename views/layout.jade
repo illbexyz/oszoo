@@ -1,11 +1,21 @@
 doctype html
 html
-	head
-		title= title
-		link(rel='stylesheet', href='/stylesheets/style.css')
-		script(src="https://cdn.socket.io/socket.io-1.3.5.js")
-		script(src="/static/term.js/src/term.js")
-		//script(src='/static/socket.io-stream/socket.io-stream.js')
-		//script(src='/javascripts/terminal.js')
-	body
-		block content
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    script(src="https://cdn.socket.io/socket.io-1.3.5.js")
+    script(src="http://code.jquery.com/jquery-1.11.1.js")
+    script.
+      $(document).ready(function(){
+        var socket = io.connect('http://localhost');
+        $('form').submit(function(){
+          socket.emit('chat message', $('#m').val());
+          $('#m').val('');
+          return false;
+        });
+        socket.on('chat message', function(msg){
+          $('#messages').append($('<li>').text(msg));
+        });
+      });
+  body
+    block content

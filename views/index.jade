@@ -1,36 +1,7 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
-  script(type='text/javascript').
-    window.addEventListener('load', function() {
-      var socket = io.connect('http://localhost:8081');
-      socket.on('connect', function() {
-        var term = new Terminal({
-          cols: 80,
-          rows: 24,
-          screenKeys: true
-        });
-
-        term.on('data', function(data) {
-          socket.emit('data', data);
-        });
-
-        term.on('title', function(title) {
-          document.title = title;
-        });
-
-        term.open(document.body);
-
-        term.write('\x1b[31mWelcome to term.js!\x1b[m\r\n');
-
-        socket.on('data', function(data) {
-          term.write(data);
-        });
-
-        socket.on('disconnect', function() {
-          term.destroy();
-        });
-      });
-    }, false);
+  ul#messages
+  form(action="")
+    input#m(autocomplete="off")
+    button Send
