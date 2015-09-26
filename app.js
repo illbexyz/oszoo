@@ -14,7 +14,7 @@ var io = require("socket.io")(server);
 
 var spawn = require('child_process').spawn;
 var rfb = require('rfb2');
-var PNG = require('node-png').PNG;
+var Png = require('node-png').Png;
 var streamify = require('stream-array');
 var streamifier = require('streamifier');
 
@@ -49,7 +49,7 @@ var chat = io.of('/chat').on('connection', function(socket){
 
 var virt = io.of('/virt').on('connection', function(socket){
   socket.on('init', function(config){
-    console.log("init");
+    console.info("init");
     var memory = '256';
     var cdrom = "~/iso/ubuntu-gnome-15.04-desktop-amd64.iso";
     var hda = '~/iso/prova.img';
@@ -72,76 +72,109 @@ var virt = io.of('/virt').on('connection', function(socket){
     });
     socket.on('keyboard', function (evnt) {
       r.keyEvent(evnt.keyCode, evnt.isDown);
+      console.info('Keyboard input');
     });
     socket.on('disconnect', function () {
-      //disconnectClient(socket);
+      disconnectClient(socket);
+      console.info('Client disconnected');
     });
   });
 });
 
-function createRfbConnection(config, socket) {
-  /*var r = rfb.createConnection({
-    host: config.host,
-    port: config.port,
-    password: config.password
-  });*/
-  console.log("creating rfb connection");
-  var r = rfb.createConnection({
-    host: '127.0.0.1',
-    port: '5905'
-  });
-  addEventHandlers(r, socket);
-  return r;
+function encodeFrame(rect) {
+  var rgb = new Buffer(rect.width * rect.height * 3, 'binary');
+  var offset = 0;
+
+  for (var i = 0; i < rect.data.length; i += 4) {
+    rgb[offset] = rect.data[i + 2];
+    offset += 1;
+    rgb[offset] = rect.data[i + 1];
+    offset += 1;
+    rgb[offset] = rect.data[i];
+    offset += 1;
+  }
+  var image = new Png(rgb, rect.width, rect.height, 'rgb');
+  return image.encodeSync();
 }
 
 function addEventHandlers(r, socket) {
-  r.on('connect', function () {
-    console.log('vnc connected');
+  var initialized = false;
+  var screenWidth;
+  var screenHeight;
+
+  function handleConnection(width, height) {
+    console.log('ciao');
+    screenWidth = width;
+    screenHeight = height;
+    console.info('RFB connection established');
     socket.emit('init', {
-      width: r.width,
-      height: r.height
+      width: width,
+      height: height
     });
     clients.push({
       socket: socket,
-      rfb: r
+      rfb: r,
+      interval: setInterval(function () {
+        r.requestUpdate(false, 0, 0, width, height);
+      }, 50)
     });
-  });
-  r.on('rect', function (rect) {
-    handleFrame(socket, rect, r);
-  });
-}
-
-function handleFrame(socket, rect, r) {
-  var rgb = new Buffer(rect.width * rect.height * 3, 'binary');
-  var offset = 0;
-  console.log(rect);
-  console.log();
-  for (var i = 0; i < rect.data.length; i += 4) {
-    rgb[offset++] = rect.data[i + 2];
-    rgb[offset++] = rect.data[i + 1];
-    rgb[offset++] = rect.data[i];
+    //r.requestUpdate();
+    initialized = true;
   }
 
-  streamifier.createReadStream(rect.data).pipe(new PNG())
-  .on('parsed', function(){
-    image = image.encodeSync();
+  r.on('error', function (e) {
+    console.error('Error while talking with the remote RFB server', e);
+  });
+
+  r.on('rect', function (rect) {
+    if (!initialized) {
+      handleConnection(rect.width, rect.height);
+    }
     socket.emit('frame', {
       x: rect.x,
       y: rect.y,
       width: rect.width,
       height: rect.height,
-      image: image.toString('base64')
+      image: encodeFrame(rect).toString('base64')
     });
+    r.requestUpdate(false, 0, 0, screenWidth, screenHeight);
   });
-  //var image = new Png(rgb, r.width, r.height, 'rgb');
+
+  r.on('*', function () {
+    console.error(arguments);
+  });
 }
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
-});
+function createRfbConnection(config, socket) {
+  var r;
+  try {
+    r = rfb.createConnection({
+      host: '127.0.0.1',
+      port: '5905'
+      //password: config.password,
+      //securityType: 'vnc',
+    });
+    setTimeout(function () {
+      r.requestUpdate(false, 0, 0);
+    }, 200);
+  } catch (e) {
+    console.log(e);
+  }
+  addEventHandlers(r, socket);
+  return r;
+}
+
+function disconnectClient(socket) {
+  clients.forEach(function (client) {
+    if (client.socket === socket) {
+      client.rfb.end();
+      clearInterval(client.interval);
+    }
+  });
+  clients = clients.filter(function (client) {
+    return client.socket === socket;
+  });
+}
 
 // error handlers
 
