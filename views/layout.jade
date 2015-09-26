@@ -5,9 +5,9 @@ html
     link(rel='stylesheet', href='/stylesheets/style.css')
     script(src="https://cdn.socket.io/socket.io-1.3.5.js")
     script(src="http://code.jquery.com/jquery-1.11.1.js")
-    script.
+    //script.
       $(document).ready(function(){
-        var socket = io.connect('http://localhost');
+        var socket = io.connect('http://localhost/chat');
         $('form').submit(function(){
           socket.emit('chat message', $('#m').val());
           $('#m').val('');
@@ -17,5 +17,8 @@ html
           $('#messages').append($('<li>').text(msg));
         });
       });
+    script(src='/javascripts/Client.js')
+    script(src='/javascripts/Screen.js')
+    script(src='/javascripts/virtual.js')
   body
     block content
