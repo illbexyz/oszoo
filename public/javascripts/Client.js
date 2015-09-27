@@ -417,7 +417,7 @@
         var canvas = self._screen.getCanvas();
         canvas.width = config.width;
         canvas.height = config.height;
-        self._scaleScreen(config);
+        self._scaleScreen(1);
         self._initEventListeners();
         resolve();
         clearTimeout(timeout);

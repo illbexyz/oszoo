@@ -103,7 +103,6 @@ function addEventHandlers(r, socket) {
   var screenHeight;
 
   function handleConnection(width, height) {
-    console.log('ciao');
     screenWidth = width;
     screenHeight = height;
     console.info('RFB connection established');
@@ -149,9 +148,9 @@ function createRfbConnection(config, socket) {
   var r;
   try {
     r = rfb.createConnection({
-      host: '127.0.0.1',
-      port: '5905'
-      //password: config.password,
+      host: '192.168.1.108',
+      port: '5900',
+      password: '1234',
       //securityType: 'vnc',
     });
     setTimeout(function () {
