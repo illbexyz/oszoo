@@ -3,7 +3,7 @@
   'use strict';
 
   var Config = {
-      URL: 'http://localhost/virt'
+      URL: 'http://localhost/vnc'
     };
   var keyMap = {
     8: [

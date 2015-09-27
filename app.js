@@ -14,9 +14,7 @@ var io = require("socket.io")(server);
 
 var spawn = require('child_process').spawn;
 var rfb = require('rfb2');
-var Png = require('node-png').Png;
-var streamify = require('stream-array');
-var streamifier = require('streamifier');
+var Png = require('png').Png;
 
 clients = [];
 
@@ -35,19 +33,9 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
-app.use('/users', users);
+//app.use('/users', users);
 
-var chat = io.of('/chat').on('connection', function(socket){
-  console.log("a user connected");
-  socket.on('disconnect', function(){
-    console.log('user disconnected');
-  });
-  socket.on('chat message', function(msg){
-    chat.emit('chat message', msg);
-  });
-});
-
-var virt = io.of('/virt').on('connection', function(socket){
+var virt = io.of('/vnc').on('connection', function(socket){
   socket.on('init', function(config){
     console.info("init");
     var memory = '256';
