@@ -6,30 +6,45 @@ var method = Qemu.prototype;
 function Qemu(){
 	this._vncPorts = [];
 	this._vncActivePorts = [];
+	this._qemu = null;
 	for(var i=0; i<=50; i++) this._vncPorts.push(i);
 }
 
 method.start = function(exe, memory, image, callback){
 	var executable = exe;
 	var password = randomstring.generate({length: 12});
-	var port = port();
+	var port = this._port();
+	var self = this;
 	var args = [
 		'-m', memory,
 		'-hda', image,
-		'-vnc', ":" + port() + "," + password
+		'-cdrom', 'ubuntu-gnome-15.04-desktop-amd64.iso',
+		'-vnc', ":" + port
 	];
-	var qemu = spawn(executable, args);
-
-	qemu.stdout.on('data', function(data){
+	this._qemu = spawn(executable, args);
+	this._qemu.on('exit', function(){
+		self._reallocatePort(port);
+	});
+	console.log(args);
+	setTimeout(function () {
 		callback(null, port, password);
-	});
-
-	qemu.stderr.on('data', function(err){
-		callback(err, null, null);
-	});
+	}, 1000);
 }
 
-function port(){
+method.stop = function(port) {
+	this._qemu.kill();
+}
+
+method._reallocatePort = function(port) {
+	console.log("port " + port + " reallocated");
+	this._vncPorts.push(port);
+	var index = this._vncActivePorts.indexOf(5);
+	if(index > -1){
+		this._vncActivePorts.splice(index, 1);
+	}
+}
+
+method._port = function() {
 	var port = this._vncPorts.pop();
 	this._vncActivePorts.push(port);
 	return port;

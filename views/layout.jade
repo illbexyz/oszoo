@@ -2,6 +2,33 @@ doctype html
 html
   head
     title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
-  body
-    block content
+    meta(name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no")
+    link(rel="stylesheet" href="https://fonts.googleapis.com/css?family=RobotoDraft:300,400,500,700,400italic")
+    link(rel="stylesheet" href="/bower_components/angular-material/angular-material.min.css")
+    link(rel='stylesheet' href='/stylesheets/style.css')
+    script(src="/socket.io/socket.io.js")
+    script(src="/bower_components/angular/angular.js")
+    script(src="/bower_components/angular-aria/angular-aria.js")
+    script(src="/bower_components/angular-animate/angular-animate.js")
+    script(src="/bower_components/angular-material/angular-material.js")
+    script(src="/javascripts/keysyms-codes.js")
+    script(src="/javascripts/oszoo.js")
+  body(ng-app='OSZoo' layout="column" ng-cloak)
+    div(ng-controller='OSZooController')
+    // Header
+    md-toolbar(layout="row" class="md-default-theme")
+      div(class="md-toolbar-tools")
+        md-button(ng-click="toggleSidenav('left')" hide-gt-sm class="md-icon-button menuBtn")
+          md-icon(aria-label="Menu" md-svg-icon="https://s3-us-west-2.amazonaws.com/s.cdpn.io/68133/menu.svg")
+        h1(layout-align-gt-sm="center" class="md-toolbar-tools").
+          OSZoo
+    .content-wrapper(layout="column" flex)
+      block content
+      md-divider
+        #footer
+          md-content(class="md-padding" layout="row")
+            .md-caption @2015 Alberto Nicoletti
+            div(flex)
+            .md-caption
+              a(href="https://github.com/albyxyz") Github
+              a(href="https://twitter.com/albyx93") Twitter 

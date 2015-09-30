@@ -1,6 +1,74 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+  display: none !important;
+}
+
+a {
+	text-decoration: none;
+}
+
+.md-button.md-icon-button.menuBtn {
+  margin-top: 6px;
+  margin-right: 0;
+}
+
+.os-list .md-button {
+  color: inherit;
+  text-align: left;
+  width: 100%;
+  margin: 0;
+  padding: 6px 16px 6px 16px;
+}
+.os-list .selected {
+  color: #03a9f4;
+}
+
+.content-wrapper {
+	margin: 0 auto 0 auto;
+  position: relative;
+  width: 60%
+}
+
+#primary-col {
+  overflow: hidden;
+}
+
+#primary-col .md-button {
+  margin: 8px auto 16px 0;
+}
+
+#primary-col .cell {
+  flex: 1 1 auto;
+}
+
+#primary-col canvas {
+  display: block;
+  max-width: 100%;
+}
+
+#headings {
+	text-align: center;
+}
+
+#headings h1 {
+	margin-bottom: 17px;
+}
+
+#headings h3 {
+	margin-top: 17px;
+}
+
+#footer a {
+	margin: 0px 12px 0px 12px;
+}
+
+#footer button {
+	margin: 0;
+	padding: 0;
+}
+
+#screen {
+	display: block;
+	margin: auto;
 }
 
 a {

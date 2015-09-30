@@ -11,6 +11,7 @@ var qemu = require('./qemu.js');
 var FrameRenderer = require('./frame-renderer.js');
 
 var routes = require('./routes/index');
+var computer = require('./routes/computer');
 
 var app = express();
 var io = require('socket.io')();
@@ -28,19 +29,37 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/bower_components', express.static(path.join(__dirname, 'bower_components')));
 
 app.use('/', routes);
+app.use('/computer', computer);
 
-io.on('startQemu', function (socket) {
+io.on('connection', function (socket) {
+  //console.log("starting qemu...");
+
   qemu.start('qemu-system-x86_64', '256', 'image.img', function(err, port, password){
-    if(err) console.error(err);
-    var frameRenderer = new FrameRenderer(io, port, password);
+    if(err){
+      console.error(err.toString('utf8'));
+      //qemu.stop();
+    }
+    var rfbPort = port + 5900;
+    console.log("qemu started on port " + rfbPort);
+    var frameRenderer = new FrameRenderer(socket, rfbPort, password);
+
+    socket.on('disconnect', function() {
+      qemu.stop(port);
+    });
+
   });
 });
 
 redisClient.on('connect', function(){
   console.log('redis connected');
 });
+
+process.on('uncaughtException', function (err) {
+    console.log(err);
+}); 
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

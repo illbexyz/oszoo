@@ -1,6 +1,76 @@
 extends layout
 
 block content
-  script(src="/socket.io/socket.io.js")
-  h1= title
-  p Welcome to #{title}
+  
+    // Sidebar
+    //md-sidenav(layout="column" class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-sm')")
+      md-list(class='os-list')
+        md-item
+          md-item-content
+            md-button.
+              Finnix
+        md-item
+          md-item-content
+            md-button.
+              Ubuntu
+        
+    // Document
+    div(layout="column" id="content" flex)
+      md-content(layout="column" flex class="md-padding")
+        #headings
+          h1(class="md-display-3") Welcome to OSZoo!
+          h3(class="md-headline") An OS collection to try in your browser.
+        md-divider
+        #os-list(layout="row")
+          md-list
+            md-item
+              md-item-content
+                md-button(class="md-primary") Finnix
+            md-item
+              md-item-content
+                md-button(class="md-primary") Ubuntu 15.04
+            md-item
+              md-item-content
+                md-button(class="md-primary") Windows XP
+            md-item
+              md-item-content
+                md-button(class="md-primary") Fedora
+            md-item
+              md-item-content
+                md-button(class="md-primary") Debian
+            md-item
+              md-item-content
+                md-button(class="md-primary") Ubuntu
+            md-item
+              md-item-content
+                md-button(class="md-primary") Finnix
+            md-item
+              md-item-content
+                md-button(class="md-primary") Ubuntu
+            md-item
+              md-item-content
+                md-button(class="md-primary") Finnix
+            md-item
+              md-item-content
+                md-button(class="md-primary") Ubuntu
+            md-item
+              md-item-content
+                md-button(class="md-primary") Finnix
+            md-item
+              md-item-content
+                md-button(class="md-primary") Ubuntu
+            md-item
+              md-item-content
+                md-button(class="md-primary") Finnix
+            md-item
+              md-item-content
+                md-button(class="md-primary") Ubuntu
+            md-item
+              md-item-content
+                md-button(class="md-primary") Finnix
+            md-item
+              md-item-content
+                md-button(class="md-primary") Ubuntu
+
+
+  
