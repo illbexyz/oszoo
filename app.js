@@ -4,8 +4,8 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var redis = require('redis');
-var redisClient = redis.createClient();
+//var redis = require('redis');
+//var redisClient = redis.createClient();
 
 var qemu = require('./qemu.js');
 var FrameRenderer = require('./frame-renderer.js');
@@ -53,9 +53,9 @@ io.on('connection', function (socket) {
   });
 });
 
-redisClient.on('connect', function(){
+/*redisClient.on('connect', function(){
   console.log('redis connected');
-});
+});*/
 
 process.on('uncaughtException', function (err) {
     console.log(err);

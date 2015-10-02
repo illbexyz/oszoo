@@ -18,7 +18,7 @@ method.start = function(exe, memory, image, callback){
 	var args = [
 		'-m', memory,
 		'-hda', image,
-		'-cdrom', 'ubuntu-gnome-15.04-desktop-amd64.iso',
+		'-cdrom', 'finnix-111.iso',
 		'-vnc', ":" + port
 	];
 	this._qemu = spawn(executable, args);
