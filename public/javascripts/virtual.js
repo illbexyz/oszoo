@@ -1,4 +1,4 @@
-var url = 'http://localhost:3000';
+var url = location.origin ;
 
 document.addEventListener("DOMContentLoaded", function() {
 	var socket = io.connect(url);
@@ -62,7 +62,38 @@ document.addEventListener("DOMContentLoaded", function() {
 
     document.addEventListener('keydown', handleKeydown);
     function handleKeydown(event){
+    	console.log(event.keyCode + " " + isCapslock(event));
     	socket.emit('keydown', {key: codeConvert(event.keyCode)});
     }
+
+    function isCapslock(e){
+
+	    e = (e) ? e : window.event;
+
+	    var charCode = false;
+	    if (e.which) {
+	        charCode = e.which;
+	    } else if (e.keyCode) {
+	        charCode = e.keyCode;
+	    }
+
+	    var shifton = false;
+	    if (e.shiftKey) {
+	        shifton = e.shiftKey;
+	    } else if (e.modifiers) {
+	        shifton = !!(e.modifiers & 4);
+	    }
+	    console.log("shifton: " + shifton);
+	    if (charCode >= 97 && charCode <= 122 && shifton) {
+	        return false;
+	    }
+
+	    if (charCode >= 65 && charCode <= 90 && shifton) {
+	        return true;
+	    }
+
+	    return false;
+
+	}
 
 });

@@ -1,4 +1,4 @@
-var app = angular.module('OSZoo', ['ngMaterial']);
+var app = angular.module('OSZoo', ['ngMaterial', 'ngAnimate']);
 
 app.config(function($mdThemingProvider) {
   $mdThemingProvider.theme('default')
@@ -13,6 +13,18 @@ app.controller('OSZooController', ['$scope', '$mdSidenav', function($scope, $mdS
  
 }]);
 
-app.controller('ScreenController', function() {
+app.controller('ScreenController', function($scope, $timeout) {
+	$scope.focus = "";
+	
+	$scope.setFocus = function() {
+		if($scope.focus == ""){
+			$scope.focus = 'screenFocus'
+		} else {
+			$scope.focus = "";
+		}
+		$timeout(function(){
+			$scope.focus = "";
+		}, 100);
+	}
 
 });

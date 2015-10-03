@@ -18,13 +18,7 @@ block content
     // Document
     div(layout="column" id="content" flex)
       md-content(layout="column" flex class="md-padding")
-          .cell(ng-controller='ScreenController')
-            canvas#screen
-  script(src="/socket.io/socket.io.js")
-  script(src="/bower_components/angular/angular.js")
-  script(src="/bower_components/angular-aria/angular-aria.js")
-  script(src="/bower_components/angular-animate/angular-animate.js")
-  script(src="/bower_components/angular-material/angular-material.js")
+          .cell(ng-controller='ScreenController as screen')
+            canvas#screen(ng-click='setFocus()' ng-class="focus")
   script(src="/javascripts/keysyms-codes.js")
-  script(src="/javascripts/oszoo.js")
   script(src="/javascripts/virtual.js")
