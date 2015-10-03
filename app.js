@@ -11,6 +11,7 @@ var qemu = require('./qemu.js');
 var FrameRenderer = require('./frame-renderer.js');
 
 var routes = require('./routes/index');
+var partials = require('./routes/partials');
 var computer = require('./routes/computer');
 
 var app = express();
@@ -32,6 +33,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/bower_components', express.static(path.join(__dirname, 'bower_components')));
 
 app.use('/', routes);
+app.use('/partials', partials);
 app.use('/computer', computer);
 
 io.on('connection', function (socket) {

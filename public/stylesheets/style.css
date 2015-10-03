@@ -89,3 +89,33 @@ a {
 a {
   color: #00B7FF;
 }
+
+.view-animate {
+    position: relative;
+    display: block;
+}
+
+.view-animate.ng-enter, .view-animate.ng-leave {
+  -webkit-transition: 0.3s ease-in all; /* Chrome */
+  transition: 0.3s ease-in all;
+}
+
+.view-animate.ng-enter {
+  opacity: 0;
+  top: -20px;
+}
+
+.view-animate.ng-enter-active {
+  opacity: 1;
+  top: 0px;
+}
+
+.view-animate.ng-leave {
+  display: none;
+  top: 0px;
+}
+
+.view-animate.ng-leave-active{
+  opacity: 0;
+  top: -20px;
+}
