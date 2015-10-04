@@ -4,15 +4,13 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-//var redis = require('redis');
-//var redisClient = redis.createClient();
 
 var qemu = require('./qemu.js');
 var FrameRenderer = require('./frame-renderer.js');
 
 var routes = require('./routes/index');
 var partials = require('./routes/partials');
-var computer = require('./routes/computer');
+var api = require('./routes/api');
 
 var app = express();
 var io = require('socket.io')();
@@ -32,27 +30,35 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/bower_components', express.static(path.join(__dirname, 'bower_components')));
 
-app.use('/', routes);
 app.use('/partials', partials);
-app.use('/computer', computer);
+//app.use('/computer', computer);
+app.use('/api', api);
+app.use('*', routes);
 
 io.on('connection', function (socket) {
-  //console.log("starting qemu...");
 
-  qemu.start('qemu-system-x86_64', '256', 'image.img', function(err, port, password){
-    if(err){
-      console.error(err.toString('utf8'));
-      //qemu.stop();
-    }
-    var rfbPort = port + 5900;
-    console.log("qemu started on port " + rfbPort);
-    var frameRenderer = new FrameRenderer(socket, rfbPort, password);
-
-    socket.on('disconnect', function() {
-      qemu.stop(port);
+  var vncport;
+  socket.on('start', function(){
+    qemu.start('qemu-system-x86_64', '256', 'image.img', function(err, port, password){
+      if(err){
+        console.error(err.toString('utf8'));
+        qemu.stop();
+      }
+      var vncport = port;
+      var rfbPort = port + 5900;
+      console.log("qemu started on port " + rfbPort);
+      var frameRenderer = new FrameRenderer(socket, rfbPort, password);
     });
-
   });
+
+  socket.on('disconnect', function() {
+    qemu.stop(vncport);
+  });
+
+  socket.on('close', function(){
+    qemu.stop(vncport);
+  });
+
 });
 
 /*redisClient.on('connect', function(){

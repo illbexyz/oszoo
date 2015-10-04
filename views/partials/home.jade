@@ -5,51 +5,7 @@ md-content(layout="column" flex class="md-padding")
   md-divider
   #os-list(layout="row")
     md-list
-      md-item
+      md-item(ng-repeat="os in osList")
         md-item-content
-          md-button(class="md-primary") Finnix
-      md-item
-        md-item-content
-          md-button(class="md-primary") Ubuntu 15.04
-      md-item
-        md-item-content
-          md-button(class="md-primary") Windows XP
-      md-item
-        md-item-content
-          md-button(class="md-primary") Fedora
-      md-item
-        md-item-content
-          md-button(class="md-primary") Debian
-      md-item
-        md-item-content
-          md-button(class="md-primary") Ubuntu
-      md-item
-        md-item-content
-          md-button(class="md-primary") Finnix
-      md-item
-        md-item-content
-          md-button(class="md-primary") Ubuntu
-      md-item
-        md-item-content
-          md-button(class="md-primary") Finnix
-      md-item
-        md-item-content
-          md-button(class="md-primary") Ubuntu
-      md-item
-        md-item-content
-          md-button(class="md-primary") Finnix
-      md-item
-        md-item-content
-          md-button(class="md-primary") Ubuntu
-      md-item
-        md-item-content
-          md-button(class="md-primary") Finnix
-      md-item
-        md-item-content
-          md-button(class="md-primary") Ubuntu
-      md-item
-        md-item-content
-          md-button(class="md-primary") Finnix
-      md-item
-        md-item-content
-          md-button(class="md-primary") Ubuntu
+          a(href="/computer/?id={{os.id}}")
+            md-button(class="md-primary") {{os.title}}

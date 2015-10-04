@@ -41,7 +41,7 @@ method._handleFrames = function(){
 
 			var image = new Jpeg(rgb, rect.width, rect.height, 'rgb');
 			image.encode(function(img, err){
-			  if (img) self._socket.emit('frame', {
+			  if (img && self._socket.connected) self._socket.emit('frame', {
 			    x: rect.x,
 			    y: rect.y,
 			    width: rect.width,

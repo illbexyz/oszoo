@@ -18,7 +18,7 @@ method.start = function(exe, memory, image, callback){
 	var args = [
 		'-m', memory,
 		'-hda', 'img/' + image,
-		'-cdrom', 'iso/finnix-110.iso',
+		'-cdrom', 'iso/finnix-111.iso',
 		'-vnc', ":" + port
 	];
 	this._qemu = spawn(executable, args);

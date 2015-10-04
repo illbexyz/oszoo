@@ -16,21 +16,20 @@ html
     script(src="/javascripts/oszoo.js")
     base(href='/')
   body(ng-app='OSZoo' layout="column" ng-cloak)
-    div(ng-controller='OSZooController')
     // Header
     md-toolbar(layout="row" class="md-default-theme")
       div(class="md-toolbar-tools")
         md-button(ng-click="toggleSidenav('left')" hide-gt-sm class="md-icon-button menuBtn")
           md-icon(aria-label="Menu" md-svg-icon="https://s3-us-west-2.amazonaws.com/s.cdpn.io/68133/menu.svg")
-        h1(layout-align-gt-sm="center" class="md-toolbar-tools").
-          OSZoo
+        h1(layout-align-gt-sm="center" class="md-toolbar-tools")
+          a(href="/") OSZoo
     .content-wrapper(layout="column" flex)
       block content
       md-divider
-        #footer
-          md-content(class="md-padding" layout="row")
-            .md-caption @2015 Alberto Nicoletti
-            div(flex)
-            .md-caption
-              a(href="https://github.com/albyxyz") Github
-              a(href="https://twitter.com/albyx93") Twitter 
+      #footer
+        md-content(class="md-padding" layout="row")
+          .md-caption @2015 Alberto Nicoletti
+          div(flex)
+          .md-caption
+            a(href="https://github.com/albyxyz") Github
+            a(href="https://twitter.com/albyx93") Twitter 

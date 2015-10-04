@@ -25,7 +25,6 @@ a {
 .content-wrapper {
 	margin: 0 auto 0 auto;
   position: relative;
-  width: 60%
 }
 
 #primary-col {
@@ -91,7 +90,6 @@ a {
 }
 
 .view-animate {
-    position: relative;
     display: block;
 }
 
@@ -100,22 +98,72 @@ a {
   transition: 0.3s ease-in all;
 }
 
-.view-animate.ng-enter {
-  opacity: 0;
-  top: -20px;
-}
-
-.view-animate.ng-enter-active {
+.view-animate.ng-enter.view-animate.ng-enter-active {
   opacity: 1;
-  top: 0px;
 }
 
-.view-animate.ng-leave {
-  display: none;
-  top: 0px;
-}
-
-.view-animate.ng-leave-active{
+.view-animate.ng-leave.view-animate.ng-leave-active{
   opacity: 0;
-  top: -20px;
+}
+
+.page        {
+    bottom:0; 
+    padding-top:50px;
+    text-align:center;
+    top:0;  
+    width:100%; 
+}
+
+.page.ng-enter           { animation: slideInRight 0.5s both ease-out; z-index: 8888; }
+.page.ng-leave           { animation: slideOutLeft 0.5s both ease-out; z-index: 9999; }
+
+/* ANIMATIONS
+============================================================================= */
+
+/* leaving animations ----------------------------------------- */
+/* rotate and fall */
+@keyframes rotateFall {
+    0%      { transform: rotateZ(0deg); }
+    20%     { transform: rotateZ(10deg); animation-timing-function: ease-out; }
+    40%     { transform: rotateZ(17deg); }
+    60%     { transform: rotateZ(16deg); }
+    100%    { transform: translateY(100%) rotateZ(17deg); }
+}
+
+/* slide in from the bottom */
+@keyframes slideOutLeft {
+    to      { opacity: 0; transform: translateX(-100%); }
+}
+
+/* rotate out newspaper */
+@keyframes rotateOutNewspaper {
+    to      { transform: translateZ(-3000px) rotateZ(360deg); opacity: 0; }
+}
+
+/* entering animations --------------------------------------- */
+/* scale up */
+@keyframes scaleUp {
+    from    { opacity: 0.3; -webkit-transform: scale(0.8); }
+}
+
+/* slide in from the right */
+@keyframes slideInRight {
+    from    { opacity: 0; transform:translateX(100%); }
+    to      { opacity: 1; transform: translateX(0); }
+}
+
+/* slide in from the bottom */
+@keyframes slideInUp {
+    from    { transform:translateY(100%); }
+    to      { transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+  from {opacity: 1;}
+  to {opacity: 0;}
+}
+
+@keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity: 1;}
 }
