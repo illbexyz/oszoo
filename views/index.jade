@@ -1,18 +1,4 @@
 extends layout
 
 block content
-  
-    // Sidebar
-    //md-sidenav(layout="column" class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-sm')")
-      md-list(class='os-list')
-        md-item
-          md-item-content
-            md-button.
-              Finnix
-        md-item
-          md-item-content
-            md-button.
-              Ubuntu
-        
-    // Document
-    div(layout="column" flex ng-view).page
+    div(layout="column" ng-view).page.container

@@ -22,9 +22,36 @@ a {
   color: #03a9f4;
 }
 
-.content-wrapper {
-	margin: 0 auto 0 auto;
-  position: relative;
+.container {
+	padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.centerAbsolute {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@media (min-width: 768px){
+  .container {
+      width: 750px;
+  }
+}
+
+@media (min-width: 992px){
+  .container {
+      width: 970px;
+  }
+}
+
+@media (min-width: 1200px){
+  .container {
+      width: 1170px;
+  }
 }
 
 #primary-col {
@@ -33,15 +60,6 @@ a {
 
 #primary-col .md-button {
   margin: 8px auto 16px 0;
-}
-
-#primary-col .cell {
-  flex: 1 1 auto;
-}
-
-#primary-col canvas {
-  display: block;
-  max-width: 100%;
 }
 
 #headings {
@@ -56,18 +74,17 @@ a {
 	margin-top: 17px;
 }
 
-#footer a {
+footer a {
 	margin: 0px 12px 0px 12px;
 }
 
-#footer button {
+footer button {
 	margin: 0;
 	padding: 0;
 }
 
-#screen {
-	display: block;
-	margin: auto;
+.hidden {
+  display: none;
 }
 
 .screenFocus-add, .screenFocus-remove {
@@ -77,11 +94,11 @@ a {
   transition:all cubic-bezier(.64,.12,.02,.41) 0.1s;
 }
 
-.screenFocus-add.screenFocus-add-active {
+.screenFocus-add.screenFocus-add {
   box-shadow: 0px 0px 40px 5px #009688;
 }
 
-.screenFocus-remove.screenFocus-remove-active {
+.screenFocus-remove.screenFocus-remove {
   box-shadow: 0px 0px 60px 20px #FFFFFF;
 }
 
@@ -106,16 +123,43 @@ a {
   opacity: 0;
 }
 
-.page        {
-    bottom:0; 
-    padding-top:50px;
-    text-align:center;
-    top:0;  
-    width:100%; 
+#frame {
+  border: solid 25px;
+  border-radius: 25px;
+  border-color: black;
+  width: 640px;
+  height: 480px;
+  background-color: black;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  align-items: center;
 }
 
-.page.ng-enter           { animation: slideInRight 0.5s both ease-out; z-index: 8888; }
-.page.ng-leave           { animation: slideOutLeft 0.5s both ease-out; z-index: 9999; }
+#screen {
+  animation: all linear 0.5;
+  max-width: 100%;
+}
+
+#screen.ng-hide {
+  width: 0;
+  height: 0;
+}
+
+.screen-progress {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.page {
+    bottom:0; 
+    text-align:center;
+    top:0;  
+    width:100%;
+}
+
+.page.ng-enter           { position:absolute; top: 64px; animation: scaleUp 0.3s both ease-out; z-index: 8888; }
+.page.ng-leave           { position:absolute; top: 64px; animation: slideOutLeft 0.3s both ease-out; z-index: 9999; }
 
 /* ANIMATIONS
 ============================================================================= */

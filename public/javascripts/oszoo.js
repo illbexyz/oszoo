@@ -40,6 +40,7 @@ app.controller('HomeController', function($scope, $http){
 
 app.controller('ComputerController', function($scope, $timeout) {
 	$scope.focus = "";
+	$scope.isLoading = true;
 	var socket;
 	
 	$scope.setFocus = function() {
@@ -64,6 +65,8 @@ app.controller('ComputerController', function($scope, $timeout) {
 		socket.on('init', function(data){
 			canvas.width = data.width;
 			canvas.height = data.height;
+			document.addEventListener("mousemove", handleMouseMove);
+	  	document.addEventListener('keydown', handleKeydown);
 		});
 
 		socket.on('frame', function (data) {
@@ -72,23 +75,24 @@ app.controller('ComputerController', function($scope, $timeout) {
 			var urlBlob = URL.createObjectURL(blob);
 
 			var uInt8Array = new Uint8Array(data.image);
-		    //var uInt8Array = imgData;
-		    var i = uInt8Array.length;
-		    var binaryString = [i];
-		    while (i--) {
-		        binaryString[i] = String.fromCharCode(uInt8Array[i]);
-		    }
-		    var bdata = binaryString.join('');
+	    //var uInt8Array = imgData;
+	    var i = uInt8Array.length;
+	    var binaryString = [i];
+	    while (i--) {
+	        binaryString[i] = String.fromCharCode(uInt8Array[i]);
+	    }
+	    var bdata = binaryString.join('');
 
-		    var base64 = window.btoa(bdata);
+	    var base64 = window.btoa(bdata);
 
 			image.src = 'data:image/jpeg;base64,' + base64;
 			image.onload = function() {
 				ctx.drawImage(image, data.x, data.y, data.width, data.height);
+				$scope.$apply(function(){
+					$scope.isLoading = false;
+				});
 			}
 		});
-		document.addEventListener("mousemove", handleMouseMove);
-	  document.addEventListener('keydown', handleKeydown);
 
 	  socket.emit('start');
 	}
