@@ -15,20 +15,36 @@ html
     script(src="/javascripts/keysyms-codes.js")
     script(src="/javascripts/oszoo.js")
     base(href='/')
-  body(ng-app='OSZoo' layout="column" ng-cloak)
-    // Header
-    md-toolbar(layout="row" class="md-default-theme")
-      div(class="md-toolbar-tools")
-        md-button(ng-click="toggleSidenav('left')" hide-gt-sm class="md-icon-button menuBtn")
-          md-icon(aria-label="Menu" md-svg-icon="https://s3-us-west-2.amazonaws.com/s.cdpn.io/68133/menu.svg")
-        h1(layout-align-gt-sm="center" class="md-toolbar-tools")
-          a(href="/") OSZoo
-    block content
-    div(flex)
-    footer.container
-      md-content(class="md-padding" layout="row")
-        .md-caption @2015 Alberto Nicoletti
-        div(flex)
-        .md-caption
-          a(href="https://github.com/albyxyz") Github
-          a(href="https://twitter.com/albyx93") Twitter 
+  body(ng-app='OSZoo' layout="row" ng-controller="HomeController")
+    div(layout="column")
+      md-sidenav(class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')" flex)
+        md-button(ng-click="close()" class="md-primary" hide-gt-md) Close Sidenav Left
+        .logo
+          img(src="images/v2.png")
+          h1 OS Zoo
+        md-input-container(class="md-icon-float")
+          label Search
+          input(ng-model="" type="text")
+        a(ng-repeat="os in osList" href="/computer?id={{os.id}}")
+          md-button(hide-md show-gt-md) {{os.title}}
+    div(layout="column" flex).bg-color
+      // Header
+      md-toolbar(layout="row" class="md-default-theme").md-whiteframe-2dp
+        div(class="md-toolbar-tools")
+          md-button(ng-click="toggleSidenav('left')" hide-gt-sm class="md-icon-button menuBtn")
+            md-icon(aria-label="Menu" md-svg-icon="https://s3-us-west-2.amazonaws.com/s.cdpn.io/68133/menu.svg")
+          div(flex)
+          h1.md-toolbar-tools
+            a(href="/") Home
+          //div(flex)
+          //h1.md-toolbar-tools
+            a(href="/about") About
+      block content
+      //div(flex)
+      //footer.container
+        md-content(class="md-padding" layout="row")
+          .md-caption @2015 Alberto Nicoletti
+          div(flex)
+          .md-caption
+            a(href="https://github.com/albyxyz") Github
+            a(href="https://twitter.com/albyx93") Twitter 

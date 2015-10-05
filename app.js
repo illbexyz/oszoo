@@ -38,8 +38,12 @@ app.use('*', routes);
 io.on('connection', function (socket) {
 
   var vncport;
-  socket.on('start', function(){
-    qemu.start('qemu-system-x86_64', '256', 'image.img', function(err, port, password){
+  socket.on('start', function(config){
+    var exe;
+    if(config.arch == 'x86_64') {
+      exe = "qemu-system-x86_64";
+    }
+    qemu.start(exe, config.memory, config.imageFile, function(err, port, password){
       if(err){
         console.error(err.toString('utf8'));
         qemu.stop();

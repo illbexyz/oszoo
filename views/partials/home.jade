@@ -1,12 +1,28 @@
-md-content(layout="column" flex class="md-padding")
+md-content(layout="column" flex class="md-padding").bg-color
   #headings
-    h1(class="md-display-3") Welcome to OSZoo!
-    h3(class="md-headline") An OS collection to try in your browser.
-  .container
-    md-divider
-    #os-list(layout="row")
-      md-list
-        md-item(ng-repeat="os in osList")
-          md-item-content
-            a(href="/computer/?id={{os.id}}")
-              md-button(class="md-primary") {{os.title}}
+    h1(class="md-display-3") Select
+    h3(class="md-headline") An OS in the sidebar
+  //.container
+    .md-whiteframe-z1
+      //md-divider
+      md-toolbar
+        div(class="md-toolbar-tools")
+          //md-button(class="md-icon-button" aria-label="Settings")
+            md-icon(md-svg-icon="img/icons/menu.svg")
+          h2
+            span Operating Systems
+          span(flex)
+          //md-button(class="md-icon-button" aria-label="Favorite")
+            <md-icon md-svg-icon="img/icons/favorite.svg" style="color: greenyellow;"></md-icon>
+
+          //<md-button class="md-icon-button" aria-label="More">
+            <md-icon md-svg-icon="img/icons/more_vert.svg"></md-icon>
+
+      //#os-list(layout="row")
+        md-grid-list(md-cols-sm="1" md-cols-md="2" md-cols-gt-md="6" md-row-height-gt-md="1:1" md-row-height="2:2" md-row-width="6:2" md-gutter="12px" md-gutter-gt-sm="8px")
+          md-grid-tile(ng-repeat="os in osList")
+            md-grid-tile-footer
+              md-button {{os.title}}
+              div(flex)
+              a(href="/computer/?id={{os.id}}")
+                md-button Start
