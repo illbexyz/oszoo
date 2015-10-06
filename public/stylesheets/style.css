@@ -2,22 +2,37 @@
   display: none !important;
 }
 
+#main {
+  font-family: Oswald sans-serif;
+}
+
 a {
 	text-decoration: none;
 }
 
-md-sidenav .logo {
+md-sidenav {
+  z-index: 9999;
+}
+
+md-sidenav #sidenav-logo {
+  display: flex;
   height: 226px;
   text-align: center;
 }
 
-md-sidenav .logo h1 {
-  font-weight: 400 ;
-  font-size: 26px ;
+md-sidenav #sidenav-logo img {
+  position: relative;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  transform: scale(1.3);
 }
 
-md-sidenav a {
-  color: black;
+md-sidenav #sidenav-logo h1 {
+  font-family: 'Alegreya', serif;
+  font-weight: 600 ;
+  font-size: 36px ;
+  margin-top: 0;
+  margin-bottom: 16px;
 }
 
 md-sidenav .md-button {
@@ -35,6 +50,15 @@ md-sidenav md-content {
 md-toolbar a {
   font-size: 24px;
   font-weight: 400;
+}
+
+md-sidenav md-input-container {
+  padding-bottom: 2px;
+}
+
+.md-toolbar-tools h1 {
+  margin-left: 8px;
+  margin-right: 8px;
 }
 
 .md-button.md-icon-button.menuBtn {
@@ -102,16 +126,16 @@ md-toolbar a {
   margin: 8px auto 16px 0;
 }
 
-#headings {
+#home {
 	text-align: center;
-  color: ;
+  font-family: 'Oswald', sans-serif;
 }
 
-#headings h1 {
+#home h1 {
 	margin-bottom: 17px;
 }
 
-#headings h3 {
+#home h3 {
 	margin-top: 17px;
 }
 
@@ -164,20 +188,37 @@ a {
   opacity: 0;
 }
 
+#timer {
+  text-align: center;
+  font-family: 'Oswald', sans-serif;
+  font-size: 30px;
+  background-color: #49B5FA;
+}
+
+#timer span {
+  padding-left: 30px;
+  padding-right: 30px;
+}
+
+#screen-container {
+  background-color: #1f2036;
+}
+
 #frame {
   border: solid 25px;
   border-radius: 25px;
   border-color: black;
   width: 640px;
-  height: 480px;
+  min-height: 480px;
   background-color: black;
-  margin-left: auto;
-  margin-right: auto;
   display: flex;
   align-items: center;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 #screen {
+  position: relative;
   animation: all linear 0.5;
   max-width: 100%;
 }
@@ -187,20 +228,33 @@ a {
   height: 0;
 }
 
+.oslist-animation {
+  position: relative;
+}
+
+.oslist-animation.ng-enter {
+  animation: slideInRight 0.5s both ease-out;
+}
+
+.oslist-animation.ng-enter-stagger {
+  transition-delay: 0s;
+  animation-delay: 0.1s;
+}
+
 .screen-progress {
   margin-left: auto;
   margin-right: auto;
 }
 
 .page {
-    bottom:0; 
+    bottom:0;
     text-align:center;
-    top:0;  
+    top:0;
     width:100%;
 }
 
-.page.ng-enter           { position:absolute; top: 64px; animation: scaleUp 0.3s both ease-out; z-index: 8888; }
-.page.ng-leave           { position:absolute; top: 64px; animation: slideOutLeft 0.3s both ease-out; z-index: 9999; }
+/*.page.ng-enter           { position:absolute; top: 64px; animation: scaleUp 0.3s both ease-out; z-index: 7777; }
+.page.ng-leave           { position:absolute; top: 64px; animation: slideOutLeft 0.3s both ease-out; z-index: 8888; }*/
 
 /* ANIMATIONS
 ============================================================================= */
@@ -233,8 +287,8 @@ a {
 
 /* slide in from the right */
 @keyframes slideInRight {
-    from    { opacity: 0; transform:translateX(100%); }
-    to      { opacity: 1; transform: translateX(0); }
+    from    { opacity: 0; left: 40px; }
+    to      { opacity: 1; left: 0; }
 }
 
 /* slide in from the bottom */

@@ -15,6 +15,8 @@ var api = require('./routes/api');
 var app = express();
 var io = require('socket.io')();
 
+var availableSessions = 20;
+
 app.io = io;
 
 // view engine setup
@@ -36,32 +38,42 @@ app.use('/api', api);
 app.use('*', routes);
 
 io.on('connection', function (socket) {
-
   var vncport;
+  var frameRenderer;
+  socket.emit("available-sessions", {sessions: availableSessions});
+
   socket.on('start', function(config){
     var exe;
     if(config.arch == 'x86_64') {
       exe = "qemu-system-x86_64";
     }
-    qemu.start(exe, config.memory, config.imageFile, function(err, port, password){
-      if(err){
-        console.error(err.toString('utf8'));
-        qemu.stop();
-      }
-      var vncport = port;
+    qemu.start(exe, config.memory, config['disk-image'], function(err, port, password){
+      vncport = port;
       var rfbPort = port + 5900;
       console.log("qemu started on port " + rfbPort);
-      var frameRenderer = new FrameRenderer(socket, rfbPort, password);
+      availableSessions--;
+      io.emit("available-sessions", {sessions: availableSessions});
+      frameRenderer = new FrameRenderer(socket, rfbPort, password);
     });
   });
 
   socket.on('disconnect', function() {
-    qemu.stop(vncport);
+    console.log("Stopping qemu (disconnect)" + vncport);
+    stopQemu(vncport);
   });
 
-  socket.on('close', function(){
-    qemu.stop(vncport);
+  socket.on('stop', function(){
+    console.log("Stopping qemu (close) " + vncport);
+    stopQemu(vncport);
   });
+
+  function stopQemu(vncport){
+    frameRenderer.cleanup();
+    qemu.stop(vncport);
+    socket.emit("machine-closed");
+    availableSessions++;
+    io.emit("available-sessions", {sessions: availableSessions});
+  }
 
 });
 
@@ -71,7 +83,7 @@ io.on('connection', function (socket) {
 
 process.on('uncaughtException', function (err) {
     console.log(err);
-}); 
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

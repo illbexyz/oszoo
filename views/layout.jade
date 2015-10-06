@@ -4,6 +4,8 @@ html
     title= title
     meta(name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no")
     link(rel="stylesheet" href="https://fonts.googleapis.com/css?family=RobotoDraft:300,400,500,700,400italic")
+    link(href='https://fonts.googleapis.com/css?family=Alegreya:400,700' rel='stylesheet' type='text/css')
+    link(href='https://fonts.googleapis.com/css?family=Oswald:400,700' rel='stylesheet' type='text/css')
     link(rel="stylesheet" href="/bower_components/angular-material/angular-material.min.css")
     link(rel='stylesheet' href='/stylesheets/style.css')
     script(src="/socket.io/socket.io.js")
@@ -15,36 +17,27 @@ html
     script(src="/javascripts/keysyms-codes.js")
     script(src="/javascripts/oszoo.js")
     base(href='/')
-  body(ng-app='OSZoo' layout="row" ng-controller="HomeController")
+  body(ng-app='OSZoo' layout="row" ng-controller="ComputerController")
     div(layout="column")
-      md-sidenav(class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')" flex)
+      md-sidenav(class="md-sidenav-left" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')")
         md-button(ng-click="close()" class="md-primary" hide-gt-md) Close Sidenav Left
-        .logo
-          img(src="images/v2.png")
+        #sidenav-logo(layout="column")
+          img(src="")
+          div(flex)
           h1 OS Zoo
-        md-input-container(class="md-icon-float")
-          label Search
-          input(ng-model="" type="text")
-        a(ng-repeat="os in osList" href="/computer?id={{os.id}}")
-          md-button(hide-md show-gt-md) {{os.title}}
+        #sidenav-actions(flex)
+          //md-subheader(class="md-accent") Operating Systems
+          //md-input-container(class="md-icon-float")
+            label Search
+            input( type="text")
+          md-button(ng-repeat="os in osList" ng-click="changeOS(os)").oslist-animation.md-primary {{os.title}}
+          md-button(ng-repeat="os in osList" ng-click="stopMachine()").oslist-animation.md-primary {{os.title}}
     div(layout="column" flex).bg-color
       // Header
       md-toolbar(layout="row" class="md-default-theme").md-whiteframe-2dp
         div(class="md-toolbar-tools")
           md-button(ng-click="toggleSidenav('left')" hide-gt-sm class="md-icon-button menuBtn")
             md-icon(aria-label="Menu" md-svg-icon="https://s3-us-west-2.amazonaws.com/s.cdpn.io/68133/menu.svg")
-          div(flex)
-          h1.md-toolbar-tools
-            a(href="/") Home
-          //div(flex)
-          //h1.md-toolbar-tools
-            a(href="/about") About
+          h1
+            a(href="/") {{title}}
       block content
-      //div(flex)
-      //footer.container
-        md-content(class="md-padding" layout="row")
-          .md-caption @2015 Alberto Nicoletti
-          div(flex)
-          .md-caption
-            a(href="https://github.com/albyxyz") Github
-            a(href="https://twitter.com/albyx93") Twitter 

@@ -6,23 +6,30 @@ var method = Qemu.prototype;
 function Qemu(){
 	this._vncPorts = [];
 	this._vncActivePorts = [];
-	this._qemu = null;
+	this._qemu = [];
 	for(var i=0; i<=50; i++) this._vncPorts.push(i);
 }
 
 method.start = function(exe, memory, image, callback){
+	console.log(image);
 	var executable = exe;
 	var password = randomstring.generate({length: 12});
 	var port = this._port();
 	var self = this;
+	// var args = [
+	// 	'-m', memory,
+	// 	'-hda', 'img/' + image,
+	// 	'-cdrom', 'iso/finnix-111.iso',
+	// 	'-vnc', ":" + port
+	// ];
 	var args = [
-		'-m', memory,
-		'-hda', 'img/' + image,
-		'-cdrom', 'iso/finnix-111.iso',
+		'-m', 256,
+		'-hda', 'img/' + "windows3-1.vmdk",
+		//'-cdrom', 'iso/finnix-111.iso',
 		'-vnc', ":" + port
 	];
-	this._qemu = spawn(executable, args);
-	this._qemu.on('exit', function(){
+	this._qemu[port] = spawn(executable, args);
+	this._qemu[port].on('exit', function(){
 		self._reallocatePort(port);
 	});
 	console.log(args);
@@ -32,7 +39,10 @@ method.start = function(exe, memory, image, callback){
 }
 
 method.stop = function(port) {
-	this._qemu.kill();
+	console.log("Killing qemu on port" + port);
+	if(this._qemu[port]){
+		this._qemu[port].kill();
+	}
 }
 
 method._reallocatePort = function(port) {
