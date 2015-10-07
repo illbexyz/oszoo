@@ -2,6 +2,10 @@
   display: none !important;
 }
 
+html {
+
+}
+
 #main {
   font-family: Oswald sans-serif;
 }
@@ -10,29 +14,44 @@ a {
 	text-decoration: none;
 }
 
+.sidenav-color {
+
+}
+
 md-sidenav {
   z-index: 9999;
 }
 
-md-sidenav #sidenav-logo {
+#sidenav-logo {
   display: flex;
-  height: 226px;
+  height: 111px;
   text-align: center;
+  padding-top: 30px;
+  border-bottom: 1px;
+  border-bottom-style: ridge;
+  border-right: 1px;
+  border-right-style: ridge;
 }
 
-md-sidenav #sidenav-logo img {
+#sidenav-logo img {
   position: relative;
   margin-top: 20px;
   margin-bottom: 20px;
   transform: scale(1.3);
 }
 
-md-sidenav #sidenav-logo h1 {
-  font-family: 'Alegreya', serif;
-  font-weight: 600 ;
-  font-size: 36px ;
+#sidenav-logo h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 600;
+  font-size: 42px;
   margin-top: 0;
-  margin-bottom: 16px;
+  margin-bottom: 0;
+}
+
+#sidenav-logo span {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 400;
+  font-size: 13px;
 }
 
 md-sidenav .md-button {
@@ -45,6 +64,10 @@ md-sidenav .md-button {
 
 md-sidenav md-content {
   padding: 0;
+}
+
+md-toolbar{
+  font-family: 'Oswald' serif;
 }
 
 md-toolbar a {
@@ -195,21 +218,24 @@ a {
   background-color: #49B5FA;
 }
 
-#timer span {
-  padding-left: 30px;
-  padding-right: 30px;
+.header-description {
+  font-weight: 300;
+}
+
+.header-value {
+  font-weight: 400;
+  padding-left: 8px;
 }
 
 #screen-container {
   background-color: #1f2036;
+  padding-top: 42px;
 }
 
 #frame {
   border: solid 25px;
   border-radius: 25px;
   border-color: black;
-  width: 640px;
-  min-height: 480px;
   background-color: black;
   display: flex;
   align-items: center;
@@ -220,7 +246,8 @@ a {
 #screen {
   position: relative;
   animation: all linear 0.5;
-  max-width: 100%;
+  width: 800px;
+  height: 600px;
 }
 
 #screen.ng-hide {

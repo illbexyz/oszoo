@@ -28,6 +28,13 @@ method.start = function(exe, memory, image, callback){
 		//'-cdrom', 'iso/finnix-111.iso',
 		'-vnc', ":" + port
 	];
+	// var args = [
+	// 	'-m', 256,
+	// 	'-hda', 'img/' + "windows3-1.vmdk",
+	// 	'-cdrom', 'iso/finnix-111.iso',
+	// 	'-vga', 'qxl',
+	// 	'-spice', 'port=' + port + ',addr=127.0.0.1,disable-ticketing'
+	// ];
 	this._qemu[port] = spawn(executable, args);
 	this._qemu[port].on('exit', function(){
 		self._reallocatePort(port);

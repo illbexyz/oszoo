@@ -43,23 +43,27 @@ io.on('connection', function (socket) {
   socket.emit("available-sessions", {sessions: availableSessions});
 
   socket.on('start', function(config){
-    var exe;
-    if(config.arch == 'x86_64') {
-      exe = "qemu-system-x86_64";
+    if(availableSessions) {
+      var exe;
+      if(config.arch == 'x86_64') {
+        exe = "qemu-system-x86_64";
+      }
+      qemu.start(exe, config.memory, config['disk-image'], function(err, port, password){
+        vncport = port;
+        var rfbPort = port + 5900;
+        console.log("qemu started on port " + rfbPort);
+        availableSessions--;
+        io.emit("available-sessions", {sessions: availableSessions});
+        frameRenderer = new FrameRenderer(socket, rfbPort, password);
+      });
     }
-    qemu.start(exe, config.memory, config['disk-image'], function(err, port, password){
-      vncport = port;
-      var rfbPort = port + 5900;
-      console.log("qemu started on port " + rfbPort);
-      availableSessions--;
-      io.emit("available-sessions", {sessions: availableSessions});
-      frameRenderer = new FrameRenderer(socket, rfbPort, password);
-    });
   });
 
   socket.on('disconnect', function() {
-    console.log("Stopping qemu (disconnect)" + vncport);
-    stopQemu(vncport);
+    if(vncport){
+      console.log("Stopping qemu (disconnect)" + vncport);
+      stopQemu(vncport);
+    }
   });
 
   socket.on('stop', function(){

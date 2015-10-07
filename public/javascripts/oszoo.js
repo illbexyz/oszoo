@@ -40,11 +40,17 @@ app.controller('ComputerController', function($scope, $timeout, $http, $interval
   //initializeTimer();
   initializeSocket();
 
+  document.addEventListener('keydown', function(e){
+        console.log(e.keyCode);
+        if(e.keyCode == 8) {
+          e.preventDefault();
+        }
+      });
+
   $interval(function () {
     timer--;
     $scope.timer = timerToString(timer);
     $scope.isLoading = isLoading
-    console.log($scope.timer);
   }, 1000);
 
   $scope.changeOS = function(os){
@@ -90,8 +96,10 @@ app.controller('ComputerController', function($scope, $timeout, $http, $interval
 		socket.on('init', function(data){
 			canvas.width = data.width;
 			canvas.height = data.height;
-			canvas.addEventListener("mousemove", handleMouseMove);
-	  	canvas.addEventListener('keydown', handleKeydown);
+	  	canvas.addEventListener('keydown',    handleKeydown);
+      canvas.addEventListener("mousedown",  handleMouseDown);
+      canvas.addEventListener("mouseup",    handleMouseUp);
+      canvas.addEventListener("mousemove",  handleMouseMove);
 		});
 
 		socket.on('frame', function (data) {
@@ -108,7 +116,10 @@ app.controller('ComputerController', function($scope, $timeout, $http, $interval
 	    var bdata = binaryString.join('');
 
 	    var base64 = window.btoa(bdata);
-
+      if(data.width == 640 && data.height == 480) {
+        canvas.width = 640;
+        canvas.height = 480;
+      }
 			image.src = 'data:image/jpeg;base64,' + base64;
 			image.onload = function() {
 				ctx.drawImage(image, data.x, data.y, data.width, data.height);
@@ -119,10 +130,10 @@ app.controller('ComputerController', function($scope, $timeout, $http, $interval
 	}
 
   document.body.onmousedown = function() {
-    ++mouseDown;
+    mouseDown = 1;
   }
   document.body.onmouseup = function() {
-    --mouseDown;
+    mouseDown = 0;
   }
 
   $scope.stopMachine = function(){
@@ -132,26 +143,46 @@ app.controller('ComputerController', function($scope, $timeout, $http, $interval
 
 	$scope.$on("$destroy", function() {
 		canvas.removeEventListener("mousemove", handleMouseMove);
-		canvas.removeEventListener('keydown', handleKeydown);
+		canvas.removeEventListener('keydown',   handleKeydown);
+    canvas.removeEventListener("mousedown", handleMouseDown);
+    canvas.removeEventListener("mouseup",   handleMouseUp);
 		socket.emit('close');
   });
 
 	function handleMouseMove(e) {
+    var pos = getMousePositionOnCanvas(e);
+    socket.emit('mouse', {x: pos.x, y: pos.y, isDown: mouseDown});
+  }
+
+  function handleMouseDown(e){
+    var pos = getMousePositionOnCanvas(e);
+    socket.emit('mouse', {x: pos.x, y: pos.y, isDown: 1});
+  }
+
+  function handleMouseUp(e){
+    var pos = getMousePositionOnCanvas(e);
+    socket.emit('mouse', {x: pos.x, y: pos.y, isDown: 0});
+  }
+
+  function getMousePositionOnCanvas(e){
     var mouseX, mouseY;
 
     if(e.offsetX) {
         mouseX = e.offsetX;
         mouseY = e.offsetY;
-    }
-    else if(e.layerX) {
+    } else if(e.layerX) {
         mouseX = e.layerX;
         mouseY = e.layerY;
     }
 
-    socket.emit('mouse', {x: mouseX, y: mouseY, isDown: mouseDown});
+    return {x: mouseX, y:mouseY};
   }
 
   function handleKeydown(event){
+    if(event.keyCode == 8){
+      console.log('coso');
+      event.preventDefault();
+    }
   	socket.emit('keydown', {key: codeConvert(event.keyCode)});
   }
 

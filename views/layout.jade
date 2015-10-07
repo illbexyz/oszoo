@@ -5,7 +5,8 @@ html
     meta(name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no")
     link(rel="stylesheet" href="https://fonts.googleapis.com/css?family=RobotoDraft:300,400,500,700,400italic")
     link(href='https://fonts.googleapis.com/css?family=Alegreya:400,700' rel='stylesheet' type='text/css')
-    link(href='https://fonts.googleapis.com/css?family=Oswald:400,700' rel='stylesheet' type='text/css')
+    link(href='https://fonts.googleapis.com/css?family=Oswald:400,300' rel='stylesheet' type='text/css')
+    link(href='https://fonts.googleapis.com/css?family=Orbitron:500,400,700,900' rel='stylesheet' type='text/css')
     link(rel="stylesheet" href="/bower_components/angular-material/angular-material.min.css")
     link(rel='stylesheet' href='/stylesheets/style.css')
     script(src="/socket.io/socket.io.js")
@@ -18,21 +19,24 @@ html
     script(src="/javascripts/oszoo.js")
     base(href='/')
   body(ng-app='OSZoo' layout="row" ng-controller="ComputerController")
-    div(layout="column")
-      md-sidenav(class="md-sidenav-left" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')")
+    div(layout="column").sidenav-color
+      md-sidenav(class="md-sidenav-left" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')").sidenav-color
         md-button(ng-click="close()" class="md-primary" hide-gt-md) Close Sidenav Left
         #sidenav-logo(layout="column")
-          img(src="")
-          div(flex)
-          h1 OS Zoo
+          //img(src="")
+          //div(flex)
+          h1 Os Zoo
+          span Powered by Virtualsquare
         #sidenav-actions(flex)
           //md-subheader(class="md-accent") Operating Systems
           //md-input-container(class="md-icon-float")
             label Search
             input( type="text")
-          md-button(ng-repeat="os in osList" ng-click="changeOS(os)").oslist-animation.md-primary {{os.title}}
-          md-button(ng-repeat="os in osList" ng-click="stopMachine()").oslist-animation.md-primary {{os.title}}
-    div(layout="column" flex).bg-color
+          div(ng-repeat="os in osList")
+            md-button(ng-click="changeOS(os)").oslist-animation.md-primary {{os.title}}
+          div(ng-repeat="os in osList")
+            md-button(ng-click="stopMachine()").oslist-animation.md-primary {{os.title}}
+    div(layout="column" flex)
       // Header
       md-toolbar(layout="row" class="md-default-theme").md-whiteframe-2dp
         div(class="md-toolbar-tools")
@@ -40,4 +44,15 @@ html
             md-icon(aria-label="Menu" md-svg-icon="https://s3-us-west-2.amazonaws.com/s.cdpn.io/68133/menu.svg")
           h1
             a(href="/") {{title}}
+      md-subheader.md-primary 
+        div(layout="row")
+          div
+            span.header-description Session expires in
+            span.header-value {{timer}}
+              md-tooltip Time remaining
+          div(flex)
+          div
+            span.header-description Sessions available
+            span.header-value {{sessions}}
+              md-tooltip Available sessions
       block content
