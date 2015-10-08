@@ -16,6 +16,7 @@ html
     script(src="/bower_components/angular-material/angular-material.js")
     script(src="/bower_components/angular-route/angular-route.js")
     script(src="/javascripts/keysyms-codes.js")
+    script(src="/javascripts/console.js")
     script(src="/javascripts/oszoo.js")
     base(href='/')
   body(ng-app='OSZoo' layout="row" ng-controller="ComputerController")
@@ -23,19 +24,14 @@ html
       md-sidenav(class="md-sidenav-left" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')").sidenav-color
         md-button(ng-click="close()" class="md-primary" hide-gt-md) Close Sidenav Left
         #sidenav-logo(layout="column")
-          //img(src="")
-          //div(flex)
           h1 Os Zoo
           span Powered by Virtualsquare
         #sidenav-actions(flex)
-          //md-subheader(class="md-accent") Operating Systems
-          //md-input-container(class="md-icon-float")
-            label Search
-            input( type="text")
-          div(ng-repeat="os in osList")
-            md-button(ng-click="changeOS(os)").oslist-animation.md-primary {{os.title}}
-          div(ng-repeat="os in osList")
-            md-button(ng-click="stopMachine()").oslist-animation.md-primary {{os.title}}
+          md-input-container
+             label Search
+             input(ng-model="user.email" type="email")
+          div(ng-repeat="os in osList").oslist-animation
+            md-button(ng-click="changeOS(os)").md-primary {{os.title}}
     div(layout="column" flex)
       // Header
       md-toolbar(layout="row" class="md-default-theme").md-whiteframe-2dp
@@ -53,6 +49,6 @@ html
           div(flex)
           div
             span.header-description Sessions available
-            span.header-value {{sessions}}
+            span.header-value {{sessionsAvailable}}
               md-tooltip Available sessions
       block content

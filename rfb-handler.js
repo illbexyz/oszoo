@@ -1,27 +1,38 @@
 var rfb = require('rfb2');
 var Jpeg = require('jpeg').Jpeg;
 
-var method = FrameRenderer.prototype;
+var method = RfbHandler.prototype;
 
-function FrameRenderer(socket, port, password){
+function RfbHandler(socket, port, password){
 	this._socket = socket;
 	this._port = port;
 	this._password = password;
 	console.log(port, password);
+	this._initialized = false;
+}
+
+/** Start a new connection with the qemu process */
+method.start = function() {
 	this._rfb = rfb.createConnection({
 		host: '127.0.0.1',
-		port: port
+		port: this._port
 	});
 
 	this._handleFrames();
 	this._handleMouse();
 	this._handleKeys();
-	this._initialized = false;
 }
+
+/** Stop the current connection and cleanup event listeners */
+method.stop = function(){
+	this._socket.removeAllListeners('keydown');
+	this._socket.removeAllListeners('mouse');
+	this._rfb.end();
+}
+
 
 method._handleFrames = function(){
 	var self = this;
-	console.log("handling frames");
 	self._rfb.on('rect', function(rect) {
 		if(!self._initialized) {
 			self._socket.emit('init', {width: rect.width, height: rect.height});
@@ -68,10 +79,4 @@ method._handleKeys = function() {
 	});
 }
 
-method.cleanup = function(){
-	this._socket.removeAllListeners('keydown');
-	this._socket.removeAllListeners('mouse');
-	this._rfb.end();
-}
-
-module.exports = FrameRenderer;
+module.exports = RfbHandler;

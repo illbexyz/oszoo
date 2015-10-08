@@ -18,18 +18,18 @@ app.controller('OSZooController', ['$scope', '$mdSidenav', function($scope, $mdS
 
 app.controller('ComputerController', function($scope, $timeout, $http, $interval) {
   // Variables
-  var aMachineisRunning = false;
   var mouseDown = 0;
 	var socket;
+  // Timer in seconds
   var timer = 600;
-  var timerString;
+  // The client is waiting for initialization
   var isLoading;
 
   // Scope variables
-  $scope.isLoading = true;
-
+  $scope.vmIsRunning = false;
+  // String timer
   $scope.timer = "10:00";
-  $scope.sessions;
+  $scope.sessionsAvailable;
   $scope.title = "Select an OS";
 
   // Initialize the os list
@@ -50,20 +50,19 @@ app.controller('ComputerController', function($scope, $timeout, $http, $interval
   $interval(function () {
     timer--;
     $scope.timer = timerToString(timer);
-    $scope.isLoading = isLoading
   }, 1000);
 
+  /**  */
   $scope.changeOS = function(os){
-    if(aMachineisRunning) {
+    if(!$scope.vmIsRunning){
+      socket.emit('start', os);
+      $scope.title = os.title;
+    } else {
       socket.emit('stop');
       socket.on('machine-closed', function() {
-        socket.emit('start', os);
-        $scope.title = os.title;
-        socket.removeAllListeners('machine-closed');
+        $scope.vmIsRunning = false;
+        $scope.changeOS(os);
       });
-    } else {
-  		socket.emit('start', os);
-      $scope.title = os.title;
     }
 	}
 
@@ -76,8 +75,7 @@ app.controller('ComputerController', function($scope, $timeout, $http, $interval
     if(seconds.length == 1) {
       seconds = "0" + seconds;
     }
-    timerString = minutes + ":" + seconds;
-    return timerString;
+    return minutes + ":" + seconds;
   }
 
   function initializeSocket() {
@@ -89,7 +87,7 @@ app.controller('ComputerController', function($scope, $timeout, $http, $interval
 		var ctx = canvas.getContext('2d');
 
     socket.on('available-sessions', function(data){
-      $scope.sessions = data.sessions;
+      $scope.sessionsAvailable = data.sessions;
       $scope.$apply();
     });
 
@@ -100,6 +98,7 @@ app.controller('ComputerController', function($scope, $timeout, $http, $interval
       canvas.addEventListener("mousedown",  handleMouseDown);
       canvas.addEventListener("mouseup",    handleMouseUp);
       canvas.addEventListener("mousemove",  handleMouseMove);
+      $scope.vmIsRunning = true;
 		});
 
 		socket.on('frame', function (data) {
@@ -123,8 +122,6 @@ app.controller('ComputerController', function($scope, $timeout, $http, $interval
 			image.src = 'data:image/jpeg;base64,' + base64;
 			image.onload = function() {
 				ctx.drawImage(image, data.x, data.y, data.width, data.height);
-				isLoading = false;
-        aMachineisRunning = true;
 			}
 		});
 	}
@@ -212,6 +209,19 @@ app.controller('ComputerController', function($scope, $timeout, $http, $interval
 
     return false;
 	}
+});
+
+app.controller('ConsoleController', function($scope) {
+
+  var mConsole = new Console(800, 600);
+
+  //var canvas = document.getElementById("console");
+  var canvas = mConsole.getCanvas();
+  var frame = document.getElementById("frame");
+  frame.appendChild(canvas);
+
+  mConsole.write("Welcome to OS Zoo!");
+
 });
 
 // app.directive('oszooTimer', function() {

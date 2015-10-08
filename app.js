@@ -6,7 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var qemu = require('./qemu.js');
-var FrameRenderer = require('./frame-renderer.js');
+var RfbHandler = require('./rfb-handler.js');
 
 var routes = require('./routes/index');
 var partials = require('./routes/partials');
@@ -15,6 +15,7 @@ var api = require('./routes/api');
 var app = express();
 var io = require('socket.io')();
 
+// Number of max sessions available
 var availableSessions = 20;
 
 app.io = io;
@@ -32,16 +33,18 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/bower_components', express.static(path.join(__dirname, 'bower_components')));
 
-app.use('/partials', partials);
-//app.use('/computer', computer);
 app.use('/api', api);
 app.use('*', routes);
 
 io.on('connection', function (socket) {
-  var vncport;
-  var frameRenderer;
+  // Port used in the current socket
+  var screenPort;
+  // Communication handler
+  var rfbHandler;
+  // Sends to the client the number of available sessions
   socket.emit("available-sessions", {sessions: availableSessions});
 
+  // Client starts a new vm
   socket.on('start', function(config){
     if(availableSessions) {
       var exe;
@@ -49,37 +52,43 @@ io.on('connection', function (socket) {
         exe = "qemu-system-x86_64";
       }
       qemu.start(exe, config.memory, config['disk-image'], function(err, port, password){
-        vncport = port;
+        screenPort = port;
+        // In RFB protocol the port is: screenPort + 5900
         var rfbPort = port + 5900;
         console.log("qemu started on port " + rfbPort);
         availableSessions--;
         io.emit("available-sessions", {sessions: availableSessions});
-        frameRenderer = new FrameRenderer(socket, rfbPort, password);
+        rfbHandler = new RfbHandler(socket, rfbPort, password);
+        rfbHandler.start();
       });
     }
   });
 
+  // When the client accidentally disconnects
   socket.on('disconnect', function() {
-    if(vncport){
-      console.log("Stopping qemu (disconnect)" + vncport);
-      stopQemu(vncport);
+    if(screenPort){
+      console.log("Stopping qemu (disconnect) " + screenPort);
+      stopQemu(screenPort);
     }
   });
 
+  // When the client intentionallly disconnects
   socket.on('stop', function(){
-    console.log("Stopping qemu (close) " + vncport);
-    stopQemu(vncport);
+    console.log("Stopping qemu (close) " + screenPort);
+    stopQemu(screenPort);
   });
 
-  function stopQemu(vncport){
-    frameRenderer.cleanup();
-    qemu.stop(vncport);
+  // Routine to cleanup the current qemu process and event listeners
+  function stopQemu(screenPort){
+    rfbHandler.stop();
+    qemu.stop(screenPort);
     socket.emit("machine-closed");
     availableSessions++;
     io.emit("available-sessions", {sessions: availableSessions});
   }
 
 });
+
 
 /*redisClient.on('connect', function(){
   console.log('redis connected');

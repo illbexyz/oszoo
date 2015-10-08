@@ -3,9 +3,7 @@ extends layout
 block content
   md-content(layout="column" flex)#main
     md-content(layout="column" class="md-padding" flex)#screen-container
-      #frame.md-whiteframe-5dp
-        canvas#screen(ng-hide="isLoading")
-    //md-content(layout="row")#timer.md-padding.bg-color
-        md-progress-circular(md-mode="indeterminate" ng-show="isLoading").screen-progress
-    //md-content(layout="column").md-padding.bg-color
-      div Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+      #frame.md-whiteframe-5dp()
+        canvas()#screen
+        //canvas(ng-controller="ConsoleController")#console
+        //md-progress-circular(md-mode="indeterminate" ng-hide="vmIsRunning").screen-progress

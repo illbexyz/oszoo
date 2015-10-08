@@ -54,10 +54,10 @@ method.stop = function(port) {
 
 method._reallocatePort = function(port) {
 	console.log("port " + port + " reallocated");
-	this._vncPorts.push(port);
-	var index = this._vncActivePorts.indexOf(5);
+	var index = this._vncActivePorts.indexOf(port);
 	if(index > -1){
 		this._vncActivePorts.splice(index, 1);
+		this._vncPorts.push(port);
 	}
 }
 

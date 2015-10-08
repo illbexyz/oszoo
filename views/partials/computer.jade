@@ -1,8 +1,0 @@
-div(layout="row" flex)
-  div(layout="column" flex)
-    md-content(layout="column" flex class="md-padding").bg-color
-      #frame.md-whiteframe-5dp
-        canvas#screen(ng-click='setFocus()' ng-class="focus" ng-hide="isLoading")
-        md-progress-circular(md-mode="indeterminate" ng-show="isLoading").screen-progress
-script(src="/javascripts/keysyms-codes.js")
-script(src="/javascripts/virtual.js")
