@@ -4,6 +4,17 @@ block content
   md-content(layout="column" flex)#main
     md-content(layout="column" class="md-padding" flex)#screen-container
       #frame.md-whiteframe-5dp()
-        canvas()#screen
-        //canvas(ng-controller="ConsoleController")#console
+        canvas(style="display: none" ng-controller="VmController")#screen
+        #console(ng-controller="ConsoleController" ng-click="setFocus()")
+          p(style="text-align: center") Os Zoo
+          p 
+            span Here you can try a bunch of OS's, to start an OS simply select one from the sidebar or if the hackyness runs strong in you, type 
+            span.consoleHighlight oslist 
+            span to get a list of the available OS's.
+          p
+            Then Then just type the 
+            span.consoleHighlight OS name 
+            span to start a new vm.
+          span user:~ 
+          input#consoleInput(type="text" ng-model="userInput" enter-press="enterPress()")
         //md-progress-circular(md-mode="indeterminate" ng-hide="vmIsRunning").screen-progress

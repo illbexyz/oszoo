@@ -4,22 +4,59 @@ app.config(function($mdThemingProvider) {
 
   $mdThemingProvider.theme('default')
     .primaryPalette('indigo')
-    .accentPalette('deep-orange');
+    .accentPalette('green');
 
   //$locationProvider.html5Mode(true);
 });
 
-app.controller('OSZooController', ['$scope', '$mdSidenav', function($scope, $mdSidenav){
+app.service("os", function($http){
+
+  function getList() {
+    var request = $http.get('/api/os');
+    return request.then(successHandler, failureHandler);
+  }
+
+  function successHandler(response) {
+    return response.data;
+  }
+
+  function failureHandler(response) {
+    console.error("error getting the os list");
+  }
+
+  return {getList: getList};
+
+});
+
+app.factory('socket', function(){
+  var url = location.origin;
+  var socket = io.connect(url);
+  return socket;
+});
+
+app.controller('HomeController', function($scope, $mdSidenav, os, socket){
+
+  $scope.sessionsAvailable;
+  $scope.osList;
+
+  os.getList().then(function(osList){
+    $scope.osList = osList;
+  });
+
+  socket.on('available-sessions', function(data){
+    $scope.sessionsAvailable = data.sessions;
+    $scope.$apply();
+  });
+
   $scope.toggleSidenav = function(menuId) {
     $mdSidenav(menuId).toggle();
   };
 
-}]);
+});
 
-app.controller('ComputerController', function($scope, $timeout, $http, $interval) {
+app.controller('VmController', function($scope, $timeout, $http, $interval, os, socket) {
   // Variables
   var mouseDown = 0;
-	var socket;
   // Timer in seconds
   var timer = 600;
   // The client is waiting for initialization
@@ -29,22 +66,17 @@ app.controller('ComputerController', function($scope, $timeout, $http, $interval
   $scope.vmIsRunning = false;
   // String timer
   $scope.timer = "10:00";
-  $scope.sessionsAvailable;
+  
   $scope.title = "Select an OS";
-
-  // Initialize the os list
-  $http.get('/api/os').then(function(response){
-		$scope.osList = response.data;
-	});
+  
   // Initialize the socket
   //initializeTimer();
   initializeSocket();
 
   document.addEventListener('keydown', function(e){
-        console.log(e.keyCode);
-        if(e.keyCode == 8) {
-          e.preventDefault();
-        }
+        // if(e.keyCode == 8) {
+        //   e.preventDefault();
+        // }
       });
 
   $interval(function () {
@@ -79,17 +111,13 @@ app.controller('ComputerController', function($scope, $timeout, $http, $interval
   }
 
   function initializeSocket() {
-		var url = location.origin;
-		socket = io.connect(url);
+		
 
 		var canvas = document.getElementById('screen');
     canvas.tabIndex = 1000;
 		var ctx = canvas.getContext('2d');
 
-    socket.on('available-sessions', function(data){
-      $scope.sessionsAvailable = data.sessions;
-      $scope.$apply();
-    });
+    
 
 		socket.on('init', function(data){
 			canvas.width = data.width;
@@ -211,17 +239,101 @@ app.controller('ComputerController', function($scope, $timeout, $http, $interval
 	}
 });
 
-app.controller('ConsoleController', function($scope) {
+app.controller('ConsoleController', function($scope, $http, $interval) {
 
-  var mConsole = new Console(800, 600);
+  $scope.userInput = "";
+  $http.get('/api/os').then(function(response){
+    $scope.osList = response.data;
+  });
+  var consoleElement = document.getElementById("console");
 
-  //var canvas = document.getElementById("console");
-  var canvas = mConsole.getCanvas();
-  var frame = document.getElementById("frame");
-  frame.appendChild(canvas);
+  var intervalPromise = runInputHint();
 
-  mConsole.write("Welcome to OS Zoo!");
+  $scope.enterPress = function(){
+    command();
+  }
 
+  $scope.setFocus = function() {
+    document.getElementById("consoleInput").focus();
+  }
+
+  document.getElementById("consoleInput").onfocus = function(){
+    if($scope.userInput == "_") {
+      $scope.userInput = "";
+    }
+    $interval.cancel(intervalPromise);
+  }
+
+  document.getElementById("consoleInput").onblur = function(){
+    if($scope.userInput == "") {
+      intervalPromise = runInputHint();
+    }
+  }
+
+  function runInputHint() {
+    return $interval(function(){
+      if($scope.userInput == "") {
+        $scope.userInput = "_";
+      } else if($scope.userInput == "_"){
+        $scope.userInput = "";
+      }
+    }, 1000);
+  }
+
+  function command(){
+    var input = document.getElementById("consoleInput");
+    var spanReplace = document.createElement("span");
+    spanReplace.appendChild(document.createTextNode(input.value));
+    consoleElement.appendChild(spanReplace);
+    switch($scope.userInput){
+      case "oslist":
+        printOsList();
+        break;
+      default:
+        var p = document.createElement("p");
+        p.appendChild(document.createTextNode("Sorry, I can't help you with that."));
+        consoleElement.appendChild(p);
+        break;
+    }
+    $scope.userInput = "";
+    //var newInput = document.createElement("input");
+    //newInput.setAttribute("type", "text");
+    //newInput.setAttribute("ng-model", "userInput");
+    var span = document.createElement("span");
+    span.appendChild(document.createTextNode("user:~ "));
+    consoleElement.appendChild(span);
+    consoleElement.appendChild(input);
+    input.focus();
+  }
+
+  function printOsList(){
+    var p = document.createElement('p');
+    var table = document.createElement('table');
+    table.setAttribute("class", "consoleHighlight");
+    var tr = document.createElement('tr');
+    for(key in $scope.osList){
+      var td = document.createElement('td');
+      td.appendChild(document.createTextNode($scope.osList[key].title));
+      tr.appendChild(td);
+    }
+    table.appendChild(tr);
+    p.appendChild(table);
+    consoleElement.appendChild(p);
+  }
+
+});
+
+app.directive('enterPress', function(){
+  return function(scope, element, attrs){
+    element.bind("keydown keypress", function(event){
+      if(event.which === 13) {
+        scope.$apply(function(){
+          scope.$eval(attrs.enterPress);
+        });
+        event.preventDefault();
+      }
+    });
+  }
 });
 
 // app.directive('oszooTimer', function() {

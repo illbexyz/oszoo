@@ -20,6 +20,7 @@ a {
 
 md-sidenav {
   z-index: 9999;
+  overflow: hidden;
 }
 
 #sidenav-logo {
@@ -253,6 +254,39 @@ a {
 #screen.ng-hide {
   width: 0;
   height: 0;
+}
+
+#console {
+  width: 800px;
+  height: 600px;
+  background-color: black;
+  color: white;
+  font-family: 'Monaco';
+  font-size: 14px;
+  display: block;
+  overflow-y: hidden; 
+}
+
+#console table td {
+  width: 266px;
+}
+
+#console input {
+  background-color: black;
+  color: white;
+  border: none;
+  outline: none;
+  font-family: 'Monaco';
+  font-size: 14px;
+  width: 700px;
+}
+
+#console .console-logo {
+  font-size: 9px;
+}
+
+.consoleHighlight {
+  color: #9EFF94;
 }
 
 .oslist-animation {

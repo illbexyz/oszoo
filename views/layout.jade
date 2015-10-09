@@ -16,10 +16,9 @@ html
     script(src="/bower_components/angular-material/angular-material.js")
     script(src="/bower_components/angular-route/angular-route.js")
     script(src="/javascripts/keysyms-codes.js")
-    script(src="/javascripts/console.js")
     script(src="/javascripts/oszoo.js")
     base(href='/')
-  body(ng-app='OSZoo' layout="row" ng-controller="ComputerController")
+  body(ng-app='OSZoo' layout="row" ng-controller="HomeController")
     div(layout="column").sidenav-color
       md-sidenav(class="md-sidenav-left" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')").sidenav-color
         md-button(ng-click="close()" class="md-primary" hide-gt-md) Close Sidenav Left
@@ -43,12 +42,12 @@ html
       md-subheader.md-primary 
         div(layout="row")
           div
-            span.header-description Session expires in
-            span.header-value {{timer}}
-              md-tooltip Time remaining
-          div(flex)
-          div
             span.header-description Sessions available
             span.header-value {{sessionsAvailable}}
               md-tooltip Available sessions
+          div(flex)
+          div
+            span.header-description Session expires in
+            span.header-value {{timer}}
+              md-tooltip Time remaining
       block content
