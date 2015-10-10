@@ -12,6 +12,7 @@ html {
 
 a {
 	text-decoration: none;
+  color: black;
 }
 
 .sidenav-color {
@@ -28,10 +29,6 @@ md-sidenav {
   height: 111px;
   text-align: center;
   padding-top: 30px;
-  border-bottom: 1px;
-  border-bottom-style: ridge;
-  border-right: 1px;
-  border-right-style: ridge;
 }
 
 #sidenav-logo img {
@@ -191,10 +188,6 @@ footer button {
   box-shadow: 0px 0px 60px 20px #FFFFFF;
 }
 
-a {
-  color: #00B7FF;
-}
-
 .view-animate {
     display: block;
 }
@@ -264,7 +257,7 @@ a {
   font-family: 'Monaco';
   font-size: 14px;
   display: block;
-  overflow-y: hidden; 
+  overflow-y: hidden;
 }
 
 #console table td {

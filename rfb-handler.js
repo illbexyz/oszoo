@@ -67,7 +67,6 @@ method._handleFrames = function(){
 method._handleMouse = function() {
 	var self = this;
 	self._socket.on('mouse', function(data) {
-		console.log(data);
 		self._rfb.pointerEvent(data.x, data.y, data.isDown);
 	});
 }

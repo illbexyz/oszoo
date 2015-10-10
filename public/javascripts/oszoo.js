@@ -34,8 +34,9 @@ app.factory('socket', function(){
   return socket;
 });
 
-app.controller('HomeController', function($scope, $mdSidenav, os, socket){
+app.controller('HomeController', function($scope, $mdSidenav, os, socket, $rootScope){
 
+  $scope.vmIsRunning = false;
   $scope.sessionsAvailable;
   $scope.osList;
 
@@ -52,26 +53,45 @@ app.controller('HomeController', function($scope, $mdSidenav, os, socket){
     $mdSidenav(menuId).toggle();
   };
 
+  $scope.title = "Select an OS";
+
+  $scope.changeOS = function(os){
+    $scope.title = os.title;
+    $scope.$broadcast("start-os-loading", os);
+	}
+
+  $scope.$on("first-frame", function(event, data) {
+    $scope.$broadcast('stop-os-loading');
+    $scope.vmIsRunning = true;
+  });
 });
 
-app.controller('VmController', function($scope, $timeout, $http, $interval, os, socket) {
+app.controller('VmController', function($scope, $timeout, $http, $interval, $rootScope, os, socket) {
   // Variables
   var mouseDown = 0;
   // Timer in seconds
   var timer = 600;
-  // The client is waiting for initialization
-  var isLoading;
 
   // Scope variables
   $scope.vmIsRunning = false;
   // String timer
   $scope.timer = "10:00";
-  
-  $scope.title = "Select an OS";
-  
+
   // Initialize the socket
   //initializeTimer();
   initializeSocket();
+
+  $scope.$on("start-os-loading", function(event, os) {
+    if(!$scope.vmIsRunning){
+      socket.emit('start', os);
+    } else {
+      socket.emit('stop');
+      socket.on('machine-closed', function() {
+        $scope.vmIsRunning = false;
+        $scope.changeOS(os);
+      });
+    }
+  });
 
   document.addEventListener('keydown', function(e){
         // if(e.keyCode == 8) {
@@ -83,20 +103,6 @@ app.controller('VmController', function($scope, $timeout, $http, $interval, os, 
     timer--;
     $scope.timer = timerToString(timer);
   }, 1000);
-
-  /**  */
-  $scope.changeOS = function(os){
-    if(!$scope.vmIsRunning){
-      socket.emit('start', os);
-      $scope.title = os.title;
-    } else {
-      socket.emit('stop');
-      socket.on('machine-closed', function() {
-        $scope.vmIsRunning = false;
-        $scope.changeOS(os);
-      });
-    }
-	}
 
   function timerToString(timer){
     var minutes = "" + Math.floor(timer / 60);
@@ -111,13 +117,9 @@ app.controller('VmController', function($scope, $timeout, $http, $interval, os, 
   }
 
   function initializeSocket() {
-		
-
 		var canvas = document.getElementById('screen');
     canvas.tabIndex = 1000;
 		var ctx = canvas.getContext('2d');
-
-    
 
 		socket.on('init', function(data){
 			canvas.width = data.width;
@@ -150,6 +152,7 @@ app.controller('VmController', function($scope, $timeout, $http, $interval, os, 
 			image.src = 'data:image/jpeg;base64,' + base64;
 			image.onload = function() {
 				ctx.drawImage(image, data.x, data.y, data.width, data.height);
+        $rootScope.$broadcast("first-frame");
 			}
 		});
 	}
@@ -163,7 +166,6 @@ app.controller('VmController', function($scope, $timeout, $http, $interval, os, 
 
   $scope.stopMachine = function(){
     socket.emit('stop');
-
   }
 
 	$scope.$on("$destroy", function() {
@@ -205,7 +207,6 @@ app.controller('VmController', function($scope, $timeout, $http, $interval, os, 
 
   function handleKeydown(event){
     if(event.keyCode == 8){
-      console.log('coso');
       event.preventDefault();
     }
   	socket.emit('keydown', {key: codeConvert(event.keyCode)});
@@ -239,15 +240,27 @@ app.controller('VmController', function($scope, $timeout, $http, $interval, os, 
 	}
 });
 
-app.controller('ConsoleController', function($scope, $http, $interval) {
+app.controller('ConsoleController', function($scope, $http, $interval, $rootScope) {
 
   $scope.userInput = "";
+  $scope.loadingSymbol = "|";
+
   $http.get('/api/os').then(function(response){
     $scope.osList = response.data;
   });
-  var consoleElement = document.getElementById("console");
+  var consoleElement = document.getElementById("consoleBody");
 
   var intervalPromise = runInputHint();
+
+  $scope.$on('start-os-loading', function(event, os) {
+    $scope.isLoading = true;
+    runLoading();
+  });
+
+  $scope.$on('stop-os-loading', function(event, data) {
+    $scope.isLoading = false;
+    stopLoading();
+  });
 
   $scope.enterPress = function(){
     command();
@@ -270,6 +283,15 @@ app.controller('ConsoleController', function($scope, $http, $interval) {
     }
   }
 
+  function runLoading(){
+    console.log("emme!");
+    $interval(loadingAnimation, 80);
+  }
+
+  function stopLoading() {
+    $interval.cancel(loadingAnimation);
+  }
+
   function runInputHint() {
     return $interval(function(){
       if($scope.userInput == "") {
@@ -278,6 +300,23 @@ app.controller('ConsoleController', function($scope, $http, $interval) {
         $scope.userInput = "";
       }
     }, 1000);
+  }
+
+  function loadingAnimation(){
+    switch($scope.loadingSymbol){
+      case "|":
+        $scope.loadingSymbol = "/";
+        break;
+      case "/":
+        $scope.loadingSymbol = "-";
+        break;
+      case "-":
+        $scope.loadingSymbol = "\\";
+        break;
+      case "\\":
+        $scope.loadingSymbol = "|";
+        break;
+    }
   }
 
   function command(){
@@ -289,21 +328,38 @@ app.controller('ConsoleController', function($scope, $http, $interval) {
       case "oslist":
         printOsList();
         break;
+      case "doge":
+        print("Such command, very useful, wow.");
+        break;
       default:
-        var p = document.createElement("p");
-        p.appendChild(document.createTextNode("Sorry, I can't help you with that."));
-        consoleElement.appendChild(p);
+        var osToLaunch = null;
+        for(key in $scope.osList){
+          if($scope.userInput == $scope.osList[key].consoleTitle){
+            osToLaunch = $scope.osList[key];
+          }
+        }
+        if(osToLaunch){
+          $rootScope.$broadcast("start-os-loading", osToLaunch);
+          print("Wait for the magic to happen...");
+        } else {
+          var p = document.createElement("p");
+          p.appendChild(document.createTextNode("Sorry, I can't help you with that."));
+          consoleElement.appendChild(p);
+        }
         break;
     }
     $scope.userInput = "";
-    //var newInput = document.createElement("input");
-    //newInput.setAttribute("type", "text");
-    //newInput.setAttribute("ng-model", "userInput");
     var span = document.createElement("span");
     span.appendChild(document.createTextNode("user:~ "));
     consoleElement.appendChild(span);
     consoleElement.appendChild(input);
     input.focus();
+  }
+
+  function print(string) {
+    var p = document.createElement('p');
+    p.appendChild(document.createTextNode(string));
+    consoleElement.appendChild(p);
   }
 
   function printOsList(){
@@ -313,7 +369,7 @@ app.controller('ConsoleController', function($scope, $http, $interval) {
     var tr = document.createElement('tr');
     for(key in $scope.osList){
       var td = document.createElement('td');
-      td.appendChild(document.createTextNode($scope.osList[key].title));
+      td.appendChild(document.createTextNode($scope.osList[key].consoleTitle));
       tr.appendChild(td);
     }
     table.appendChild(tr);

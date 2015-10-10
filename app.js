@@ -47,11 +47,7 @@ io.on('connection', function (socket) {
   // Client starts a new vm
   socket.on('start', function(config){
     if(availableSessions) {
-      var exe;
-      if(config.arch == 'x86_64') {
-        exe = "qemu-system-x86_64";
-      }
-      qemu.start(exe, config.memory, config['disk-image'], function(err, port, password){
+      qemu.start(config, function(err, port, password){
         screenPort = port;
         // In RFB protocol the port is: screenPort + 5900
         var rfbPort = port + 5900;

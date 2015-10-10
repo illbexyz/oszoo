@@ -23,8 +23,10 @@ html
       md-sidenav(class="md-sidenav-left" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')").sidenav-color
         md-button(ng-click="close()" class="md-primary" hide-gt-md) Close Sidenav Left
         #sidenav-logo(layout="column")
-          h1 Os Zoo
-          span Powered by Virtualsquare
+          h1 
+            a(href="/") Os Zoo
+          span 
+            a(href="http://wiki.v2.cs.unibo.it/wiki/index.php/Main_Page") a Virtualsquare project
         #sidenav-actions(flex)
           md-input-container
              label Search
@@ -42,7 +44,7 @@ html
       md-subheader.md-primary 
         div(layout="row")
           div
-            span.header-description Sessions available
+            span.header-description Available sessions
             span.header-value {{sessionsAvailable}}
               md-tooltip Available sessions
           div(flex)

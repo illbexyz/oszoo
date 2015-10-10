@@ -7,12 +7,9 @@ router.get('/os', function(req, res, next) {
 	db.search('os', '*')
 	.then(function(result){
 		var os = [];
-		for(value in result.body.results){
-			for(key in result.body.results[value]){
-				if(key == "value"){
-					os.push(result.body.results[value][key]);
-				}
-			}
+		for(key in result.body.results){
+			result.body.results[key].value.id = result.body.results[key].path.key;
+			os.push(result.body.results[key].value);
 		}
 		res.json(os);
 	})

@@ -10,24 +10,27 @@ function Qemu(){
 	for(var i=0; i<=50; i++) this._vncPorts.push(i);
 }
 
-method.start = function(exe, memory, image, callback){
-	console.log(image);
-	var executable = exe;
+method.start = function(config, callback){
+	var exe;
+	if(config.arch == 'x86_64') {
+		exe = "qemu-system-x86_64";
+	}
 	var password = randomstring.generate({length: 12});
 	var port = this._port();
 	var self = this;
-	// var args = [
-	// 	'-m', memory,
-	// 	'-hda', 'img/' + image,
-	// 	'-cdrom', 'iso/finnix-111.iso',
-	// 	'-vnc', ":" + port
-	// ];
 	var args = [
-		'-m', 256,
-		'-hda', 'img/' + "windows3-1.vmdk",
-		//'-cdrom', 'iso/finnix-111.iso',
-		'-vnc', ":" + port
-	];
+	 	'-m', config.memory,
+	 	'-vnc', ":" + port
+	 ];
+	if(config.diskImage){
+		args.push('-hda');
+		args.push("img/" + config.diskImage);
+	}
+	if(config.cdrom){
+		args.push('-cdrom');
+		args.push("iso/" + config.cdrom);
+	}
+
 	// var args = [
 	// 	'-m', 256,
 	// 	'-hda', 'img/' + "windows3-1.vmdk",
@@ -35,7 +38,7 @@ method.start = function(exe, memory, image, callback){
 	// 	'-vga', 'qxl',
 	// 	'-spice', 'port=' + port + ',addr=127.0.0.1,disable-ticketing'
 	// ];
-	this._qemu[port] = spawn(executable, args);
+	this._qemu[port] = spawn(exe, args);
 	this._qemu[port].on('exit', function(){
 		self._reallocatePort(port);
 	});
