@@ -63,6 +63,8 @@ app.controller('HomeController', function($scope, $mdSidenav, os, socket, $rootS
   $scope.$on("first-frame", function(event, data) {
     $scope.$broadcast('stop-os-loading');
     $scope.vmIsRunning = true;
+    var canvas = document.getElementById("screen");
+    canvas.focus();
   });
 });
 
