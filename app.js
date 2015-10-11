@@ -36,6 +36,8 @@ app.use('/bower_components', express.static(path.join(__dirname, 'bower_componen
 app.use('/api', api);
 app.use('*', routes);
 
+var TIMER = 600;
+
 io.on('connection', function (socket) {
   // Port used in the current socket
   var screenPort;
@@ -44,24 +46,38 @@ io.on('connection', function (socket) {
   // Sends to the client the number of available sessions
   socket.emit("available-sessions", {sessions: availableSessions});
   var vmRunning = false;
+  var timer = TIMER;
+  var timerCallback;
 
   // Client starts a new vm
   socket.on('start', function(config){
-    console.log("starting " + vmRunning);
     if(availableSessions) {
+      console.log(vmRunning);
       if(vmRunning){
         restartQemu(screenPort);
       }
+      if(timer < TIMER){
+        timer = 600;
+      }
       qemu.start(config, function(err, port, password){
+        timerCallback = setInterval(function() {
+          timer--;
+          socket.emit("session-timer", {timer: timer});
+          if(timer == 0){
+            stopQemu(screenPort);
+            socket.emit("session-expired");
+          }
+        }, 1000);
         screenPort = port;
         // In RFB protocol the port is: screenPort + 5900
         var rfbPort = port + 5900;
         console.log("qemu started on port " + rfbPort);
         availableSessions--;
         io.emit("available-sessions", {sessions: availableSessions});
+        vmRunning = true;
+        console.log(vmRunning);
         rfbHandler = new RfbHandler(socket, rfbPort, password);
         rfbHandler.start();
-        vmRunning = true;
       });
     }
   });

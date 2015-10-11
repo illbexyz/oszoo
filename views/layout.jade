@@ -48,7 +48,7 @@ html
             span.header-value {{sessionsAvailable}}
               md-tooltip Available sessions
           div(flex)
-          div
+          div(ng-show="timer")
             span.header-description Session expires in
             span.header-value {{timer}}
               md-tooltip Time remaining

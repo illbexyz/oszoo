@@ -49,6 +49,10 @@ app.controller('HomeController', function($scope, $mdSidenav, os, socket, $rootS
     $scope.$apply();
   });
 
+  socket.on('session-timer', function(data){
+    $scope.timer = timerToString(data.timer);
+  });
+
   $scope.toggleSidenav = function(menuId) {
     $mdSidenav(menuId).toggle();
   };
@@ -66,6 +70,19 @@ app.controller('HomeController', function($scope, $mdSidenav, os, socket, $rootS
     var canvas = document.getElementById("screen");
     canvas.focus();
   });
+
+  function timerToString(timer){
+    var minutes = "" + Math.floor(timer / 60);
+    var seconds = "" + timer % 60;
+    if(minutes.length == 1) {
+      minutes = "0" + minutes;
+    }
+    if(seconds.length == 1) {
+      seconds = "0" + seconds;
+    }
+    return minutes + ":" + seconds;
+  }
+
 });
 
 app.controller('VmController', function($scope, $timeout, $http, $interval, $rootScope, os, socket) {
@@ -115,18 +132,6 @@ app.controller('VmController', function($scope, $timeout, $http, $interval, $roo
     timer--;
     $scope.timer = timerToString(timer);
   }, 1000);
-
-  function timerToString(timer){
-    var minutes = "" + Math.floor(timer / 60);
-    var seconds = "" + timer % 60;
-    if(minutes.length == 1) {
-      minutes = "0" + minutes;
-    }
-    if(seconds.length == 1) {
-      seconds = "0" + seconds;
-    }
-    return minutes + ":" + seconds;
-  }
 
   function initializeSocket() {
 		var canvas = document.getElementById('screen');
