@@ -30,6 +30,7 @@ method.start = function(config, callback){
 		args.push('-cdrom');
 		args.push("iso/" + config.cdrom);
 	}
+	args.push('-snapshot');
 
 	// var args = [
 	// 	'-m', 256,
