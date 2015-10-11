@@ -43,10 +43,15 @@ io.on('connection', function (socket) {
   var rfbHandler;
   // Sends to the client the number of available sessions
   socket.emit("available-sessions", {sessions: availableSessions});
+  var vmRunning = false;
 
   // Client starts a new vm
   socket.on('start', function(config){
+    console.log("starting " + vmRunning);
     if(availableSessions) {
+      if(vmRunning){
+        restartQemu(screenPort);
+      }
       qemu.start(config, function(err, port, password){
         screenPort = port;
         // In RFB protocol the port is: screenPort + 5900
@@ -56,6 +61,7 @@ io.on('connection', function (socket) {
         io.emit("available-sessions", {sessions: availableSessions});
         rfbHandler = new RfbHandler(socket, rfbPort, password);
         rfbHandler.start();
+        vmRunning = true;
       });
     }
   });
@@ -78,9 +84,16 @@ io.on('connection', function (socket) {
   function stopQemu(screenPort){
     rfbHandler.stop();
     qemu.stop(screenPort);
+    vmRunning = false;
     socket.emit("machine-closed");
     availableSessions++;
     io.emit("available-sessions", {sessions: availableSessions});
+  }
+
+  function restartQemu(screenPort){
+    stopQemu(screenPort);
+    vmRunning = true;
+    console.log("restarting on " + screenPort);
   }
 
 });

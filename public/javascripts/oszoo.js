@@ -74,6 +74,8 @@ app.controller('VmController', function($scope, $timeout, $http, $interval, $roo
   // Timer in seconds
   var timer = 600;
 
+  var canvas = document.getElementById("screen");
+
   // Scope variables
   $scope.vmIsRunning = false;
   // String timer
@@ -88,18 +90,26 @@ app.controller('VmController', function($scope, $timeout, $http, $interval, $roo
       socket.emit('start', os);
     } else {
       socket.emit('stop');
-      socket.on('machine-closed', function() {
-        $scope.vmIsRunning = false;
-        $scope.changeOS(os);
-      });
+      socket.on('machine-closed', restartVm);
+    }
+
+    function restartVm(){
+      socket.emit('start', os);
+      socket.removeListener("machine-closed", restartVm);
     }
   });
 
-  document.addEventListener('keydown', function(e){
-        // if(e.keyCode == 8) {
-        //   e.preventDefault();
-        // }
-      });
+  canvas.addEventListener('keydown', function(e){
+    if(e.keyCode == 8) {
+     e.preventDefault();
+    }
+  });
+
+  canvas.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    handleMouse2Down(e);
+  }, false);
+
 
   $interval(function () {
     timer--;
@@ -186,6 +196,11 @@ app.controller('VmController', function($scope, $timeout, $http, $interval, $roo
   function handleMouseDown(e){
     var pos = getMousePositionOnCanvas(e);
     socket.emit('mouse', {x: pos.x, y: pos.y, isDown: 1});
+  }
+
+  function handleMouse2Down(e){
+    var pos = getMousePositionOnCanvas(e);
+    socket.emit('mouse', {x: pos.x, y: pos.y, isDown: 2});
   }
 
   function handleMouseUp(e){
@@ -286,7 +301,6 @@ app.controller('ConsoleController', function($scope, $http, $interval, $rootScop
   }
 
   function runLoading(){
-    console.log("emme!");
     $interval(loadingAnimation, 80);
   }
 
