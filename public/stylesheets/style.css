@@ -40,7 +40,7 @@ md-sidenav {
 
 #sidenav-logo h1 {
   font-family: 'Orbitron', sans-serif;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 42px;
   margin-top: 0;
   margin-bottom: 0;
@@ -254,8 +254,8 @@ footer button {
   height: 600px;
   background-color: black;
   color: white;
-  font-family: 'Monaco';
-  font-size: 14px;
+  font-family: 'Inconsolata';
+  font-size: 16px;
   display: block;
   overflow-y: hidden;
 }
