@@ -46,10 +46,10 @@ html
           div
             span.header-description Available sessions
             span.header-value {{sessionsAvailable}}
-              md-tooltip Available sessions
+            md-tooltip How many vm session are available
           div(flex)
           div(ng-show="timer")
             span.header-description Session expires in
             span.header-value {{timer}}
-              md-tooltip Time remaining
+            md-tooltip Time remaining before the vm will shutdown
       block content
