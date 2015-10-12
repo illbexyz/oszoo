@@ -127,12 +127,6 @@ app.controller('VmController', function($scope, $timeout, $http, $interval, $roo
     handleMouse2Down(e);
   }, false);
 
-
-  $interval(function () {
-    timer--;
-    $scope.timer = timerToString(timer);
-  }, 1000);
-
   function initializeSocket() {
 		var canvas = document.getElementById('screen');
     canvas.tabIndex = 1000;
