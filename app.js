@@ -100,9 +100,11 @@ io.on('connection', function (socket) {
   function stopQemu(screenPort){
     rfbHandler.stop();
     qemu.stop(screenPort);
-    vmRunning = false;
+    if(vmRunning){
+      vmRunning = false;
+      availableSessions++;
+    }
     socket.emit("machine-closed");
-    availableSessions++;
     io.emit("available-sessions", {sessions: availableSessions});
   }
 
