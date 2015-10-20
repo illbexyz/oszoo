@@ -1,22 +1,59 @@
 extends layout
 
 block content
-  md-content(layout="column" flex)#main
-    md-content(layout="column" class="md-padding" flex)#screen-container
-      #frame.md-whiteframe-5dp()
-        canvas(ng-show="vmIsRunning" ng-controller="VmController")#screen
-        #console(ng-hide="vmIsRunning" ng-controller="ConsoleController" ng-click="setFocus()")
-          p(style="text-align: center") Os Zoo
-          #consoleBody
-            p 
-              span Here you can try a bunch of OS's, to start an OS simply select one from the sidebar or, if the hackyness runs strong in you, type 
-              span.consoleHighlight oslist 
-              span to get a list of the available OS's.
-            p
-              Then Then just type the 
-              span.consoleHighlight OS name 
-              span to start a new vm.
-            span user:~ 
-            input#consoleInput(type="text" ng-model="userInput" enter-press="enterPress()")
-          p(ng-show="isLoading") {{loadingSymbol}}
-        //md-progress-circular(md-mode="indeterminate" ng-hide="vmIsRunning").screen-progress
+  .main-container(ng-app='OSZoo' layout="row" ng-controller="HomeController")
+    div(layout="column")
+      md-sidenav(class="md-sidenav-left" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')").sidenav-color
+        md-button(ng-click="close()" class="md-primary" hide-gt-md) Close Sidenav Left
+        #sidenav-logo(layout="column")
+          h1 
+            a(href="/") Os Zoo
+          span 
+            a(href="http://wiki.v2.cs.unibo.it/wiki/index.php/Main_Page") a Virtualsquare project
+        #sidenav-actions(flex)
+          md-input-container
+             label Search
+             input(ng-model="user.email" type="email")
+          div(ng-repeat="os in osList").oslist-animation
+            md-button(ng-click="changeOS(os)").md-primary {{os.title}}
+    div(layout="column" flex)
+      // Header
+      md-toolbar(layout="row" class="md-default-theme").md-whiteframe-2dp
+        div(class="md-toolbar-tools" layout="row")
+          md-button(ng-click="toggleSidenav('left')" hide-gt-sm class="md-icon-button menuBtn")
+            md-icon(aria-label="Menu" md-svg-icon="https://s3-us-west-2.amazonaws.com/s.cdpn.io/68133/menu.svg")
+          h1
+            a(href="/") {{title}}
+          div(flex)
+          md-button(ng-show="vmIsRunning" ng-click="showInfo()") Info
+      md-subheader.md-primary 
+        div(layout="row")
+          div
+            span.header-description Available sessions
+            span.header-value {{sessionsAvailable}}
+            md-tooltip How many vm session are available
+          div(flex)
+          div(ng-show="vmIsRunning")
+            span.header-description Session expires in
+            span.header-value {{timer}}
+            md-tooltip Time remaining before the vm will shutdown
+      md-content(layout="column" flex)#main
+        md-content(layout="column" class="md-padding" flex)#screen-container
+          #frame.md-whiteframe-5dp()
+            div(ng-show="vmIsRunning")
+              canvas#screen(ng-controller="VmController")
+            #console(ng-hide="vmIsRunning" ng-controller="ConsoleController" ng-click="setFocus()")
+              p(style="text-align: center") Os Zoo
+              #consoleBody
+                p 
+                  span Here you can try a bunch of OS's, to start an OS simply select one from the sidebar or, if the hackyness runs strong in you, type 
+                  span.consoleHighlight oslist 
+                  span to get a list of the available OS's.
+                p
+                  Then Then just type the 
+                  span.consoleHighlight OS name 
+                  span to start a new vm.
+                span user:~ 
+                input#consoleInput(type="text" ng-model="userInput" enter-press="enterPress()")
+              p(ng-show="isLoading") {{loadingSymbol}}
+            //md-progress-circular(md-mode="indeterminate" ng-hide="vmIsRunning").screen-progress
