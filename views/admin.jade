@@ -1,0 +1,93 @@
+extends layout
+
+block content
+  .main-container(ng-app='OSZoo' ng-controller='AdminController')
+    div(layout="column")
+      md-toolbar(layout="row").md-whiteframe-2dp
+        div(class="md-toolbar-tools" layout="row")
+          md-button(ng-click="toggleSidenav('left')" hide-gt-sm class="md-icon-button menuBtn")
+            md-icon(aria-label="Menu" md-svg-icon="https://s3-us-west-2.amazonaws.com/s.cdpn.io/68133/menu.svg")
+          h1
+            a(href="/") Admin
+      md-content.md-padding
+        md-content.md-padding
+          h1 OS List
+          div(layout="column")
+            div(ng-repeat="os in osList")
+              div(layout)
+                form
+                  h2 {{os.title}}
+                  div(layout layout-sm="column")
+                    md-input-container(flex)
+                      label Title
+                      input(ng-model="os.title")
+                    md-input-container(flex)
+                      label Console Title
+                      input(ng-model="os.consoleTitle")
+                  div(layout layout-sm="column")
+                    md-input-container(ng-show="os.diskImage" flex)
+                      label Disk Image
+                      input(ng-model="os.diskImage")
+                    md-input-container(ng-show="os.cdrom" flex)
+                      label CDRom
+                      input(type="text" ng-model="os.cdrom")
+                    md-input-container(flex)
+                      label Architecture
+                      md-select(ng-model="os.arch")
+                        md-option(value="x86_64") x86_64
+                        md-option(value="powerpc") PowerPC
+                        md-option(value="arm") ARM
+                    md-input-container(flex)
+                      label Memory
+                      md-select(ng-model="os.memory")
+                        md-option(value="64") 64
+                        md-option(value="128") 128
+                        md-option(value="256") 256
+                        md-option(value="512") 512
+                        md-option(value="1024") 1024
+                  div(layout layout-sm="column")
+                    md-input-container(flex)
+                      label Description
+                      textarea(column="1") {{os.description}}
+                  
+            
+      md-content.md-padding
+        md-content.md-padding
+          h1 Insert OS
+          div(layout)
+            form
+              div(layout layout-sm="column")
+                md-input-container(flex)
+                  label Title
+                  input 
+                md-input-container(flex)
+                  label Console Name
+                  input 
+              div(layout layout-sm="column")
+                md-input-container(flex)
+                  label Disk image name
+                  input
+                md-input-container(flex)
+                  label Cdrom name
+                  input 
+                md-input-container
+                  label Architecture
+                  md-select(ng-model="os.coso")
+                    md-option(value="x86_64") x86_64
+                    md-option(value="powerpc") PowerPC
+                    md-option(value="arm") ARM
+                md-input-container
+                  label Memory
+                  md-select(ng-model="os.coso")
+                    md-option(value="64") 64
+                    md-option(value="128") 128
+                    md-option(value="256") 256
+                    md-option(value="512") 512
+                    md-option(value="1024") 1024
+              div(layout layout-sm="column")
+                md-input-container(flex)
+                  label Description
+                  textarea(column="1") 
+              div(layout layout-sm="column")
+                div(flex)
+                md-button.md-raised.md-primary Send

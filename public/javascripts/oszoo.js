@@ -34,11 +34,12 @@ app.factory('socket', function(){
   return socket;
 });
 
-app.controller('HomeController', function($scope, $mdSidenav, os, socket, $rootScope){
+app.controller('HomeController', function($scope, $mdSidenav, os, socket, $rootScope, $mdDialog, $mdToast){
 
   $scope.vmIsRunning = false;
   $scope.sessionsAvailable;
   $scope.osList;
+  $scope.currentOs;
 
   os.getList().then(function(osList){
     $scope.osList = osList;
@@ -53,6 +54,17 @@ app.controller('HomeController', function($scope, $mdSidenav, os, socket, $rootS
     $scope.timer = timerToString(data.timer);
   });
 
+  socket.on('session-expired', function() {
+    $mdToast.show(
+      $mdToast.simple()
+        .content('Session expired!')
+        .position("right bottom")
+        .hideDelay(2000)
+    );
+    $scope.vmIsRunning = false;
+    $scope.title = "Select an OS";
+  });
+
   $scope.toggleSidenav = function(menuId) {
     $mdSidenav(menuId).toggle();
   };
@@ -61,8 +73,20 @@ app.controller('HomeController', function($scope, $mdSidenav, os, socket, $rootS
 
   $scope.changeOS = function(os){
     $scope.title = os.title;
+    $scope.currentOs = os;
     $scope.$broadcast("start-os-loading", os);
 	}
+
+  $scope.showInfo = function(){
+    $mdDialog.show(
+      $mdDialog.alert()
+        .clickOutsideToClose(true)
+        .title('Boot info')
+        .content("Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
+        .ariaLabel($scope.currentOs.title + ' info')
+        .ok('Got it!')
+    );
+  }
 
   $scope.$on("first-frame", function(event, data) {
     $scope.$broadcast('stop-os-loading');
@@ -414,3 +438,11 @@ app.directive('enterPress', function(){
 //   };
 // });
 // '<span class="md-accent"> {{timer}} <md-tooltip> Time remaining</md-tooltip></span>'
+
+app.controller('AdminController', function($scope, os){
+
+  os.getList().then(function(osList){
+    $scope.osList = osList;
+  });
+
+});

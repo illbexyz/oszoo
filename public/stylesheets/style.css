@@ -3,6 +3,10 @@ a {
   color: black;
 }
 
+h1, h2, h3, h4, h5, h6 {
+	font-family: 'Oswald';
+}
+
 md-sidenav {
   z-index: 9999;
   overflow: hidden;
@@ -79,6 +83,11 @@ md-sidenav md-input-container {
   padding-left: 8px;
 }
 
+.main-container {
+	width: 100%;
+	height: 100%;
+}
+
 #screen-container {
   background-color: #1f2036;
   padding-top: 42px;
@@ -147,6 +156,20 @@ md-sidenav md-input-container {
 .oslist-animation.ng-enter-stagger {
   transition-delay: 0s;
   animation-delay: 0.1s;
+}
+
+.tile {
+	width: 80%;
+}
+
+form {
+	width: 100%;
+	height: 100%;
+}
+
+form md-input-container {
+	margin-left: 2px;
+	margin-right: 2px;
 }
 
 /* ANIMATIONS

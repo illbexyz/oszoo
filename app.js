@@ -11,6 +11,7 @@ var RfbHandler = require('./rfb-handler.js');
 var routes = require('./routes/index');
 var partials = require('./routes/partials');
 var api = require('./routes/api');
+var admin = require('./routes/admin');
 
 var app = express();
 var io = require('socket.io')();
@@ -34,6 +35,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/bower_components', express.static(path.join(__dirname, 'bower_components')));
 
 app.use('/api', api);
+app.use('/admin', admin);
 app.use('*', routes);
 
 var TIMER = 600;

@@ -30,4 +30,8 @@ router.get('/os/:id', function(req, res, next) {
 	});
 });
 
+router.post('/os', function(req, res){
+	console.log(req.body);
+});
+
 module.exports = router;
