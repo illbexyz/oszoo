@@ -1,0 +1,39 @@
+div(layout)
+  form
+    h2 {{newOs.title}}
+    div(layout layout-sm="column")
+      md-input-container(flex)
+        label Title
+        input(ng-model="newOs.title")
+      md-input-container(flex)
+        label Console Title
+        input(ng-model="newOs.consoleTitle")
+    div(layout layout-sm="column")
+      md-input-container(flex)
+        label Disk Image
+        input(ng-model="newOs.diskImage")
+      md-input-container(flex)
+        label CDRom
+        input(type="text" ng-model="newOs.cdrom")
+      md-input-container(flex)
+        label Architecture
+        md-select(ng-model="newOs.arch")
+          md-option(value="x86_64") x86_64
+          md-option(value="powerpc") PowerPC
+          md-option(value="arm") ARM
+      md-input-container(flex)
+        label Memory
+        md-select(ng-model="newOs.memory")
+          md-option(value="64") 64
+          md-option(value="128") 128
+          md-option(value="256") 256
+          md-option(value="512") 512
+          md-option(value="1024") 1024
+    div(layout layout-sm="column")
+      md-input-container(flex)
+        label Description
+        textarea(ng-model="newOs.description" column="1")
+    div.md-actions(layout="row")
+      span(flex)
+      md-button(ng-click="cancel()" class="md-primary") Cancel
+      md-button(ng-click="confirm(newOs)" class="md-primary") Create
