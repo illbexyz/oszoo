@@ -1,93 +1,44 @@
 extends layout
 
 block content
-  .main-container(ng-app='OSZoo' ng-controller='AdminController')
+  .main-container(ng-app='OSZoo' ng-controller='AdminController' layout="row")
     div(layout="column")
-      md-toolbar(layout="row").md-whiteframe-2dp
+      //md-sidenav(flex class="md-sidenav-left" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')").sidenav-color
+        md-button(ng-click="close()" class="md-primary" hide-gt-md) Close Sidenav Left
+        #sidenav-logo(layout="column")
+          h1 
+            a(href="/") Os Zoo
+          span 
+            a(href="http://wiki.v2.cs.unibo.it/wiki/index.php/Main_Page") a Virtualsquare project
+        #sidenav-actions(flex)
+          md-button.md-primary Sessions
+          md-button.md-primary Operating Systems
+    .main(layout="column" flex).md-whiteframe-z2
+      md-toolbar(layout="row").md-whiteframe-z2
         div(class="md-toolbar-tools" layout="row")
           md-button(ng-click="toggleSidenav('left')" hide-gt-sm class="md-icon-button menuBtn")
             md-icon(aria-label="Menu" md-svg-icon="https://s3-us-west-2.amazonaws.com/s.cdpn.io/68133/menu.svg")
           h1
             a(href="/") Admin
-      md-content.md-padding
-        md-content.md-padding
-          h1 OS List
-          div(layout="column")
-            div(ng-repeat="os in osList")
-              div(layout)
-                form
-                  h2 {{os.title}}
-                  div(layout layout-sm="column")
-                    md-input-container(flex)
-                      label Title
-                      input(ng-model="os.title")
-                    md-input-container(flex)
-                      label Console Title
-                      input(ng-model="os.consoleTitle")
-                  div(layout layout-sm="column")
-                    md-input-container(ng-show="os.diskImage" flex)
-                      label Disk Image
-                      input(ng-model="os.diskImage")
-                    md-input-container(ng-show="os.cdrom" flex)
-                      label CDRom
-                      input(type="text" ng-model="os.cdrom")
-                    md-input-container(flex)
-                      label Architecture
-                      md-select(ng-model="os.arch")
-                        md-option(value="x86_64") x86_64
-                        md-option(value="powerpc") PowerPC
-                        md-option(value="arm") ARM
-                    md-input-container(flex)
-                      label Memory
-                      md-select(ng-model="os.memory")
-                        md-option(value="64") 64
-                        md-option(value="128") 128
-                        md-option(value="256") 256
-                        md-option(value="512") 512
-                        md-option(value="1024") 1024
-                  div(layout layout-sm="column")
-                    md-input-container(flex)
-                      label Description
-                      textarea(column="1") {{os.description}}
-                  
-            
-      md-content.md-padding
-        md-content.md-padding
-          h1 Insert OS
-          div(layout)
-            form
-              div(layout layout-sm="column")
-                md-input-container(flex)
-                  label Title
-                  input 
-                md-input-container(flex)
-                  label Console Name
-                  input 
-              div(layout layout-sm="column")
-                md-input-container(flex)
-                  label Disk image name
-                  input
-                md-input-container(flex)
-                  label Cdrom name
-                  input 
-                md-input-container
-                  label Architecture
-                  md-select(ng-model="os.coso")
-                    md-option(value="x86_64") x86_64
-                    md-option(value="powerpc") PowerPC
-                    md-option(value="arm") ARM
-                md-input-container
-                  label Memory
-                  md-select(ng-model="os.coso")
-                    md-option(value="64") 64
-                    md-option(value="128") 128
-                    md-option(value="256") 256
-                    md-option(value="512") 512
-                    md-option(value="1024") 1024
-              div(layout layout-sm="column")
-                md-input-container(flex)
-                  label Description
-                  textarea(column="1") 
-              div(layout layout-sm="column")
-                div(flex)
-                md-button.md-raised.md-primary Send
+      .content(layout="row" layout-sm="column")
+        div.md-whiteframe-z1.tile(flex)
+          md-toolbar(layout="row")
+            div(class="md-toolbar-tools" layout="row")
+              h1 Operating Systems
+              div(flex)
+              md-button.md-icon-button(ng-click="showNewOsDialog($event)" aria-label="Plus")
+                md-icon(md-svg-icon="images/icons/ic_add_white_24px.svg")
+          md-content
+            .tileos(ng-repeat="os in osList" layout="row")
+              md-button.md-primary(layout="row" flex ng-click="showModifyOsDialog($event, os)")
+                span(flex="33") {{os.title}}
+                span(flex="66").button-description {{os.description}}
+        div.md-whiteframe-z1.tile(flex)
+          md-toolbar(layout="row")
+            div(class="md-toolbar-tools" layout="row")
+              h1 Sessions
+              span(flex)
+              h1(ng-show="sessions") {{sessions}}/20
+          md-content
+            .tileos(ng-repeat="client in clients")
+              md-button.md-primary(ng-click="showModifyOsDialog($event, os)") {{client.ip}}

@@ -17,7 +17,9 @@ var app = express();
 var io = require('socket.io')();
 
 // Number of max sessions available
-var availableSessions = 20;
+var MAX_SESSIONS = 20;
+// Current sessions available
+var availableSessions = MAX_SESSIONS;
 
 app.io = io;
 
@@ -36,46 +38,64 @@ app.use('/bower_components', express.static(path.join(__dirname, 'bower_componen
 
 app.use('/api', api);
 app.use('/admin', admin);
+app.use('/partials', partials);
 app.use('*', routes);
 
 var TIMER = 600;
 
-io.on('connection', function (socket) {
-  // Port used in the current socket
-  var screenPort;
+var clients = [];
+
+var admin = io.of('/admin');
+admin.on('connection', function(socket){
+  socket.emit('available-sessions', {sessions: availableSessions});
+  socket.emit('clients', clients);
+});
+
+var vm = io.of('/vm');
+vm.on('connection', function (socket) {
+  var connectionInfo = {
+    ip: "",
+    screenPort: 0,  // Port used in the current socket
+    timer: 0
+  };
+  connectionInfo.ip = socket.request.connection.remoteAddress;
+  console.log(connectionInfo.ip);
   // Communication handler
   var rfbHandler;
   // Sends to the client the number of available sessions
-  socket.emit("available-sessions", {sessions: availableSessions});
+  socket.emit('available-sessions', {sessions: availableSessions});
   var vmRunning = false;
-  var timer = TIMER;
+  connectionInfo.timer = TIMER;
   var timerCallback;
 
   // Client starts a new vm
   socket.on('start', function(config){
+    clients.push(connectionInfo);
+    admin.emit('new-client', connectionInfo);
     if(availableSessions) {
       console.log(vmRunning);
       if(vmRunning){
-        restartQemu(screenPort);
+        restartQemu(connectionInfo.screenPort);
       }
-      if(timer < TIMER){
-        timer = 600;
+      if(connectionInfo.timer < TIMER){
+        connectionInfo.timer = 600;
       }
       qemu.start(config, function(err, port, password){
         timerCallback = setInterval(function() {
-          timer--;
-          socket.emit("session-timer", {timer: timer});
-          if(timer == 0){
-            stopQemu(screenPort);
-            socket.emit("session-expired");
+          connectionInfo.timer--;
+          socket.emit('session-timer', {timer: connectionInfo.timer});
+          if(connectionInfo.timer == 0){
+            stopQemu(connectionInfo.screenPort);
+            socket.emit('session-expired');
           }
         }, 1000);
-        screenPort = port;
+        connectionInfo.screenPort = port;
         // In RFB protocol the port is: screenPort + 5900
         var rfbPort = port + 5900;
-        console.log("qemu started on port " + rfbPort);
+        console.log('qemu started on port ' + rfbPort);
         availableSessions--;
-        io.emit("available-sessions", {sessions: availableSessions});
+        vm.emit('available-sessions', {sessions: availableSessions});
+        admin.emit('available-sessions', {sessions: availableSessions});
         vmRunning = true;
         console.log(vmRunning);
         rfbHandler = new RfbHandler(socket, rfbPort, password);
@@ -86,34 +106,37 @@ io.on('connection', function (socket) {
 
   // When the client accidentally disconnects
   socket.on('disconnect', function() {
-    if(screenPort){
-      console.log("Stopping qemu (disconnect) " + screenPort);
-      stopQemu(screenPort);
+    if(connectionInfo.screenPort){
+      console.log('Stopping qemu (disconnect) ' + connectionInfo.screenPort);
+      stopQemu(connectionInfo.screenPort);
     }
   });
 
   // When the client intentionallly disconnects
   socket.on('stop', function(){
-    console.log("Stopping qemu (close) " + screenPort);
-    stopQemu(screenPort);
+    console.log('Stopping qemu (close) ' + connectionInfo.screenPort);
+    stopQemu(connectionInfo.screenPort);
   });
 
   // Routine to cleanup the current qemu process and event listeners
   function stopQemu(screenPort){
+    clients.splice(clients.indexOf(connectionInfo), 1);
+    admin.emit('remove-client', connectionInfo);
     rfbHandler.stop();
     qemu.stop(screenPort);
     if(vmRunning){
       vmRunning = false;
       availableSessions++;
     }
-    socket.emit("machine-closed");
-    io.emit("available-sessions", {sessions: availableSessions});
+    socket.emit('machine-closed');
+    vm.emit('available-sessions', {sessions: availableSessions});
+    admin.emit('available-sessions', {sessions: availableSessions});
   }
 
   function restartQemu(screenPort){
     stopQemu(screenPort);
     vmRunning = true;
-    console.log("restarting on " + screenPort);
+    console.log('restarting on ' + screenPort);
   }
 
 });

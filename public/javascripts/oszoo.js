@@ -11,8 +11,26 @@ app.config(function($mdThemingProvider) {
 
 app.service("os", function($http){
 
+  var url = '/api/os';
+
   function getList() {
-    var request = $http.get('/api/os');
+    var request = $http.get(url);
+    return request.then(successHandler, failureHandler);
+  }
+
+  function post(os) {
+    var request = $http.post(url, os);
+    return request.then(successHandler, failureHandler);
+  }
+
+  function put(os) {
+    var request = $http.put(url, os);
+    return request.then(successHandler, failureHandler);
+  }
+
+  function deletea(os) {
+    var deleteUrl = url + '/' + os.id;
+    var request = $http.delete(deleteUrl);
     return request.then(successHandler, failureHandler);
   }
 
@@ -24,12 +42,17 @@ app.service("os", function($http){
     console.error("error getting the os list");
   }
 
-  return {getList: getList};
+  return {
+          getList: getList,
+          post: post,
+          put: put,
+          delete: deletea
+        };
 
 });
 
 app.factory('socket', function(){
-  var url = location.origin;
+  var url = location.origin + '/vm';
   var socket = io.connect(url);
   return socket;
 });
@@ -40,7 +63,6 @@ app.controller('HomeController', function($scope, $mdSidenav, os, socket, $rootS
   $scope.sessionsAvailable;
   $scope.osList;
   $scope.currentOs;
-
   os.getList().then(function(osList){
     $scope.osList = osList;
   });
@@ -114,7 +136,6 @@ app.controller('VmController', function($scope, $timeout, $http, $interval, $roo
   var mouseDown = 0;
   // Timer in seconds
   var timer = 600;
-
   var canvas = document.getElementById("screen");
 
   // Scope variables
@@ -431,18 +452,95 @@ app.directive('enterPress', function(){
   }
 });
 
-// app.directive('oszooTimer', function() {
-//   return {
-//     restrict: 'E',
-//     templateUrl: '<span> Ciao </span>'
-//   };
-// });
-// '<span class="md-accent"> {{timer}} <md-tooltip> Time remaining</md-tooltip></span>'
+app.controller('AdminController', function($scope, $mdDialog, os){
 
-app.controller('AdminController', function($scope, os){
+  var url = location.origin + '/admin';
+  var socket = io.connect(url);
 
   os.getList().then(function(osList){
     $scope.osList = osList;
+  });
+
+  $scope.showModifyOsDialog = function(event, os){
+    $scope.os = os;
+    $mdDialog.show({
+      controller: DialogController,
+      templateUrl: 'partials/modify-os-form.jade',
+      clickOutsideToClose:true,
+      scope: $scope,
+      preserveScope: true,
+      targetEvent: event
+    });
+
+    function DialogController($scope, $mdDialog){
+      $scope.cancel = function(){
+        $mdDialog.hide();
+      }
+
+      $scope.confirm = function(os){
+        $mdDialog.hide();
+        $scope.modifyOs(os);
+      }
+    }
+  }
+
+  $scope.showNewOsDialog = function(event){
+    $mdDialog.show({
+      controller: DialogController,
+      templateUrl: 'partials/new_os.jade',
+      clickOutsideToClose:true,
+      scope: $scope,
+      preserveScope: true,
+      targetEvent: event
+    });
+
+    function DialogController($scope, $mdDialog){
+      $scope.cancel = function(){
+        $mdDialog.hide();
+      }
+
+      $scope.confirm = function(os){
+        $mdDialog.hide();
+        $scope.addOs(os);
+      }
+    }
+  }
+
+  $scope.addOs = function(newOs){
+    os.post(newOs).then(function() {
+      $scope.osList.push(newOs);
+    });
+  }
+
+  $scope.modifyOs = function(modOs){
+    os.put(modOs);
+  }
+
+  $scope.deleteOs = function(delOs){
+    os.delete(delOs).then(function() {
+      $scope.osList.splice($scope.osList.indexOf(delOs), 1);
+      $scope.$apply();
+    });
+  }
+
+  socket.on('available-sessions', function(data){
+    $scope.sessions = data.sessions;
+    $scope.$apply();
+  });
+
+  socket.on('clients', function(clients) {
+    $scope.clients = clients;
+    $scope.$apply();
+  });
+
+  socket.on('new-client', function(client) {
+    $scope.clients.push(client);
+    $scope.$apply();
+  });
+
+  socket.on('remove-client', function(client) {
+    $scope.clients.splice($scope.clients.indexOf(client), 1);
+    $scope.$apply();
   });
 
 });
