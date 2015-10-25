@@ -19,6 +19,7 @@
     "jpeg": "git+https://github.com/tcr/node-jpeg.git",
     "morgan": "~1.5.1",
     "orchestrate": "^0.5.1",
+    "q": "^1.4.1",
     "randomstring": "^1.1.0",
     "redis": "^2.0.1",
     "rfb2": "0.0.10",

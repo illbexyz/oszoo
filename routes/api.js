@@ -4,18 +4,8 @@ var router = express.Router();
 
 /* GET OS id. */
 router.get('/os', function(req, res, next) {
-	db.search('os', '*')
-	.then(function(result){
-		var os = [];
-		for(key in result.body.results){
-			result.body.results[key].value.id = result.body.results[key].path.key;
-			os.push(result.body.results[key].value);
-		}
+	db.list('os').then(function(os){
 		res.json(os);
-	})
-	.fail(function(error){
-		console.log("Error retriving the os list");
-		console.log(error);
 	});
 });
 
@@ -31,7 +21,34 @@ router.get('/os/:id', function(req, res, next) {
 });
 
 router.post('/os', function(req, res){
-	console.log(req.body);
+	db.post('os', req.body)
+	.then(function(result) {
+		res.json(result.body);
+	})
+	.fail(function(error) {
+		console.log("Error creating a new os");
+	});
+});
+
+router.put('/os', function(req, res) {
+	db.put('os', req.body.id, req.body)
+	.then(function(result) {
+		res.json(result.body);
+	})
+	.fail(function(error) {
+		console.log("Error modifying an os");
+	});
+});
+
+router.delete('/os/:id', function(req, res) {
+	console.log(req.params.id);
+	db.delete('os', req.params.id)
+	.then(function(result) {
+		res.json(result.body);
+	})
+	.fail(function(error) {
+		console.log("Error deleting an os");
+	});
 });
 
 module.exports = router;
