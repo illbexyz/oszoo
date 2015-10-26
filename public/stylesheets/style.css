@@ -163,25 +163,37 @@ md-sidenav md-input-container {
 	border-radius: 4px;
 }
 
-.tileos {
+.tile-row {
   border-top: 1px solid #ddd;
   border-bottom: 1px solid #ddd;
+	height: 50px;
 }
 
-.tileos:last-child {
+.tile-row:last-child {
   border-bottom: 0;
 	border-bottom-radius: 3px 3px 0 0;
 }
 
-.tileos h1, h2, h3, h4, h5, h6 {
+.tile-row h1, h2, h3, h4, h5, h6 {
 	margin: 0;
 }
 
-.tileos button {
+.tile-row button {
 	text-align: left;
 	margin: 0;
 	padding: 6px 8px 6px 8px;
 	display: flex;
+}
+
+.tile-row-text {
+	padding: 16px 8px 16px 8px;
+	font-size: 14px;
+	display: flex;
+	text-align: center;
+}
+
+.header {
+	font-weight: 600;
 }
 
 .button-description {
@@ -189,7 +201,7 @@ md-sidenav md-input-container {
   color: black;
   font-weight: 400;
 	text-overflow: ellipsis;
-	overflow-x: auto;
+	overflow-x: hidden;
 }
 
 .content {

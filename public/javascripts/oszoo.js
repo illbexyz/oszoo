@@ -457,6 +457,8 @@ app.controller('AdminController', function($scope, $mdDialog, os){
   var url = location.origin + '/admin';
   var socket = io.connect(url);
 
+  $scope.clients = [];
+
   os.getList().then(function(osList){
     $scope.osList = osList;
   });
@@ -521,6 +523,14 @@ app.controller('AdminController', function($scope, $mdDialog, os){
       $scope.osList.splice($scope.osList.indexOf(delOs), 1);
       $scope.$apply();
     });
+  }
+
+  $scope.noSessionsRunning = function(){
+    if($scope.clients.length == 0){
+      return true;
+    } else {
+      return false;
+    }
   }
 
   socket.on('available-sessions', function(data){

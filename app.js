@@ -70,6 +70,8 @@ vm.on('connection', function (socket) {
 
   // Client starts a new vm
   socket.on('start', function(config){
+    connectionInfo.osTitle = config.title;
+    connectionInfo.memory = config.memory;
     clients.push(connectionInfo);
     admin.emit('new-client', connectionInfo);
     if(availableSessions) {

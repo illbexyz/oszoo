@@ -19,8 +19,8 @@ block content
           md-button(ng-click="toggleSidenav('left')" hide-gt-sm class="md-icon-button menuBtn")
             md-icon(aria-label="Menu" md-svg-icon="https://s3-us-west-2.amazonaws.com/s.cdpn.io/68133/menu.svg")
           h1
-            a(href="/") Admin
-      .content(layout="row" layout-sm="column")
+            a(href="/") Control Panel
+      .content(layout="column")
         div.md-whiteframe-z1.tile(flex)
           md-toolbar(layout="row")
             div(class="md-toolbar-tools" layout="row")
@@ -29,10 +29,10 @@ block content
               md-button.md-icon-button(ng-click="showNewOsDialog($event)" aria-label="Plus")
                 md-icon(md-svg-icon="images/icons/ic_add_white_24px.svg")
           md-content
-            .tileos(ng-repeat="os in osList" layout="row")
+            .tile-row(ng-repeat="os in osList" layout="row")
               md-button.md-primary(layout="row" flex ng-click="showModifyOsDialog($event, os)")
-                span(flex="33") {{os.title}}
-                span(flex="66").button-description {{os.description}}
+                span(flex="20") {{os.title}}
+                span(flex="80").button-description {{os.description}}
         div.md-whiteframe-z1.tile(flex)
           md-toolbar(layout="row")
             div(class="md-toolbar-tools" layout="row")
@@ -40,5 +40,20 @@ block content
               span(flex)
               h1(ng-show="sessions") {{sessions}}/20
           md-content
-            .tileos(ng-repeat="client in clients")
-              md-button.md-primary(ng-click="showModifyOsDialog($event, os)") {{client.ip}}
+            .tile-row(ng-if="noSessionsRunning()")
+              div.tile-row-text(flex)
+                div No active sessions!
+            .tile-row(ng-if="!noSessionsRunning()")
+              div.tile-row-text.header(flex)
+                div(flex) IP Address
+                div(flex) Operating System
+                div(flex) Memory(MB)
+                div(flex) Timer
+                div(flex) RFB Port
+            .tile-row(ng-repeat="client in clients" layout="row")
+              div.tile-row-text(flex)
+                div(flex) {{client.ip}}
+                div(flex) {{client.osTitle}}
+                div(flex) {{client.memory}}
+                div(flex) {{client.timer}}
+                div(flex) {{client.screenPort}}
