@@ -38,8 +38,7 @@ class Qemu
       return
     console.log args
     setTimeout (->
-      callback null, port, password
-      return
+      callback null, port
     ), 1000
     return
 

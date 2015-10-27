@@ -88,7 +88,12 @@ app.controller 'HomeController', ($scope, $mdSidenav, os, socket, $rootScope, $m
     return
 
   $scope.showInfo = ->
-    $mdDialog.show $mdDialog.alert().clickOutsideToClose(true).title('Boot info').content('Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.').ariaLabel($scope.currentOs.title + ' info').ok('Got it!')
+    $mdDialog.show $mdDialog.alert().
+      clickOutsideToClose(true).
+      title('Boot info').
+      content($scope.currentOs.description).
+      ariaLabel($scope.currentOs.title + ' info').
+      ok('Close')
     return
 
   $scope.$on 'first-frame', (event, data) ->
@@ -98,13 +103,18 @@ app.controller 'HomeController', ($scope, $mdSidenav, os, socket, $rootScope, $m
     canvas.focus()
     return
   return
+
+
 app.controller 'VmController', ($scope, $timeout, $http, $interval, $rootScope, os, socket) ->
   # Variables
   mouseDown = 0
   # Timer in seconds
   timer = 600
+  # Canvas
   canvas = document.getElementById('screen')
-  # Scope variables
+  # Keycode converter
+  codeConverter = new KeysymsCodeConverter()
+  console.log codeConverter
 
   initializeSocket = ->
     `var canvas`
@@ -193,7 +203,7 @@ app.controller 'VmController', ($scope, $timeout, $http, $interval, $rootScope, 
   handleKeydown = (event) ->
     if event.keyCode == 8
       event.preventDefault()
-    socket.emit 'keydown', key: codeConvert(event.keyCode)
+    socket.emit 'keydown', key: codeConverter.convert(event.keyCode)
     return
 
   isCapslock = (e) ->

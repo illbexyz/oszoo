@@ -4,11 +4,9 @@ Jpeg = require('jpeg').Jpeg
 ###* Start a new connection with the qemu process ###
 
 class RfbHandler
-  constructor: (socket, port, password) ->
+  constructor: (socket, port) ->
     @_socket = socket
     @_port = port
-    @_password = password
-    console.log port, password
     @_initialized = false
     return
 
