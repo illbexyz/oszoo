@@ -1,6 +1,6 @@
 node_modules/
 iso/
 img/
-./*.js
+*.js
 routes/*.js
 config/*.js
