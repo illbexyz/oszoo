@@ -1,5 +1,5 @@
 express = require('express')
-db = require('../config/database')
+db = require('../database/database')
 router = express.Router()
 
 ### GET OS id. ###

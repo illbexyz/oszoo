@@ -4,15 +4,41 @@ favicon = require('serve-favicon')
 logger = require('morgan')
 cookieParser = require('cookie-parser')
 bodyParser = require('body-parser')
-qemu = require('./qemu.coffee')
-RfbHandler = require('./rfb-handler.coffee')
+session = require('express-session')
+
 routes = require('./routes/index')
 partials = require('./routes/partials')
 api = require('./routes/api')
 admin = require('./routes/admin')
-app = express()
+login = require('./routes/login')
+
 io = require('socket.io')()
-app.io = io
+
+qemu = require('./qemu')
+RfbHandler = require('./rfb-handler')
+User = require('./database/user')
+
+passport = require('passport');
+LocalStrategy = require('passport-local').Strategy;
+
+#------------------------------------------------------------------------------#
+#------------------------- Passport configuration -----------------------------#
+#------------------------------------------------------------------------------#
+
+passport.use(new LocalStrategy((username, password, cb) ->
+  User.findByUsername username, (user) ->
+    return cb(null, user)
+  )
+)
+
+passport.serializeUser((user, cb) ->
+  cb(null, user.username);
+)
+
+passport.deserializeUser((name, cb) ->
+  User.findByUsername name, (user) ->
+    cb(null, user)
+)
 
 #------------------------------------------------------------------------------#
 #-------------------------------- Constants -----------------------------------#
@@ -23,24 +49,35 @@ MAX_TIMER = 600
 # Number of max sessions available
 MAX_SESSIONS = 20
 
+app = express()
+app.io = io
+
+#------------------------------------------------------------------------------#
+#--------------------- Middlewares & Express configs --------------------------#
+#------------------------------------------------------------------------------#
+
 # view engine setup
 app.set 'views', path.join(__dirname, 'views')
 app.set 'view engine', 'jade'
 # uncomment after placing your favicon in /public
 #app.use(favicon(__dirname + '/public/favicon.ico'));
 
-#------------------------------------------------------------------------------#
-#------------------------------- Middlewares ----------------------------------#
-#------------------------------------------------------------------------------#
-
 app.use logger('dev')
 app.use bodyParser.json()
 app.use bodyParser.urlencoded(extended: false)
+app.use session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true
+})
+app.use passport.initialize()
+app.use passport.session()
 app.use cookieParser()
 app.use require('coffee-middleware') src: "#{__dirname}/public"
 app.use express.static(path.join(__dirname, 'public'))
 app.use '/bower_components', express.static(path.join(__dirname, 'bower_components'))
 app.use '/api', api
+app.use '/login', login
 app.use '/admin', admin
 app.use '/partials', partials
 app.use '*', routes
