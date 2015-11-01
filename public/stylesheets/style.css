@@ -230,6 +230,18 @@ form md-input-container {
 	margin-right: 2px;
 }
 
+#login {
+	width: 400px;
+	margin-top: 40px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#login form {
+	margin: 0;
+	padding: 0;
+}
+
 /* ANIMATIONS
 ============================================================================= */
 
