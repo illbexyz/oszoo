@@ -17,6 +17,7 @@ md-sidenav {
   height: 111px;
   text-align: center;
   padding-top: 30px;
+	margin-bottom: 12px;
 }
 
 #sidenav-logo h1 {
@@ -52,7 +53,9 @@ md-toolbar a {
 }
 
 md-sidenav md-input-container {
-  padding-bottom: 2px;
+	margin-left: 12px;
+	margin-right: 12px;
+	padding-bottom: 12px;
 }
 
 .md-toolbar-tools h1 {
@@ -102,6 +105,7 @@ md-sidenav md-input-container {
   align-items: center;
   margin-left: auto;
   margin-right: auto;
+	cursor: none;
 }
 
 #screen {
@@ -153,6 +157,10 @@ md-sidenav md-input-container {
   animation: slideInRight 0.5s both ease-out;
 }
 
+.oslist-animation.ng-leave {
+	animation: fadeOut 0.5s both ease-out;
+}
+
 .oslist-animation.ng-enter-stagger {
   transition-delay: 0s;
   animation-delay: 0.1s;
@@ -164,9 +172,9 @@ md-sidenav md-input-container {
 }
 
 .tile-row {
-  border-top: 1px solid #ddd;
   border-bottom: 1px solid #ddd;
 	height: 50px;
+	position: relative;
 }
 
 .tile-row:last-child {
@@ -183,6 +191,15 @@ md-sidenav md-input-container {
 	margin: 0;
 	padding: 6px 8px 6px 8px;
 	display: flex;
+}
+
+.tile-row.ng-enter {
+	animation: slideInDown 0.5s both ease-out;
+}
+
+.tile-row.ng-enter-stagger {
+	transition-delay: 0s;
+  animation-delay: 0.05s;
 }
 
 .tile-row-text {
@@ -257,7 +274,8 @@ form md-input-container {
 
 /* slide in from the bottom */
 @keyframes slideOutLeft {
-    to      { opacity: 0; transform: translateX(-100%); }
+		from 		{ opacity: 1; }
+    to      { opacity: 0; left: 40px; }
 }
 
 /* rotate out newspaper */
@@ -281,6 +299,12 @@ form md-input-container {
 @keyframes slideInUp {
     from    { transform:translateY(100%); }
     to      { transform: translateY(0); }
+}
+
+/* slide in from the top */
+@keyframes slideInDown {
+    from    { opacity: 0; transform: translateY(-60%); }
+    to      { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes fadeOut {
