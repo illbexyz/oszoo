@@ -27,8 +27,14 @@ LocalStrategy = require('passport-local').Strategy;
 
 passport.use(new LocalStrategy((username, password, cb) ->
   User.findByUsername username, (user) ->
-    return cb(null, user)
+    if user.validPassword(password)
+      return cb(null, user)
+    else
+      return cb(null, false, message: "Incorrect password")
+  , (error) ->
+    return cb(null, false, message: "Incorrect username")
   )
+
 )
 
 passport.serializeUser((user, cb) ->
@@ -158,7 +164,8 @@ class VmController extends Controller
     vm.emit 'available-sessions', sessions: availableSessions
     admin.emit 'available-sessions', sessions: availableSessions
     @vmIsRunning = true
-    @rfbHandler = new RfbHandler(@socket, rfbPort).start()
+    @rfbHandler = new RfbHandler(@socket, rfbPort)
+    @rfbHandler.start()
     return
 
   # Stop the running vm

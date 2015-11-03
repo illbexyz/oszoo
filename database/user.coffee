@@ -1,4 +1,5 @@
 db = require('./database')
+bcrypt = require('bcrypt')
 collection = 'users'
 usermodel = {}
 
@@ -6,6 +7,9 @@ class User
   constructor: (username, password) ->
     @username = username
     @password = password
+
+  validPassword: (password) ->
+    bcrypt.compareSync password, @password
 
 usermodel.findById = (id, success, failure) ->
   db.get(collection, id).then((result) ->
@@ -20,6 +24,5 @@ usermodel.findByUsername = (username, success, failure) ->
     success(user)
   ).fail (error) ->
     failure(error)
-
 
 module.exports = usermodel;

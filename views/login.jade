@@ -10,11 +10,11 @@ block content
         md-input-container(flex).md-icon-float
           label Username
           md-icon(md-svg-src="images/icons/ic_account_circle_black_24px.svg")
-          input(ng-model="username")
+          input(ng-model="username" name="username")
         md-input-container(flex).md-icon-float
           label Password
           md-icon(md-svg-src="images/icons/ic_vpn_key_black_24px.svg")
-          input(ng-model="password" type="password")
+          input(ng-model="password" type="password" name="password")
         div(layout)
           span(flex)
-          md-button.md-primary Submit
+          md-button.md-primary(type="submit") Submit
