@@ -11,10 +11,11 @@ block content
           span 
             a(href="http://wiki.v2.cs.unibo.it/wiki/index.php/Main_Page") a Virtualsquare project
         #sidenav-actions(flex)
-          md-input-container
+          md-input-container(flex).md-icon-float
              label Search
-             input(ng-model="user.email" type="email")
-          div(ng-repeat="os in osList").oslist-animation
+             md-icon(md-svg-src="images/icons/ic_search_black_24px.svg")
+             input(ng-model="search")
+          div(ng-repeat="os in osList | filter:search").oslist-animation
             md-button(ng-click="changeOS(os)").md-primary {{os.title}}
     div(layout="column" flex)
       // Header
