@@ -15,7 +15,7 @@ block content
              label Search
              md-icon(md-svg-src="images/icons/ic_search_black_24px.svg")
              input(ng-model="search")
-          div(ng-repeat="os in osList | filter:search").oslist-animation
+          div(ng-repeat="os in osList | filter:search").os
             md-button(ng-click="changeOS(os)").md-primary {{os.title}}
     div(layout="column" flex)
       // Header
@@ -26,7 +26,9 @@ block content
           h1
             a(href="/") {{title}}
           div(flex)
-          md-button(ng-show="vmIsRunning" ng-click="showInfo()") Info
+          md-button.fade(ng-show="vmIsRunning" ng-click="showInfo()") Info
+          md-button.fade.md-icon-button.md-primary(ng-show="vmIsRunning" ng-click="stopVm()" aria-label="Stop Vm")
+            md-icon(md-svg-icon="images/icons/ic_close_white_24px.svg")
       md-subheader.md-primary 
         div(layout="row")
           div
@@ -34,7 +36,7 @@ block content
             span.header-value {{sessionsAvailable}}
             md-tooltip How many vm session are available
           div(flex)
-          div(ng-show="vmIsRunning")
+          div(ng-show="vmIsRunning").fade
             span.header-description Session expires in
             span.header-value {{timer}}
             md-tooltip Time remaining before the vm will shutdown

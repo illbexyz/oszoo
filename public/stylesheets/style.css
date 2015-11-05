@@ -8,7 +8,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 md-sidenav {
-  z-index: 9999;
   overflow: hidden;
 }
 
@@ -149,19 +148,23 @@ md-sidenav md-input-container {
   color: #9EFF94;
 }
 
-.oslist-animation {
-  position: relative;
+.fade.ng-leave, .fade.ng-hide-add {
+  animation: fadeOut 0.3s both ease-out;
 }
 
-.oslist-animation.ng-enter {
-  animation: slideInRight 0.5s both ease-out;
+.fade.ng-enter, .fade.ng-hide-remove {
+  animation: fadeIn 0.3s both ease-out;
 }
 
-.oslist-animation.ng-leave {
-	animation: fadeOut 0.5s both ease-out;
+.os.ng-enter {
+  animation: slideInDown 0.3s both ease-out;
 }
 
-.oslist-animation.ng-enter-stagger {
+.os.ng-leave {
+	animation: slideOutUp 0.3s both ease-in;
+}
+
+.os.ng-enter-stagger {
   transition-delay: 0s;
   animation-delay: 0.1s;
 }
@@ -273,8 +276,8 @@ form md-input-container {
 }
 
 /* slide in from the bottom */
-@keyframes slideOutLeft {
-		from 		{ opacity: 1; }
+@keyframes slideOutRight {
+    from    { opacity: 1; left: 0px; }
     to      { opacity: 0; left: 40px; }
 }
 
@@ -303,8 +306,14 @@ form md-input-container {
 
 /* slide in from the top */
 @keyframes slideInDown {
-    from    { opacity: 0; transform: translateY(-60%); }
+    from    { opacity: 0; transform: translateY(-30%); }
     to      { opacity: 1; transform: translateY(0); }
+}
+
+/* slide in from the bottom */
+@keyframes slideOutUp {
+    from    { opacity:1; transform:translateY(0); }
+    to      { opacity:0; transform: translateY(-30%); }
 }
 
 @keyframes fadeOut {
