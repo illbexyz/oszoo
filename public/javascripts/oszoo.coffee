@@ -66,20 +66,12 @@ app.factory 'socket', ->
 
 app.controller 'HomeController', ($scope, $mdSidenav, os, socket, $rootScope, $mdDialog, $mdToast) ->
 
-  # TODO: timer directive
-  timerToString = (timer) ->
-    minutes = '' + Math.floor(timer / 60)
-    seconds = '' + timer % 60
-    if minutes.length == 1
-      minutes = '0' + minutes
-    if seconds.length == 1
-      seconds = '0' + seconds
-    minutes + ':' + seconds
-
+  $scope.title = 'Select an OS'
   $scope.vmIsRunning = false
   $scope.sessionsAvailable
   $scope.osList
   $scope.currentOs
+
   os.getList().then (osList) ->
     $scope.osList = osList
     return
@@ -89,17 +81,23 @@ app.controller 'HomeController', ($scope, $mdSidenav, os, socket, $rootScope, $m
     $scope.$apply()
 
   socket.on 'session-timer', (data) ->
+    # TODO: timer directive
+    timerToString = (timer) ->
+      minutes = '' + Math.floor(timer / 60)
+      seconds = '' + timer % 60
+      if minutes.length == 1
+        minutes = '0' + minutes
+      if seconds.length == 1
+        seconds = '0' + seconds
+      minutes + ':' + seconds
     $scope.timer = timerToString(data.timer)
 
   socket.on 'session-expired', ->
     $mdToast.show $mdToast.simple().content('Session expired!').position('right bottom').hideDelay(2000)
-    $scope.vmIsRunning = false
-    $scope.title = 'Select an OS'
+    $scope.stopVm()
 
   $scope.toggleSidenav = (menuId) ->
     $mdSidenav(menuId).toggle()
-
-  $scope.title = 'Select an OS'
 
   $scope.changeOS = (os) ->
     $scope.title = os.title
@@ -116,6 +114,11 @@ app.controller 'HomeController', ($scope, $mdSidenav, os, socket, $rootScope, $m
       ok('Close')
     return
 
+  $scope.stopVm = ->
+    $scope.vmIsRunning = false
+    $scope.title = 'Select an OS'
+    $scope.$broadcast 'stop-vm'
+
   $scope.$on 'first-frame', (event, data) ->
     $scope.$broadcast 'stop-os-loading'
     $scope.vmIsRunning = true
@@ -123,7 +126,6 @@ app.controller 'HomeController', ($scope, $mdSidenav, os, socket, $rootScope, $m
     canvas.focus()
     return
   return
-
 
 app.controller 'VmController', ($scope, $timeout, $http, $interval, $rootScope, os, socket) ->
   # Variables
@@ -134,43 +136,68 @@ app.controller 'VmController', ($scope, $timeout, $http, $interval, $rootScope, 
   canvas = document.getElementById('screen')
   # Keycode converter
   codeConverter = new KeysymsCodeConverter()
-  console.log codeConverter
+  $scope.vmIsRunning = false
+  # String timer
+  $scope.timer = '10:00'
 
-  initializeSocket = ->
-    canvas = document.getElementById('screen')
-    canvas.tabIndex = 1000
-    ctx = canvas.getContext('2d')
-    socket.on 'init', (data) ->
+  document.body.onmousedown = ->
+    mouseDown = 1
+    return
+
+  document.body.onmouseup = ->
+    mouseDown = 0
+    return
+
+  canvas = document.getElementById('screen')
+  canvas.tabIndex = 1000
+  ctx = canvas.getContext('2d')
+
+  socket.on 'init', (data) ->
+    canvas.width = data.width
+    canvas.height = data.height
+    canvas.addEventListener 'keydown', handleKeydown
+    canvas.addEventListener 'mousedown', handleMouseDown
+    canvas.addEventListener 'mouseup', handleMouseUp
+    canvas.addEventListener 'mousemove', handleMouseMove
+    canvas.addEventListener 'contextmenu', handleMouse2Down
+    $scope.vmIsRunning = true
+    return
+
+  socket.on 'frame', (data) ->
+    image = new Image
+    blob = new Blob([ data.image ], type: 'image/jpeg')
+    urlBlob = URL.createObjectURL(blob)
+    uInt8Array = new Uint8Array(data.image)
+    i = uInt8Array.length
+    binaryString = [ i ]
+    scale = 1
+    while i--
+      binaryString[i] = String.fromCharCode(uInt8Array[i])
+    bdata = binaryString.join('')
+    base64 = window.btoa(bdata)
+    if data.width == 640 and data.height == 480
       canvas.width = data.width
       canvas.height = data.height
-      canvas.addEventListener 'keydown', handleKeydown
-      canvas.addEventListener 'mousedown', handleMouseDown
-      canvas.addEventListener 'mouseup', handleMouseUp
-      canvas.addEventListener 'mousemove', handleMouseMove
-      $scope.vmIsRunning = true
-      return
-    socket.on 'frame', (data) ->
-      image = new Image
-      blob = new Blob([ data.image ], type: 'image/jpeg')
-      urlBlob = URL.createObjectURL(blob)
-      uInt8Array = new Uint8Array(data.image)
-      i = uInt8Array.length
-      binaryString = [ i ]
-      while i--
-        binaryString[i] = String.fromCharCode(uInt8Array[i])
-      bdata = binaryString.join('')
-      base64 = window.btoa(bdata)
-      if data.width == 640 and data.height == 480
-        canvas.width = 640
-        canvas.height = 480
-      image.src = 'data:image/jpeg;base64,' + base64
+    if data.width == 800 and data.height == 600
+      canvas.width = data.width
+      canvas.height = data.height
+    if data.width == 1280 and data.height == 720
+      canvas.width = data.width
+      canvas.height = data.height
+    switch data.width
+      when 640 then scale = 1.25
+      when 800 then scale = 1
+      when 1280 then scale = 0.625
+    switch data.height
+      when 600 then scale = 1
+      when 720 then scale = 1.11
+    image.src = 'data:image/jpeg;base64,' + base64
 
-      image.onload = ->
-        ctx.drawImage image, data.x, data.y, data.width, data.height
-        $rootScope.$broadcast 'first-frame'
-        return
-
+    image.onload = ->
+      ctx.drawImage image, data.x, data.y, data.width, data.height
+      $rootScope.$broadcast 'first-frame'
       return
+
     return
 
   handleMouseMove = (e) ->
@@ -179,7 +206,6 @@ app.controller 'VmController', ($scope, $timeout, $http, $interval, $rootScope, 
       x: pos.x
       y: pos.y
       isDown: mouseDown
-    console.log pos.x, pos.y
     return
 
   handleMouseDown = (e) ->
@@ -191,6 +217,7 @@ app.controller 'VmController', ($scope, $timeout, $http, $interval, $rootScope, 
     return
 
   handleMouse2Down = (e) ->
+    e.preventDefault()
     pos = getMousePositionOnCanvas(e)
     socket.emit 'mouse',
       x: pos.x
@@ -244,12 +271,6 @@ app.controller 'VmController', ($scope, $timeout, $http, $interval, $rootScope, 
       return true
     false
 
-  $scope.vmIsRunning = false
-  # String timer
-  $scope.timer = '10:00'
-  # Initialize the socket
-  #initializeTimer();
-  initializeSocket()
   $scope.$on 'start-os-loading', (event, os) ->
 
     restartVm = ->
@@ -263,26 +284,13 @@ app.controller 'VmController', ($scope, $timeout, $http, $interval, $rootScope, 
       socket.emit 'stop'
       socket.on 'machine-closed', restartVm
     return
-  canvas.addEventListener 'keydown', (e) ->
-    if e.keyCode == 8
-      e.preventDefault()
-    return
-  canvas.addEventListener 'contextmenu', ((e) ->
-    e.preventDefault()
-    handleMouse2Down e
-    return
-  ), false
 
-  document.body.onmousedown = ->
-    mouseDown = 1
-    return
-
-  document.body.onmouseup = ->
-    mouseDown = 0
-    return
+  $scope.$on 'stop-vm', (event) ->
+    $scope.stopMachine()
 
   $scope.stopMachine = ->
     socket.emit 'stop'
+    $scope.vmIsRunning = false
     return
 
   $scope.$on '$destroy', ->
@@ -290,9 +298,15 @@ app.controller 'VmController', ($scope, $timeout, $http, $interval, $rootScope, 
     canvas.removeEventListener 'keydown', handleKeydown
     canvas.removeEventListener 'mousedown', handleMouseDown
     canvas.removeEventListener 'mouseup', handleMouseUp
+    canvas.removeEventListener 'contextmenu', handleMouse2Down
     socket.emit 'close'
     return
   return
+
+#------------------------------------------------------------------------------#
+#--------------------- Interactive console controller -------------------------#
+#------------------------------------------------------------------------------#
+
 app.controller 'ConsoleController', ($scope, $http, $interval, $rootScope) ->
 
   runLoading = ->
@@ -413,6 +427,11 @@ app.controller 'ConsoleController', ($scope, $http, $interval, $rootScope) ->
     return
 
   return
+
+#------------------------------------------------------------------------------#
+#------------------------- Enter Press directive ------------------------------#
+#------------------------------------------------------------------------------#
+
 app.directive 'enterPress', ->
   (scope, element, attrs) ->
     element.bind 'keydown keypress', (event) ->
@@ -423,6 +442,11 @@ app.directive 'enterPress', ->
         event.preventDefault()
       return
     return
+
+#------------------------------------------------------------------------------#
+#------------------------- Admin page controller ------------------------------#
+#------------------------------------------------------------------------------#
+
 app.controller 'AdminController', ($scope, $mdDialog, os) ->
   url = location.origin + '/admin'
   socket = io.connect(url)

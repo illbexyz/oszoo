@@ -156,7 +156,7 @@ class VmController extends Controller
   # Callback for the qemu start event
   onQemuStart: (err, port) ->
     # Start the timer
-    setInterval @decrementTimer.bind(this), 1000
+    @timerInterval = setInterval @decrementTimer.bind(this), 1000
     @sessionDetails.screenPort = port
     # By RFB protocol, the actual port is 5900 + screenPort
     rfbPort = 5900 + port
@@ -172,6 +172,7 @@ class VmController extends Controller
   stopQemu: ->
     if @vmIsRunning
       activeSessions.splice activeSessions.indexOf(@sessionDetails), 1
+      clearInterval(@timerInterval)
       @sessionDetails.timer = 600
       @vmIsRunning = false
       availableSessions++
