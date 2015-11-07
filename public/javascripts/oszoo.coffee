@@ -128,12 +128,106 @@ app.controller 'HomeController', ($scope, $mdSidenav, os, socket, $rootScope, $m
   return
 
 app.controller 'VmController', ($scope, $timeout, $http, $interval, $rootScope, os, socket) ->
+  xMov = 0
+  yMov = 0
   # Variables
   mouseDown = 0
   # Timer in seconds
   timer = 600
   # Canvas
   canvas = document.getElementById('screen')
+
+  canvas.requestPointerLock = canvas.requestPointerLock or
+                            canvas.mozRequestPointerLock or
+                            canvas.webkitRequestPointerLock
+
+  document.exitPointerLock = document.exitPointerLock or
+         document.mozExitPointerLock or
+         document.webkitExitPointerLock;
+
+  handleMouseMove = (e) ->
+    movementX = e.movementX or
+        e.mozMovementX      or
+        e.webkitMovementX   or
+        0
+
+    movementY = e.movementY or
+        e.mozMovementY      or
+        e.webkitMovementY   or
+        0
+
+    xMov += movementX
+    if xMov < 0
+      xMov = 0
+    if xMov > 800
+      xMov = 800
+
+    yMov += movementY
+    if yMov < 0
+      yMov = 0
+    if yMov > 600
+      yMov = 600
+
+    socket.emit 'mouse',
+      x: xMov
+      y: yMov
+      isDown: mouseDown
+
+  handleMouseDown = (e) ->
+    socket.emit 'mouse',
+      x: xMov
+      y: yMov
+      isDown: 1
+    return
+
+  handleMouse2Down = (e) ->
+    e.preventDefault()
+    console.log xMov, yMov
+    socket.emit 'mouse',
+      x: xMov
+      y: yMov
+      isDown: 2
+    return
+
+  handleMouseUp = (e) ->
+    socket.emit 'mouse',
+      x: xMov
+      y: yMov
+      isDown: 0
+    return
+
+  handleKeydown = (event) ->
+    if event.keyCode == 8
+      event.preventDefault()
+    socket.emit 'keydown', key: codeConverter.convert(event.keyCode)
+    return
+
+  lockChangeAlert = () ->
+    if document.pointerLockElement == canvas or
+    document.mozPointerLockElement == canvas or
+    document.webkitPointerLockElement == canvas
+      document.addEventListener "mousemove", handleMouseMove, false
+      document.addEventListener 'keydown', handleKeydown, false
+      document.addEventListener 'mousedown', handleMouseDown, false
+      document.addEventListener 'mouseup', handleMouseUp, false
+      document.addEventListener 'contextmenu', handleMouse2Down, false
+    else
+      document.removeEventListener "mousemove", handleMouseMove, false
+      document.removeEventListener 'keydown', handleKeydown, false
+      document.removeEventListener 'mousedown', handleMouseDown, false
+      document.removeEventListener 'mouseup', handleMouseUp, false
+      document.removeEventListener 'contextmenu', handleMouse2Down, false
+
+  canvas.onclick = (event) ->
+    if xMov == 0 and yMov == 0
+      xMov = event.x or event.clientX
+      yMov = event.y or event.clientY
+    canvas.requestPointerLock()
+
+  document.addEventListener('pointerlockchange', lockChangeAlert, false)
+  document.addEventListener('mozpointerlockchange', lockChangeAlert, false)
+  document.addEventListener('webkitpointerlockchange', lockChangeAlert, false)    
+
   # Keycode converter
   codeConverter = new KeysymsCodeConverter()
   $scope.vmIsRunning = false
@@ -148,18 +242,12 @@ app.controller 'VmController', ($scope, $timeout, $http, $interval, $rootScope, 
     mouseDown = 0
     return
 
-  canvas = document.getElementById('screen')
   canvas.tabIndex = 1000
   ctx = canvas.getContext('2d')
 
   socket.on 'init', (data) ->
     canvas.width = data.width
     canvas.height = data.height
-    canvas.addEventListener 'keydown', handleKeydown
-    canvas.addEventListener 'mousedown', handleMouseDown
-    canvas.addEventListener 'mouseup', handleMouseUp
-    canvas.addEventListener 'mousemove', handleMouseMove
-    canvas.addEventListener 'contextmenu', handleMouse2Down
     $scope.vmIsRunning = true
     return
 
@@ -198,59 +286,6 @@ app.controller 'VmController', ($scope, $timeout, $http, $interval, $rootScope, 
       $rootScope.$broadcast 'first-frame'
       return
 
-    return
-
-  handleMouseMove = (e) ->
-    pos = getMousePositionOnCanvas(e)
-    socket.emit 'mouse',
-      x: pos.x
-      y: pos.y
-      isDown: mouseDown
-    return
-
-  handleMouseDown = (e) ->
-    pos = getMousePositionOnCanvas(e)
-    socket.emit 'mouse',
-      x: pos.x
-      y: pos.y
-      isDown: 1
-    return
-
-  handleMouse2Down = (e) ->
-    e.preventDefault()
-    pos = getMousePositionOnCanvas(e)
-    socket.emit 'mouse',
-      x: pos.x
-      y: pos.y
-      isDown: 2
-    return
-
-  handleMouseUp = (e) ->
-    pos = getMousePositionOnCanvas(e)
-    socket.emit 'mouse',
-      x: pos.x
-      y: pos.y
-      isDown: 0
-    return
-
-  getMousePositionOnCanvas = (e) ->
-    mouseX = undefined
-    mouseY = undefined
-    if e.offsetX
-      mouseX = e.offsetX
-      mouseY = e.offsetY
-    else if e.layerX
-      mouseX = e.layerX
-      mouseY = e.layerY
-    {
-      x: mouseX
-      y: mouseY
-    }
-
-  handleKeydown = (event) ->
-    if event.keyCode == 8
-      event.preventDefault()
-    socket.emit 'keydown', key: codeConverter.convert(event.keyCode)
     return
 
   isCapslock = (e) ->
@@ -294,11 +329,6 @@ app.controller 'VmController', ($scope, $timeout, $http, $interval, $rootScope, 
     return
 
   $scope.$on '$destroy', ->
-    canvas.removeEventListener 'mousemove', handleMouseMove
-    canvas.removeEventListener 'keydown', handleKeydown
-    canvas.removeEventListener 'mousedown', handleMouseDown
-    canvas.removeEventListener 'mouseup', handleMouseUp
-    canvas.removeEventListener 'contextmenu', handleMouse2Down
     socket.emit 'close'
     return
   return
