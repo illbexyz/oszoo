@@ -15,7 +15,7 @@ class Qemu
   start: (config, callback) ->
     exe = undefined
     if config.arch == 'x86_64'
-      exe = 'qemu-system-x86_64'
+      exe = 'kvm'
     password = randomstring.generate(length: 12)
     port = @_port()
     self = this
