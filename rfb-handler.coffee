@@ -61,7 +61,6 @@ class RfbHandler
   _handleMouse: ->
     self = this
     self._socket.on 'mouse', (data) ->
-      console.log data.x, data.y, data.isDown
       self._rfb.pointerEvent data.x, data.y, data.isDown
       return
     return
@@ -70,6 +69,7 @@ class RfbHandler
     self = this
     self._socket.on 'keydown', (data) ->
       self._rfb.keyEvent data.key, 1
+      self._rfb.keyEvent data.key, 0
       return
     return
 
