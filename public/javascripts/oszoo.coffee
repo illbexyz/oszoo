@@ -199,6 +199,7 @@ app.controller 'VmController', ($scope, $timeout, $http, $interval, $rootScope, 
   handleKeydown = (event) ->
     if event.keyCode == 8
       event.preventDefault()
+    console.log(event.keyCode)
     socket.emit 'keydown', key: codeConverter.convert(event.keyCode)
     return
 
