@@ -4,7 +4,6 @@ block content
   .main-container(ng-app='OSZoo' layout="row" ng-controller="HomeController")
     div(layout="column")
       md-sidenav(class="md-sidenav-left" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')").sidenav-color
-        md-button(ng-click="close()" class="md-primary" hide-gt-md) Close Sidenav Left
         #sidenav-logo(layout="column")
           h1 
             a(href="/") Os Zoo
@@ -21,8 +20,8 @@ block content
       // Header
       md-toolbar(layout="row" class="md-default-theme").md-whiteframe-2dp
         div(class="md-toolbar-tools" layout="row")
-          md-button(ng-click="toggleSidenav('left')" hide-gt-sm class="md-icon-button menuBtn")
-            md-icon(aria-label="Menu" md-svg-icon="https://s3-us-west-2.amazonaws.com/s.cdpn.io/68133/menu.svg")
+          md-button(ng-click="toggleSidenav('left')" hide-gt-md class="md-icon-button menuBtn")
+            md-icon(aria-label="Menu" md-svg-icon="/images/icons/ic_menu_white_24px.svg")
           h1
             a(href="/") {{title}}
           div(flex)
