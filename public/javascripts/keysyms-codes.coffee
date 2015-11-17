@@ -10,8 +10,9 @@ class window.KeysymsCodeConverter
       19: 65300
       20: 65509
       27: 65307
-      33: 0
-      34: 0
+      32: 32
+      33: 33
+      34: 34
       35: 65367
       36: 65360
       37: 65361
@@ -56,6 +57,38 @@ class window.KeysymsCodeConverter
       88: 120
       89: 121
       90: 122
+      91: 65515
+      92: 65516
+      93: 65376
+      106: 65450
+      107: 65451
+      109: 65453
+      110: 65454
+      111: 65455
+      112: 65470
+      113: 65471
+      114: 65472
+      115: 65473
+      116: 65474
+      117: 65475
+      118: 65476
+      119: 65477
+      120: 65478
+      121: 65479
+      144: 65407
+      145: 65300
+      186: 59 #semicolon
+      187: 61 #equal sign
+      188: 44 #comma
+      189: 45 #dash
+      190: 46 #period
+      191: 47 #forward slash
+      192: 96 #grave accent
+      219: 91 #open bracket
+      220: 92 #back slash
+      221: 93 #close bracket
+      222: 39 #single quote
+
 
   convert: (code) ->
     @keyCodes[code]
