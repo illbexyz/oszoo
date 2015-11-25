@@ -258,8 +258,8 @@ app.controller 'VmController', ($scope, $timeout, $http, $interval, $rootScope, 
   ctx = canvas.getContext('2d')
 
   socket.on 'init', (data) ->
-    #canvas.width = data.width
-    #canvas.height = data.height
+    canvas.width = data.width
+    canvas.height = data.height
     $scope.vmIsRunning = true
     return
 
