@@ -247,8 +247,8 @@ app.controller 'VmController', ($scope, $timeout, $http, $interval, $rootScope, 
   ctx = canvas.getContext('2d')
 
   socket.on 'init', (data) ->
-    canvas.width = data.width
-    canvas.height = data.height
+    #canvas.width = data.width
+    #canvas.height = data.height
     $scope.vmIsRunning = true
     return
 
@@ -264,22 +264,6 @@ app.controller 'VmController', ($scope, $timeout, $http, $interval, $rootScope, 
       binaryString[i] = String.fromCharCode(uInt8Array[i])
     bdata = binaryString.join('')
     base64 = window.btoa(bdata)
-    if data.width == 640 and data.height == 480
-      canvas.width = data.width
-      canvas.height = data.height
-    if data.width == 800 and data.height == 600
-      canvas.width = data.width
-      canvas.height = data.height
-    if data.width == 1280 and data.height == 720
-      canvas.width = data.width
-      canvas.height = data.height
-    switch data.width
-      when 640 then scale = 1.25
-      when 800 then scale = 1
-      when 1280 then scale = 0.625
-    switch data.height
-      when 600 then scale = 1
-      when 720 then scale = 1.11
     image.src = 'data:image/jpeg;base64,' + base64
 
     image.onload = ->
@@ -495,8 +479,9 @@ app.controller 'AdminController', ($scope, $mdDialog, os) ->
         return
 
       $scope.confirm = (os) ->
-        $mdDialog.hide()
-        $scope.modifyOs os
+        if $scope.modifyOsForm.$valid
+          $scope.modifyOs os
+          $mdDialog.hide()
         return
 
       return
