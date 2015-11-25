@@ -1,5 +1,6 @@
 div(layout)
-  form
+  form(name="modifyOsForm")
+    input(type="hidden", name="_csrf", value=csrfToken)
     div(layout="row")
       h2 {{os.title}}
       span(flex)
@@ -8,10 +9,10 @@ div(layout)
     div(layout layout-sm="column")
       md-input-container(flex)
         label Title
-        input(ng-model="os.title")
+        input(ng-model="os.title" required)
       md-input-container(flex)
         label Console Title
-        input(ng-model="os.consoleTitle")
+        input(ng-model="os.consoleTitle" required)
     div(layout layout-sm="column")
       md-input-container(ng-show="os.diskImage" flex)
         label Disk Image
@@ -21,13 +22,13 @@ div(layout)
         input(type="text" ng-model="os.cdrom")
       md-input-container(flex)
         label Architecture
-        md-select(ng-model="os.arch")
+        md-select(ng-model="os.arch" required)
           md-option(value="x86_64") x86_64
           md-option(value="powerpc") PowerPC
           md-option(value="arm") ARM
       md-input-container(flex)
         label Memory
-        md-select(ng-model="os.memory")
+        md-select(ng-model="os.memory" required)
           md-option(value="64") 64
           md-option(value="128") 128
           md-option(value="256") 256
