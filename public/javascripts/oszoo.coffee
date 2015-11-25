@@ -199,8 +199,17 @@ app.controller 'VmController', ($scope, $timeout, $http, $interval, $rootScope, 
   handleKeydown = (event) ->
     if event.keyCode == 8
       event.preventDefault()
-    console.log(event.keyCode)
-    socket.emit 'keydown', key: codeConverter.convert(event.keyCode)
+    socket.emit 'keydown',
+      key: codeConverter.convert(event.keyCode)
+      keydown: 1
+    return
+
+  handleKeyup = (event) ->
+    if event.keyCode == 8
+      event.preventDefault()
+    socket.emit 'keydown',
+      key: codeConverter.convert(event.keyCode)
+      keydown: 0
     return
 
   lockChangeAlert = () ->
@@ -209,12 +218,14 @@ app.controller 'VmController', ($scope, $timeout, $http, $interval, $rootScope, 
     document.webkitPointerLockElement == canvas
       document.addEventListener "mousemove", handleMouseMove, false
       document.addEventListener 'keydown', handleKeydown, false
+      document.addEventListener "keyup", handleKeyup, false
       document.addEventListener 'mousedown', handleMouseDown, false
       document.addEventListener 'mouseup', handleMouseUp, false
       document.addEventListener 'contextmenu', handleMouse2Down, false
     else
       document.removeEventListener "mousemove", handleMouseMove, false
       document.removeEventListener 'keydown', handleKeydown, false
+      document.removeEventListener 'keyup', handleKeyup, false
       document.removeEventListener 'mousedown', handleMouseDown, false
       document.removeEventListener 'mouseup', handleMouseUp, false
       document.removeEventListener 'contextmenu', handleMouse2Down, false

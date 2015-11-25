@@ -1,7 +1,7 @@
 rfb = require('rfb2')
 Jpeg = require('jpeg').Jpeg
 
-###* Start a new connection with the qemu process ###
+# Start a new connection with the qemu process
 
 class RfbHandler
   constructor: (socket, port) ->
@@ -68,8 +68,7 @@ class RfbHandler
   _handleKeys: ->
     self = this
     self._socket.on 'keydown', (data) ->
-      self._rfb.keyEvent data.key, 1
-      self._rfb.keyEvent data.key, 0
+      self._rfb.keyEvent data.key, data.keydown
       return
     return
 

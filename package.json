@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "sudo nodemon ./bin/www.coffee"
+    "start": "nodemon ./bin/www.coffee"
   },
   "dependencies": {
     "angular": "^1.4.7",
