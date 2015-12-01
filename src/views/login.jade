@@ -1,0 +1,21 @@
+extends layout
+
+block content
+  .main-container(ng-app='OSZoo' layout="column")
+    md-toolbar(layout="row").md-whiteframe-z2
+      div(class="md-toolbar-tools" layout="row")
+        h1 Login
+    #login.md-padding.md-whiteframe-z1
+      form(action='/login' method="post" layout="column")
+        input(type="hidden", name="_csrf", value=csrfToken)
+        md-input-container(flex).md-icon-float
+          label Username
+          md-icon(md-svg-src="images/icons/ic_account_circle_black_24px.svg")
+          input(ng-model="username" name="username")
+        md-input-container(flex).md-icon-float
+          label Password
+          md-icon(md-svg-src="images/icons/ic_vpn_key_black_24px.svg")
+          input(ng-model="password" type="password" name="password")
+        div(layout)
+          span(flex)
+          md-button.md-primary(type="submit") Submit
