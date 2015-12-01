@@ -54,4 +54,5 @@ module.exports = function(grunt) {
 
   // Default task(s).
   grunt.registerTask('default', ['copy', 'coffeelint', 'coffee', 'browserify']);
+  grunt.registerTask('build', ['copy', 'coffeelint', 'coffee', 'browserify', 'uglify']);
 };
