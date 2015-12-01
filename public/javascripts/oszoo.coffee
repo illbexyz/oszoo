@@ -336,11 +336,11 @@ app.controller 'VmController', ($scope, $timeout, $http, $interval, $rootScope, 
 app.controller 'ConsoleController', ($scope, $http, $interval, $rootScope) ->
 
   runLoading = ->
-    $interval loadingAnimation, 80
+    $scope.loadingInterval = $interval loadingAnimation, 80
     return
 
   stopLoading = ->
-    $interval.cancel loadingAnimation
+    $interval.cancel $scope.loadingInterval
     return
 
   runInputHint = ->
@@ -385,7 +385,7 @@ app.controller 'ConsoleController', ($scope, $http, $interval, $rootScope) ->
           print 'Wait for the magic to happen...'
         else
           p = document.createElement('p')
-          p.appendChild document.createTextNode('Sorry, I can\'t help you with that.')
+          p.appendChild document.createTextNode("Sorry, I can't help you with that.")
           consoleElement.appendChild p
         break
     $scope.userInput = ''

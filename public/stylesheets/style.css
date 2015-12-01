@@ -221,6 +221,7 @@ md-sidenav md-input-container {
   font-weight: 400;
 	text-overflow: ellipsis;
 	overflow-x: hidden;
+  white-space: nowrap;
 }
 
 .content {
