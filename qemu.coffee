@@ -22,8 +22,6 @@ class Qemu
     args = [
       '-m'
       config.memory
-      '--usbdevice'
-      'tablet'
       '-vnc'
       ':' + port
     ]

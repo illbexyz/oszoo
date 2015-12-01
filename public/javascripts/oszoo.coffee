@@ -159,14 +159,14 @@ app.controller 'VmController', ($scope, $timeout, $http, $interval, $rootScope, 
     xMov += movementX
     if xMov < 0
       xMov = 0
-    if xMov > 800
-      xMov = 800
+    if xMov > canvas.width
+      xMov = canvas.width
 
     yMov += movementY
     if yMov < 0
       yMov = 0
-    if yMov > 600
-      yMov = 600
+    if yMov > canvas.height
+      yMov = canvas.height
 
     socket.emit 'mouse',
       x: xMov
@@ -232,8 +232,8 @@ app.controller 'VmController', ($scope, $timeout, $http, $interval, $rootScope, 
 
   canvas.onclick = (event) ->
     if xMov == 0 and yMov == 0
-      xMov = event.x or event.clientX
-      yMov = event.y or event.clientY
+      xMov = canvas.width/2
+      yMov = canvas.height/2
     canvas.requestPointerLock()
 
   document.addEventListener('pointerlockchange', lockChangeAlert, false)
@@ -252,6 +252,15 @@ app.controller 'VmController', ($scope, $timeout, $http, $interval, $rootScope, 
 
   document.body.onmouseup = ->
     mouseDown = 0
+    return
+
+  resizeCanvas = (width, height) ->
+    if width == 640 and height == 480 or
+    width == 800 and height == 600 or
+    width == 1024 and height == 768 or
+    width == 1280 and height == 720
+      canvas.width = width
+      canvas.height = height
     return
 
   canvas.tabIndex = 1000
@@ -275,6 +284,7 @@ app.controller 'VmController', ($scope, $timeout, $http, $interval, $rootScope, 
       binaryString[i] = String.fromCharCode(uInt8Array[i])
     bdata = binaryString.join('')
     base64 = window.btoa(bdata)
+    resizeCanvas(data.width, data.height)
     image.src = 'data:image/jpeg;base64,' + base64
 
     image.onload = ->
