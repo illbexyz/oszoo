@@ -2,18 +2,7 @@ extends layout
 
 block content
   .main-container(ng-app='OSZoo' ng-controller='AdminController' layout="row")
-    div(layout="column")
-      //md-sidenav(flex class="md-sidenav-left" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')").sidenav-color
-        md-button(ng-click="close()" class="md-primary" hide-gt-md) Close Sidenav Left
-        #sidenav-logo(layout="column")
-          h1 
-            a(href="/") Os Zoo
-          span 
-            a(href="http://wiki.v2.cs.unibo.it/wiki/index.php/Main_Page") a Virtualsquare project
-        #sidenav-actions(flex)
-          md-button.md-primary Sessions
-          md-button.md-primary Operating Systems
-    div(layout="column" flex).md-whiteframe-z2
+      div(layout="column" flex).md-whiteframe-z2
       md-toolbar(layout="row").md-whiteframe-z2
         div(class="md-toolbar-tools" layout="row")
           md-button(ng-click="toggleSidenav('left')" hide-gt-sm class="md-icon-button menuBtn")

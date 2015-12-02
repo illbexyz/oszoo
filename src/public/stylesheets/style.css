@@ -1,0 +1,327 @@
+a {
+	text-decoration: none;
+  color: black;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: 'Oswald';
+}
+
+md-sidenav {
+  overflow: hidden;
+}
+
+#sidenav-logo {
+  display: flex;
+  height: 111px;
+  text-align: center;
+  padding-top: 30px;
+	margin-bottom: 12px;
+}
+
+#sidenav-logo h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 500;
+  font-size: 42px;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+#sidenav-logo span {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+}
+
+md-sidenav .md-button {
+  width: 100%;
+  height: 50px;
+  margin: 0;
+  text-align: left;
+  padding-left: 16px;
+  font-weight: 600;
+}
+
+md-toolbar {
+  font-family: 'Oswald';
+}
+
+md-toolbar a {
+  font-size: 24px;
+  font-weight: 400;
+}
+
+md-sidenav md-input-container {
+	margin-left: 12px;
+	margin-right: 12px;
+	padding-bottom: 12px;
+}
+
+.md-toolbar-tools h1 {
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+.md-button.md-icon-button.menuBtn {
+  margin-top: 6px;
+  margin-right: 0;
+}
+
+@media (min-width: 768px){
+}
+
+@media (min-width: 992px){
+}
+
+@media (min-width: 1200px){
+}
+
+.header-description {
+  font-weight: 300;
+}
+
+.header-value {
+  font-weight: 600;
+  padding-left: 8px;
+}
+
+.main-container {
+	width: 100%;
+	height: 100%;
+}
+
+#screen-container {
+  background-color: #1f2036;
+  padding-top: 42px;
+}
+
+#frame {
+  border: solid 25px;
+  border-radius: 25px;
+  border-color: black;
+  background-color: black;
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#screen {
+  position: relative;
+  animation: all linear 0.5;
+  width: 800px;
+  height: 600px;
+}
+
+#screen.ng-hide {
+  width: 0;
+  height: 0;
+}
+
+#console {
+  width: 800px;
+  height: 600px;
+  background-color: black;
+  color: white;
+  font-family: 'Inconsolata';
+  font-size: 16px;
+  display: block;
+  overflow-y: hidden;
+}
+
+#console table td {
+  width: 266px;
+}
+
+#console input {
+  background-color: black;
+  color: white;
+  border: none;
+  outline: none;
+  font-family: 'Inconsolata';
+  font-size: 16px;
+  width: 700px;
+}
+
+.consoleHighlight {
+  color: #9EFF94;
+}
+
+.fade.ng-leave, .fade.ng-hide-add {
+  animation: fadeOut 0.3s both ease-out;
+}
+
+.fade.ng-enter, .fade.ng-hide-remove {
+  animation: fadeIn 0.3s both ease-out;
+}
+
+.os.ng-enter {
+  animation: slideInDown 0.3s both ease-out;
+}
+
+.os.ng-leave {
+	animation: slideOutUp 0.3s both ease-in;
+}
+
+.os.ng-enter-stagger {
+  transition-delay: 0s;
+  animation-delay: 0.1s;
+}
+
+.tile {
+	margin: 8px;
+	border-radius: 4px;
+}
+
+.tile-row {
+  border-bottom: 1px solid #ddd;
+	height: 50px;
+	position: relative;
+}
+
+.tile-row:last-child {
+  border-bottom: 0;
+	border-bottom-radius: 3px 3px 0 0;
+}
+
+.tile-row h1, h2, h3, h4, h5, h6 {
+	margin: 0;
+}
+
+.tile-row button {
+	text-align: left;
+	margin: 0;
+	padding: 6px 8px 6px 8px;
+	display: flex;
+}
+
+.tile-row.ng-enter {
+	animation: slideInDown 0.5s both ease-out;
+}
+
+.tile-row.ng-enter-stagger {
+	transition-delay: 0s;
+  animation-delay: 0.05s;
+}
+
+.tile-row-text {
+	padding: 16px 8px 16px 8px;
+	font-size: 14px;
+	display: flex;
+	text-align: center;
+}
+
+.header {
+	font-weight: 600;
+}
+
+.button-description {
+  text-transform: none;
+  color: black;
+  font-weight: 400;
+	text-overflow: ellipsis;
+	overflow-x: hidden;
+  white-space: nowrap;
+}
+
+.content {
+	width: 90%;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 18px;
+}
+
+.deleteIcon {
+	color: green;
+}
+
+form {
+	width: 100%;
+	height: 100%;
+	padding: 40px;
+}
+
+form h1, h2, h3, h4, h5, h6, {
+	margin: 0;
+}
+
+form md-input-container {
+	margin-left: 2px;
+	margin-right: 2px;
+}
+
+#login {
+	width: 400px;
+	margin-top: 40px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#login form {
+	margin: 0;
+	padding: 0;
+}
+
+/* ANIMATIONS
+============================================================================= */
+
+/* leaving animations ----------------------------------------- */
+/* rotate and fall */
+@keyframes rotateFall {
+    0%      { transform: rotateZ(0deg); }
+    20%     { transform: rotateZ(10deg); animation-timing-function: ease-out; }
+    40%     { transform: rotateZ(17deg); }
+    60%     { transform: rotateZ(16deg); }
+    100%    { transform: translateY(100%) rotateZ(17deg); }
+}
+
+/* slide in from the bottom */
+@keyframes slideOutRight {
+    from    { opacity: 1; left: 0px; }
+    to      { opacity: 0; left: 40px; }
+}
+
+/* rotate out newspaper */
+@keyframes rotateOutNewspaper {
+    to      { transform: translateZ(-3000px) rotateZ(360deg); opacity: 0; }
+}
+
+/* entering animations --------------------------------------- */
+/* scale up */
+@keyframes scaleUp {
+    from    { opacity: 0.3; -webkit-transform: scale(0.8); }
+}
+
+/* slide in from the right */
+@keyframes slideInRight {
+    from    { opacity: 0; left: 40px; }
+    to      { opacity: 1; left: 0; }
+}
+
+/* slide in from the bottom */
+@keyframes slideInUp {
+    from    { transform:translateY(100%); }
+    to      { transform: translateY(0); }
+}
+
+/* slide in from the top */
+@keyframes slideInDown {
+    from    { opacity: 0; transform: translateY(-30%); }
+    to      { opacity: 1; transform: translateY(0); }
+}
+
+/* slide in from the bottom */
+@keyframes slideOutUp {
+    from    { opacity:1; transform:translateY(0); }
+    to      { opacity:0; transform: translateY(-30%); }
+}
+
+@keyframes fadeOut {
+  from {opacity: 1;}
+  to {opacity: 0;}
+}
+
+@keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}

@@ -4,13 +4,20 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
 
     copy: {
-      client: {
+      views: {
         expand: true,
         cwd: 'src/views/',
         src: '**',
         dest: 'dist/views/',
         filter: 'isFile',
       },
+      public: {
+      	expand: true,
+        cwd: 'src/public/',
+        src: '**',
+        dest: 'dist/public/',
+        filter: 'isFile',
+      }
     },
 
     coffeelint: {
@@ -39,6 +46,10 @@ module.exports = function(grunt) {
       client: {
         files: {
           'dist/public/javascripts/oszoo.js': ['dist/public/javascripts/oszoo.js']
+        },
+        options : {
+          beautify : true,
+          mangle   : true
         }
       }
     },

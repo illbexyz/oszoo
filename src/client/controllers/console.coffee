@@ -5,11 +5,11 @@
 module.exports = ($scope, $http, $interval, $rootScope) ->
 
   runLoading = ->
-    $interval loadingAnimation, 80
+    $scope.loadingInterval = $interval loadingAnimation, 80
     return
 
   stopLoading = ->
-    $interval.cancel loadingAnimation
+    $interval.cancel $scope.loadingInterval
     return
 
   runInputHint = ->
