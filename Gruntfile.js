@@ -54,6 +54,30 @@ module.exports = function(grunt) {
       }
     },
 
+    watch: {
+      coffee: {
+        files: ['src/**/*.coffee'],
+        tasks: ['coffeelint', 'coffee',],
+        options: {
+          spawn: false,
+        },
+      },
+      views: {
+        files: ['src/views/**/*.jade'],
+        tasks: ['copy'],
+        options: {
+          spawn: false,
+        },
+      },
+      client: {
+        files: ['src/client/**/*.coffee'],
+        tasks: ['coffeelint', 'coffee', 'browserify'],
+        options: {
+          spawn: false,
+        },
+      },
+    },
+
   });
 
   grunt.loadNpmTasks('grunt-coffeelint');
@@ -64,6 +88,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
 
   // Default task(s).
-  grunt.registerTask('default', ['copy', 'coffeelint', 'coffee', 'browserify']);
+  grunt.registerTask('default', ['copy', 'coffeelint', 'coffee', 'browserify', 'watch']);
   grunt.registerTask('build', ['copy', 'coffeelint', 'coffee', 'browserify', 'uglify']);
 };
