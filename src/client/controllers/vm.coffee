@@ -8,6 +8,10 @@ module.exports = ($scope, $rootScope, os, socket, keysyms) ->
   # Canvas
   canvas = document.getElementById('screen')
 
+  $scope.vmIsRunning = false
+  # String timer
+  $scope.timer = '10:00'
+
   canvas.requestPointerLock = canvas.requestPointerLock or
                             canvas.mozRequestPointerLock or
                             canvas.webkitRequestPointerLock
@@ -15,6 +19,31 @@ module.exports = ($scope, $rootScope, os, socket, keysyms) ->
   document.exitPointerLock = document.exitPointerLock or
          document.mozExitPointerLock or
          document.webkitExitPointerLock;
+
+  canvas.tabIndex = 1000
+  ctx = canvas.getContext('2d')
+
+  lockChangeAlert = () ->
+    if document.pointerLockElement == canvas or
+    document.mozPointerLockElement == canvas or
+    document.webkitPointerLockElement == canvas
+      document.addEventListener "mousemove", handleMouseMove, false
+      document.addEventListener 'keydown', handleKeydown, false
+      document.addEventListener "keyup", handleKeyup, false
+      document.addEventListener 'mousedown', handleMouseDown, false
+      document.addEventListener 'mouseup', handleMouseUp, false
+      document.addEventListener 'contextmenu', handleMouse2Down, false
+    else
+      document.removeEventListener "mousemove", handleMouseMove, false
+      document.removeEventListener 'keydown', handleKeydown, false
+      document.removeEventListener 'keyup', handleKeyup, false
+      document.removeEventListener 'mousedown', handleMouseDown, false
+      document.removeEventListener 'mouseup', handleMouseUp, false
+      document.removeEventListener 'contextmenu', handleMouse2Down, false
+
+  document.addEventListener('pointerlockchange', lockChangeAlert, false)
+  document.addEventListener('mozpointerlockchange', lockChangeAlert, false)
+  document.addEventListener('webkitpointerlockchange', lockChangeAlert, false)
 
   handleMouseMove = (e) ->
     movementX = e.movementX or
@@ -39,33 +68,17 @@ module.exports = ($scope, $rootScope, os, socket, keysyms) ->
     if yMov > canvas.height
       yMov = canvas.height
 
-    socket.emit 'mouse',
-      x: xMov
-      y: yMov
-      isDown: mouseDown
+    sendMouse()
 
   handleMouseDown = (e) ->
-    socket.emit 'mouse',
-      x: xMov
-      y: yMov
-      isDown: 1
-    return
+    sendMouse()
 
   handleMouse2Down = (e) ->
     e.preventDefault()
-    console.log xMov, yMov
-    socket.emit 'mouse',
-      x: xMov
-      y: yMov
-      isDown: 2
-    return
+    sendMouse()
 
   handleMouseUp = (e) ->
-    socket.emit 'mouse',
-      x: xMov
-      y: yMov
-      isDown: 0
-    return
+    sendMouse()
 
   handleKeydown = (event) ->
     if event.keyCode == 8
@@ -73,7 +86,6 @@ module.exports = ($scope, $rootScope, os, socket, keysyms) ->
     socket.emit 'keydown',
       key: keysyms(event.keyCode)
       keydown: 1
-    return
 
   handleKeyup = (event) ->
     if event.keyCode == 8
@@ -81,25 +93,6 @@ module.exports = ($scope, $rootScope, os, socket, keysyms) ->
     socket.emit 'keydown',
       key: keysyms(event.keyCode)
       keydown: 0
-    return
-
-  lockChangeAlert = () ->
-    if document.pointerLockElement == canvas or
-    document.mozPointerLockElement == canvas or
-    document.webkitPointerLockElement == canvas
-      document.addEventListener "mousemove", handleMouseMove, false
-      document.addEventListener 'keydown', handleKeydown, false
-      document.addEventListener "keyup", handleKeyup, false
-      document.addEventListener 'mousedown', handleMouseDown, false
-      document.addEventListener 'mouseup', handleMouseUp, false
-      document.addEventListener 'contextmenu', handleMouse2Down, false
-    else
-      document.removeEventListener "mousemove", handleMouseMove, false
-      document.removeEventListener 'keydown', handleKeydown, false
-      document.removeEventListener 'keyup', handleKeyup, false
-      document.removeEventListener 'mousedown', handleMouseDown, false
-      document.removeEventListener 'mouseup', handleMouseUp, false
-      document.removeEventListener 'contextmenu', handleMouse2Down, false
 
   canvas.onclick = (event) ->
     if xMov == 0 and yMov == 0
@@ -107,21 +100,11 @@ module.exports = ($scope, $rootScope, os, socket, keysyms) ->
       yMov = canvas.height/2
     canvas.requestPointerLock()
 
-  document.addEventListener('pointerlockchange', lockChangeAlert, false)
-  document.addEventListener('mozpointerlockchange', lockChangeAlert, false)
-  document.addEventListener('webkitpointerlockchange', lockChangeAlert, false)
-
-  $scope.vmIsRunning = false
-  # String timer
-  $scope.timer = '10:00'
-
   document.body.onmousedown = ->
     mouseDown = 1
-    return
 
   document.body.onmouseup = ->
     mouseDown = 0
-    return
 
   resizeCanvas = (width, height) ->
     if width == 640 and height == 480 or
@@ -130,36 +113,6 @@ module.exports = ($scope, $rootScope, os, socket, keysyms) ->
     width == 1280 and height == 720
       canvas.width = width
       canvas.height = height
-    return
-
-  canvas.tabIndex = 1000
-  ctx = canvas.getContext('2d')
-
-  socket.on 'init', (data) ->
-    canvas.width = data.width
-    canvas.height = data.height
-    $scope.vmIsRunning = true
-    return
-
-  socket.on 'frame', (data) ->
-    image = new Image
-    blob = new Blob([ data.image ], type: 'image/jpeg')
-    urlBlob = URL.createObjectURL(blob)
-    uInt8Array = new Uint8Array(data.image)
-    i = uInt8Array.length
-    binaryString = [ i ]
-    scale = 1
-    while i--
-      binaryString[i] = String.fromCharCode(uInt8Array[i])
-    bdata = binaryString.join('')
-    base64 = window.btoa(bdata)
-    resizeCanvas(data.width, data.height)
-    image.src = 'data:image/jpeg;base64,' + base64
-
-    image.onload = ->
-      ctx.drawImage image, data.x, data.y, data.width, data.height
-      $rootScope.$broadcast 'first-frame'
-      return
 
   isCapslock = (e) ->
     e = if e then e else window.event
@@ -179,19 +132,55 @@ module.exports = ($scope, $rootScope, os, socket, keysyms) ->
       return true
     false
 
+  #----------------------------------------------------------------------------#
+  #-------------------------- Websocket messaging -----------------------------#
+  #----------------------------------------------------------------------------#
+
+  socket.on 'init', (data) ->
+    canvas.width = data.width
+    canvas.height = data.height
+    $scope.vmIsRunning = true
+
+  socket.on 'frame', (data) ->
+    image = new Image
+    blob = new Blob([ data.image ], type: 'image/jpeg')
+    urlBlob = URL.createObjectURL(blob)
+    uInt8Array = new Uint8Array(data.image)
+    i = uInt8Array.length
+    binaryString = [ i ]
+    scale = 1
+    while i--
+      binaryString[i] = String.fromCharCode(uInt8Array[i])
+    bdata = binaryString.join('')
+    base64 = window.btoa(bdata)
+    resizeCanvas(data.width, data.height)
+    image.src = 'data:image/jpeg;base64,' + base64
+
+    image.onload = ->
+      ctx.drawImage image, data.x, data.y, data.width, data.height
+      $rootScope.$broadcast 'first-frame'
+
+  sendMouse = (x, y, isDown) ->
+    socket.emit 'mouse',
+      x: xMov
+      y: yMov
+      isDown: isDown
+
+  #----------------------------------------------------------------------------#
+  #---------------------------- Angular messaging -----------------------------#
+  #----------------------------------------------------------------------------#
+
   $scope.$on 'start-os-loading', (event, os) ->
 
     restartVm = ->
       socket.emit 'start', os
       socket.removeListener 'machine-closed', restartVm
-      return
 
     if !$scope.vmIsRunning
       socket.emit 'start', os
     else
       socket.emit 'stop'
       socket.on 'machine-closed', restartVm
-    return
 
   $scope.$on 'stop-vm', (event) ->
     $scope.stopMachine()
@@ -203,6 +192,4 @@ module.exports = ($scope, $rootScope, os, socket, keysyms) ->
 
   $scope.$on '$destroy', ->
     socket.emit 'close'
-    return
     
-  return

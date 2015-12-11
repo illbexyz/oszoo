@@ -35,6 +35,23 @@ module.exports = function(grunt) {
       }
     },
 
+    babel: {
+      options: {
+        sourceMap: true,
+        presets: ['es2015']
+      },
+      dist: {
+        files: [{
+          expand: true,
+          flatten: false,
+          cwd: 'src/',
+          src: ['**/*.js'],
+          dest: 'dist/',
+          ext: '.js'
+        }]
+      }
+    },
+
     browserify: {
       client: {
         src: 'dist/client/app.js',
@@ -76,9 +93,18 @@ module.exports = function(grunt) {
           spawn: false,
         },
       },
+      babel: {
+        files: ['src/websockets/**/*.js', 'src/app.js', 'src/virtual/*.js', 'src/database/*.js', 'src/routes/*.js'],
+        tasks: ['babel'],
+        options: {
+          spawn: false,
+        },
+      }
     },
 
   });
+
+  require('load-grunt-tasks')(grunt);
 
   grunt.loadNpmTasks('grunt-coffeelint');
   grunt.loadNpmTasks('grunt-contrib-coffee');
@@ -88,6 +114,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
 
   // Default task(s).
-  grunt.registerTask('default', ['copy', 'coffeelint', 'coffee', 'browserify', 'watch']);
+  grunt.registerTask('default', ['copy', 'coffeelint', 'coffee', 'babel', 'browserify', 'watch']);
   grunt.registerTask('build', ['copy', 'coffeelint', 'coffee', 'browserify', 'uglify']);
 };

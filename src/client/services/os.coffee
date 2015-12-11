@@ -20,7 +20,7 @@ module.exports = ($http) ->
     request.then successHandler, failureHandler
 
   deletea = (os) ->
-    deleteUrl = url + '/' + os.id
+    deleteUrl = url + '/' + os._id
     request = $http.delete(deleteUrl)
     request.then successHandler, failureHandler
 
