@@ -3,6 +3,7 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
+    // Used to copy static files
     copy: {
       views: {
         expand: true,
@@ -20,25 +21,13 @@ module.exports = function(grunt) {
       }
     },
 
-    coffeelint: {
-      app: ['src/**/*.coffee']
-    },
-
-    coffee: {
-      glob_to_multiple: {
-        expand: true,
-        flatten: false,
-        cwd: 'src/',
-        src: ['**/*.coffee'],
-        dest: 'dist/',
-        ext: '.js'
-      }
+    eslint: {
+      target: ['src/**/*.js']
     },
 
     babel: {
       options: {
-        sourceMap: true,
-        presets: ['es2015']
+        presets: ['es2015'],
       },
       dist: {
         files: [{
@@ -72,32 +61,33 @@ module.exports = function(grunt) {
     },
 
     watch: {
-      coffee: {
-        files: ['src/**/*.coffee'],
-        tasks: ['coffeelint', 'coffee',],
-        options: {
-          spawn: false,
-        },
-      },
       views: {
         files: ['src/views/**/*.jade'],
         tasks: ['copy'],
         options: {
           spawn: false,
-        },
+        }
       },
       client: {
-        files: ['src/client/**/*.coffee'],
-        tasks: ['coffeelint', 'coffee', 'browserify'],
+        files: ['src/client/**/*.js'],
+        tasks: ['babel', 'browserify'],
         options: {
           spawn: false,
         },
       },
       babel: {
-        files: ['src/websockets/**/*.js', 'src/app.js', 'src/virtual/*.js', 'src/database/*.js', 'src/routes/*.js'],
+        files: [
+          'src/websockets/**/*.js', 
+          'src/app.js', 
+          'src/virtual/**/*.js', 
+          'src/database/**/*.js', 
+          'src/routes/**/*.js', 
+          'src/database/**/*.js', 
+          'src/bin/**/*.js'
+        ],
         tasks: ['babel'],
         options: {
-          spawn: false,
+          spawn: false
         },
       }
     },
@@ -106,14 +96,13 @@ module.exports = function(grunt) {
 
   require('load-grunt-tasks')(grunt);
 
-  grunt.loadNpmTasks('grunt-coffeelint');
-  grunt.loadNpmTasks('grunt-contrib-coffee');
+
   grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-copy');
 
   // Default task(s).
-  grunt.registerTask('default', ['copy', 'coffeelint', 'coffee', 'babel', 'browserify', 'watch']);
-  grunt.registerTask('build', ['copy', 'coffeelint', 'coffee', 'browserify', 'uglify']);
+  grunt.registerTask('default', ['copy', 'eslint', 'babel', 'browserify', 'watch']);
+  grunt.registerTask('build', ['copy', 'eslint', 'babel', 'browserify', 'uglify']);
 };
