@@ -1,6 +1,4 @@
 const express = require('express');
-const db = require('../database/database');
-const User = require('../database/user');
 const Os = require('../database/os');
 const router = express.Router();
 
@@ -30,7 +28,7 @@ router.post('/os', function(req, res){
     arch: req.body.arch,
     diskImage: req.body.diskImage,
     cdrom: req.body.cdrom,
-    description: req.body.description, 
+    description: req.body.description
   });
   os.save(function(err, savedOs) {
     if(err) return console.error(`Error creating a new os ${err}`);
@@ -57,7 +55,7 @@ router.put('/os', function(req, res) {
 });
 
 router.delete('/os/:id', function(req, res) {
-  console.log(req.params)
+  console.log(req.params);
   Os.findByIdAndRemove(req.params.id).then((result) => {
     res.json(result.body);
   }, (error) => {

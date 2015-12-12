@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const favicon = require('serve-favicon');
+//const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
@@ -14,8 +14,6 @@ const login = require('./routes/login');
 
 const io = require('socket.io')();
 
-const qemu = require('./virtual/qemu');
-const RfbHandler = require('./virtual/rfb-handler');
 const User = require('./database/user');
 
 const passport = require('passport');
@@ -24,10 +22,10 @@ const LocalStrategy = require('passport-local').Strategy;
 const AdminController = require('./websockets/admin');
 const VmController = require('./websockets/vm');
 
-const WatchJS = require("watchjs");
+const WatchJS = require('watchjs');
 const watch = WatchJS.watch;
-const unwatch = WatchJS.unwatch;
-const callWatchers = WatchJS.callWatchers;
+//const unwatch = WatchJS.unwatch;
+//const callWatchers = WatchJS.callWatchers;
 
 //------------------------------------------------------------------------------//
 //------------------------- Passport configuration -----------------------------//
@@ -35,14 +33,14 @@ const callWatchers = WatchJS.callWatchers;
 
 passport.use(new LocalStrategy((username, password, cb) => {
   User.findByUsername(username, (user) => {
-      if(user.validPassword(password)){
-        return cb(null, user);
-      } else {
-        return cb(null, false, {message: "Incorrect password"});
-      }
-    }, (error) => {
-      return cb(null, false, {message: "Incorrect username"})
-    });
+    if(user.validPassword(password)){
+      return cb(null, user);
+    } else {
+      return cb(null, false, {message: 'Incorrect password'});
+    }
+  }, (error) => {
+    return cb(null, false, {message: `Incorrect username: ${error}`});
+  });
 }));
 
 passport.serializeUser((user, cb) => {
@@ -101,9 +99,9 @@ app.use('*', routes);
 //------------------------------------------------------------------------------//
 
 // List containing infos for each session
-let activeSessions = [];
+let activeSessions = []; //eslint-disable-line
 // Current sessions available
-let availableSessions = new Number(MAX_SESSIONS);
+let availableSessions = new Number(MAX_SESSIONS); //eslint-disable-line
 
 let state = {
   activeSessions: [],
@@ -112,7 +110,7 @@ let state = {
 
 let adminSocket = io.of('/admin');
 adminSocket.on('connection', (socket) => {
-  let adminController = AdminController({socket: socket, state: state})
+  let adminController = AdminController({socket: socket, state: state});
 });
 
 let vmSocket = io.of('/vm');
@@ -147,7 +145,7 @@ app.use((req, res, next) => {
 // development error handler
 // will print stacktrace
 if(app.get('env') == 'development') {
-  app.use((err, req, res, next) => {
+  app.use((err, req, res, next) => { //eslint-disable-line
     res.status(err.status || 500);
     res.render('error', {
       message: err.message,
@@ -158,7 +156,7 @@ if(app.get('env') == 'development') {
 
 // production error handler
 // no stacktraces leaked to user
-app.use((err, req, res, next) => {
+app.use((err, req, res, next) => { //eslint-disable-line
   res.status(err.status || 500);
   res.render('error', {
     message: err.message,

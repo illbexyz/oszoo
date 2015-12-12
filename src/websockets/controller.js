@@ -1,7 +1,7 @@
 const stampit = require('stampit');
 
 const sessionEmitter = stampit().init(function() {
-  this.socket.emit('available-sessions', {sessions: this.state.availableSessions})
+  this.socket.emit('available-sessions', {sessions: this.state.availableSessions});
 });
 
 const controller = (config) => {
@@ -10,6 +10,6 @@ const controller = (config) => {
     state: config.state
   });
   return stampit().compose(sessionEmitter, refs);
-}
+};
 
 module.exports = controller;

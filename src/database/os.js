@@ -1,5 +1,4 @@
-const db = require('./database');
-const bcrypt = require('bcrypt');
+require('./database');
 const mongoose = require('mongoose');
 
 const osSchema = mongoose.Schema({
@@ -9,7 +8,7 @@ const osSchema = mongoose.Schema({
   arch: String,
   diskImage: String,
   cdrom: String,
-  description: String, 
+  description: String
 });
 
 const Os = mongoose.model('Os', osSchema);

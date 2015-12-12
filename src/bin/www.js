@@ -17,31 +17,30 @@ let normalizePort = function(val) {
     return port;
   }
   return false;
-}
+};
 
 // Event listener for HTTP server "error" event.
 let onError = function(error) {
   if(error.syscall != 'listen'){
-    throw error
+    throw error;
   }
   let bind = typeof port === 'string'
     ? 'Pipe ' + port
     : 'Port ' + port;
   // handle specific listen errors with friendly messages
   switch(error.code){
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
-      process.exit(1);
-      break;
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
-      process.exit(1);
-      break;
-    default:
-      throw error;
-      break;
+  case 'EACCES':
+    console.error(bind + ' requires elevated privileges');
+    process.exit(1);
+    break;
+  case 'EADDRINUSE':
+    console.error(bind + ' is already in use');
+    process.exit(1);
+    break;
+  default:
+    throw error;
   }
-}
+};
 
 // Event listener for HTTP server "listening" event.
 let onListening = function() {
@@ -50,7 +49,7 @@ let onListening = function() {
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
-}
+};
 
 // Get port from environment and store in Express.
 const port = normalizePort(process.env.PORT || '80');

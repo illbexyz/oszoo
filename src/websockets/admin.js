@@ -7,6 +7,6 @@ const admin = stampit().init(function(){
 
 let adminController = (config) => {
   return stampit().compose(controller(config), admin)();
-}
+};
 
 module.exports = adminController;

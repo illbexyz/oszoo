@@ -1,5 +1,4 @@
 const bcrypt = require('bcrypt');
-const database = require('../database/database');
 const User = require('../database/user');
 
 bcrypt.genSalt(10, function(err, salt) {

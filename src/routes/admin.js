@@ -6,7 +6,7 @@ let authenticated = function(req, res, next){
     return next();
   }
   res.redirect('/login');
-}
+};
 
 router.get('/', authenticated, (req, res, next) => { 
   res.render('admin', {title: 'Admin'});
