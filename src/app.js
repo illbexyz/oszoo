@@ -123,6 +123,7 @@ vmSocket.on('connection', (socket) => {
 
 watch(state, 'availableSessions', () => {
   adminSocket.emit('available-sessions', {sessions: state.availableSessions});
+  adminSocket.emit('culo');
   vmSocket.emit('available-sessions', {sessions: state.availableSessions});
 });
 

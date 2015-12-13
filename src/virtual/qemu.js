@@ -36,7 +36,6 @@ const qemu = stampit({
         args.push('-hda');
         args.push('img/' + config.diskImage);
       }
-      console.log(config);
       if(config.cdrom) {
         args.push('-cdrom');
         args.push('iso/' + config.cdrom);
@@ -48,7 +47,6 @@ const qemu = stampit({
       });
       console.log(args);
       setTimeout(() => {
-        console.log('port in callback: '+ port);
         callback(null, port);
       }, 1000);
     },
@@ -61,7 +59,6 @@ const qemu = stampit({
     },
 
     reallocatePort: function(port) {
-      console.log('port ' + port + ' reallocated');
       let index = this.vncActivePorts.indexOf(port);
       if(index > -1) {
         this.vncActivePorts.splice(index, 1);

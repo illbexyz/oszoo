@@ -55,7 +55,6 @@ router.put('/os', function(req, res) {
 });
 
 router.delete('/os/:id', function(req, res) {
-  console.log(req.params);
   Os.findByIdAndRemove(req.params.id).then((result) => {
     res.json(result.body);
   }, (error) => {

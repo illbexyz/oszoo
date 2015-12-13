@@ -9,7 +9,7 @@ const MAX_TIMER = 600;
 // sessionDetails = {
 //   ip: '',
 //   timer: 0,
-//   osTitle: '',
+//   title: '',
 //   memory: 0,
 //   screenPort: 0
 // };
@@ -23,11 +23,10 @@ const vm = stampit({
   },
   methods: {
     initSession(details) {
-      console.log('init session');
       this.session = {};
       this.session.ip = this.socket.request.connection.remoteAddress;
       this.session.timer = MAX_TIMER;
-      this.session.osTitle = details.osTitle;
+      this.session.title = details.title;
       this.session.memory = details.memory;
     },
 
@@ -41,9 +40,8 @@ const vm = stampit({
     },
 
     start(config) {
-      console.log('start');
       this.initSession({
-        osTitle: config.osTitle,
+        title: config.title,
         memory: config.memory
       });
       this.state.activeSessions.push(this.session);
@@ -52,16 +50,13 @@ const vm = stampit({
           this.stop();
         qemu.start(config, this.onQemuStart.bind(this));
       }
-      console.log('start finished');
     },
 
     // Callback for the qemu start event
     onQemuStart(err, port) {
-      console.log('------- on qemu start ------');
       this.timerInterval = setInterval(this.decrementTimer.bind(this), 1000);
       this.session.screenPort = port;
       const rfbPort = 5900 + port;
-      console.log('port in onQemuStart: ' + rfbPort);
       this.state.availableSessions--;
       this.vmIsRunning = true;
       this.rfbHandler = RfbHandler(this.socket, rfbPort);
@@ -69,7 +64,6 @@ const vm = stampit({
     },
 
     stop() {
-      console.log('stop');
       if(this.vmIsRunning) {
         this.state.activeSessions.splice(
           this.state.activeSessions.indexOf(this.session), 1
@@ -79,7 +73,7 @@ const vm = stampit({
         this.state.availableSessions++;
         this.rfbHandler.stop();
         qemu.stop(this.session.screenPort);
-        this.socket.emit('machine-closed');
+        this.socket.emit('stop');
       }
     }
   }
