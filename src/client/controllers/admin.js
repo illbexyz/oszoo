@@ -3,6 +3,7 @@
 //----------------------------------------------------------------------------//
 
 module.exports = function($scope, $mdDialog, os, socket) {
+  const adminSocket = socket('admin');
   $scope.clients = [];
 
   os.getList().then((osList) => {
@@ -80,22 +81,22 @@ module.exports = function($scope, $mdDialog, os, socket) {
     return $scope.clients.length == 0;
   };
 
-  socket.on('available-sessions', (data) => {
+  adminSocket.on('available-sessions', (data) => {
     $scope.sessions = data.sessions;
     $scope.$apply();
   });
 
-  socket.on('clients', (clients) => {
-    $scope.clients = clients;
+  adminSocket.on('clients', (data) => {
+    $scope.clients = data.clients;
     $scope.$apply();
   });
 
-  socket.on('new-client', (client) => {
+  adminSocket.on('new-client', (client) => {
     $scope.clients.push(client);
     $scope.$apply();
   });
 
-  socket.on('remove-client', (client) => {
+  adminSocket.on('remove-client', (client) => {
     $scope.clients.splice($scope.clients.indexOf(client), 1);
     $scope.$apply();
   });

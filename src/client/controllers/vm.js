@@ -1,14 +1,12 @@
 module.exports = function($scope, $rootScope, os, socket, keysyms){
+  const vmSocket = socket('vm');
+
   let xMov = 0;
   let yMov = 0;
-  // Variables
-  let mouseDown = 0;
-  // Timer in seconds
-  let timer = 600;
   // Canvas
   let canvas = document.getElementById('screen');
 
-  $scope.vmIsRunning = false;
+
   // String timer
   $scope.timer = '10:00';
 
@@ -83,16 +81,24 @@ module.exports = function($scope, $rootScope, os, socket, keysyms){
   }
 
   function handleKeydown(e) {
-    if(e.keyCode == 8) e.preventDefault();
-    socket.emit('keydown', {
+    if(e.keyCode == 8 || e.keyCode == 37 
+      || e.keyCode == 38 || e.keyCode == 39
+      || e.keyCode == 40) {
+      e.preventDefault();
+    }
+    vmSocket.emit('keydown', {
       key: keysyms(e.keyCode),
       keydown: 1
     });
   }
 
   function handleKeyup(e){
-    if(e.keyCode == 8) e.preventDefault();
-    socket.emit('keydown', {
+    if(e.keyCode == 8 || e.keyCode == 37 
+      || e.keyCode == 38 || e.keyCode == 39
+      || e.keyCode == 40) {
+      e.preventDefault();
+    }
+    vmSocket.emit('keydown', {
       key: keysyms(e.keyCode),
       keydown: 0
     });
@@ -105,14 +111,6 @@ module.exports = function($scope, $rootScope, os, socket, keysyms){
       yMov = canvas.height / 2;
     }
     canvas.requestPointerLock();
-  };
-
-  document.body.onmousedown = function(){
-    mouseDown = 1;
-  };
-
-  document.body.onmouseup = function(){
-    mouseDown = 0;
   };
 
   function resizeCanvas(width, height) {
@@ -129,13 +127,12 @@ module.exports = function($scope, $rootScope, os, socket, keysyms){
   //------------------------- Websocket messaging ----------------------------//
   //--------------------------------------------------------------------------//
 
-  socket.on('init', (data) => {
+  vmSocket.on('init', (data) => {
     canvas.width = data.width;
     canvas.height = data.height;
-    $scope.vmIsRunning = true;
   });
 
-  socket.on('frame', (data) => {
+  vmSocket.on('frame', (data) => {
     const image = new Image();
     const uInt8Array = new Uint8Array(data.image);
     let i = uInt8Array.length;
@@ -155,41 +152,11 @@ module.exports = function($scope, $rootScope, os, socket, keysyms){
   });
 
   function sendMouse(x, y, isDown) {
-    socket.emit('mouse', {
+    vmSocket.emit('mouse', {
       x: xMov,
       y: yMov,
       isDown: isDown
     });
   }
 
-  //--------------------------------------------------------------------------//
-  //--------------------------- Angular messaging ----------------------------//
-  //--------------------------------------------------------------------------//
-
-  $scope.$on('start-os-loading', (event, os) => {
-    function restartVm() {
-      socket.emit('start', os);
-      socket.removeListener('machine-closed', restartVm);
-    }
-
-    if(!$scope.vmIsRunning) {
-      socket.emit('start', os);
-    } else {
-      socket.emit('stop');
-      socket.on('machine-closed', restartVm);
-    }
-  });
-
-  $scope.$on('stop-vm', () => {
-    $scope.stopMachine();
-  });
-
-  $scope.stopMachine = () => {
-    socket.emit('stop');
-    $scope.vmIsRunning = false;
-  };
-
-  $scope.$on('$destroy', () => {
-    socket.emit('close');
-  });
 };

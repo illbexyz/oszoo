@@ -2,23 +2,31 @@
 //-------------------------- Homepage controller -----------------------------//
 //----------------------------------------------------------------------------//
 
-module.exports = function($scope, $mdDialog, $mdToast, $mdSidenav, os, socket) {
+module.exports = function($scope, $mdDialog, $mdToast, $mdSidenav, os, socket, vm) {
+  const WatchJS = require('watchjs');
+  const watch = WatchJS.watch;
+
+  const homeSocket = socket('vm');
+
   $scope.title = 'Select an OS';
-  $scope.vmIsRunning = false;
   $scope.sessionsAvailable;
   $scope.osList;
   $scope.currentOs;
+
+  watch(vm, 'running', () => {
+    $scope.vmIsRunning = vm.running;
+  });
 
   os.getList().then((osList) => {
     $scope.osList = osList;
   });
 
-  socket.on('available-sessions', (data) => {
+  homeSocket.on('available-sessions', (data) => {
     $scope.sessionsAvailable = data.sessions;
     $scope.$apply();
   });
 
-  socket.on('session-timer', (data) => {
+  homeSocket.on('session-timer', (data) => {
     // TODO: timer directive
     const timerToString = (timer) => {
       let minutes = `${Math.floor(timer / 60)}`;
@@ -31,7 +39,7 @@ module.exports = function($scope, $mdDialog, $mdToast, $mdSidenav, os, socket) {
     $scope.timer = timerToString(data.timer);
   });
 
-  socket.on('session-expired', () => {
+  homeSocket.on('session-expired', () => {
     $mdToast.show($mdToast.simple()
       .content('Session expired!')
       .position('right bottom')
@@ -46,7 +54,17 @@ module.exports = function($scope, $mdDialog, $mdToast, $mdSidenav, os, socket) {
   $scope.changeOS = (os) => {
     $scope.title = os.title;
     $scope.currentOs = os;
-    $scope.$broadcast('start-os-loading');
+    vm.start(os, () => {
+      $scope.$broadcast('console-stop-loading');
+      const canvas = document.getElementById('screen');
+      canvas.focus();
+    });
+    $scope.$broadcast('console-start-loading');
+  };
+
+  $scope.stopVm = () => {
+    $scope.title = 'Select an OS';
+    vm.stop();
   };
 
   $scope.showInfo = () => {
@@ -58,16 +76,4 @@ module.exports = function($scope, $mdDialog, $mdToast, $mdSidenav, os, socket) {
       .ok('Close'));
   };
 
-  $scope.stopVm = () => {
-    $scope.vmIsRunning = false;
-    $scope.title = 'Select an OS';
-    $scope.$broadcast('stop-vm');
-  };
-
-  $scope.$on('first-frame', (event, data) => {
-    $scope.$broadcast('stop-os-loading');
-    $scope.vmIsRunning = true;
-    const canvas = document.getElementById('screen');
-    canvas.focus();
-  });
 };

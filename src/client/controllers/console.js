@@ -2,24 +2,29 @@
 //-------------------- Interactive console controller ------------------------//
 //----------------------------------------------------------------------------//
 
-module.exports = function($scope, $http, $interval, $rootScope) {
+module.exports = function($scope, $http, $interval, vm) {
 
   $scope.userInput = '';
   $scope.loadingSymbol = '|';
 
   const consoleElement = document.getElementById('consoleBody');
   let intervalPromise = runInputHint();
+  let loadingInterval = null;
 
-  function runLoading() {
-    $scope.loadingInterval = $interval(loadingAnimation, 80);
+  function startLoading() {
+    if(loadingInterval)
+      loadingInterval = $interval(loadingAnimation, 80);
   }
 
   function stopLoading() {
-    $interval.cancel($scope.loadingInterval);
+    if(loadingInterval) {
+      $interval.cancel(loadingInterval);
+      loadingInterval = null;
+    }
   }
 
   function runInputHint() {
-    $interval(() => {
+    return $interval(() => {
       if($scope.userInput == '') {
         $scope.userInput = '_';
       } else if($scope.userInput == '_') {
@@ -61,11 +66,14 @@ module.exports = function($scope, $http, $interval, $rootScope) {
       let osToLaunch = null;
       $scope.osList.forEach((os) => {
         if($scope.userInput == os.consoleTitle) {
-          osToLaunch = os.consoleTitle;
+          osToLaunch = os;
         }
       });
       if(osToLaunch) {
-        $rootScope.$broadcast('start-os-loading', osToLaunch);
+        startLoading();
+        vm.start(osToLaunch, () => {
+          stopLoading();
+        });
         print('Wait for the magic to happen...');
       } else {
         let p = document.createElement('p');
@@ -108,13 +116,11 @@ module.exports = function($scope, $http, $interval, $rootScope) {
     $scope.osList = response.data;
   });
 
-  $scope.$on('start-os-loading', () => {
-    $scope.isLoading = true;
-    runLoading();
+  $scope.$on('console-start-loading', () => {
+    startLoading();
   });
 
-  $scope.$on('stop-os-loading', () => {
-    $scope.isLoading = false;
+  $scope.$on('console-stop-loading', () => {
     stopLoading();
   });
 
