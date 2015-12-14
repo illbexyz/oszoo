@@ -13,7 +13,7 @@
     "url": "https://github.com/albyxyz/oszoo.git"
   },
   "scripts": {
-    "start": "nodemon ./dist/bin/www.js"
+    "start": "cd dist && nodemon ./bin/www.js"
   },
   "dependencies": {
     "angular": "^1.4.8",
