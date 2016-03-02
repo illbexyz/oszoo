@@ -1,8 +1,4 @@
-//----------------------------------------------------------------------------//
-//------------------------ Admin page controller -----------------------------//
-//----------------------------------------------------------------------------//
-
-module.exports = function($scope, $mdDialog, os, socket) {
+module.exports = function admin($scope, $mdDialog, os, socket) {
   const adminSocket = socket('admin');
   $scope.clients = [];
 

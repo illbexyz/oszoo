@@ -1,33 +1,12 @@
-//----------------------------------------------------------------------------//
-//-------------------- Interactive console controller ------------------------//
-//----------------------------------------------------------------------------//
-
-module.exports = function($scope, $http, $interval, vm) {
-
+module.exports = function console($scope, $http, $interval, vm) {
   $scope.userInput = '';
   $scope.loadingSymbol = '|';
 
-  const consoleElement = document.getElementById('consoleBody');
-  let intervalPromise = runInputHint();
-  let loadingInterval = null;
-
-  function startLoading() {
-    if(loadingInterval)
-      loadingInterval = $interval(loadingAnimation, 80);
-  }
-
-  function stopLoading() {
-    if(loadingInterval) {
-      $interval.cancel(loadingInterval);
-      loadingInterval = null;
-    }
-  }
-
   function runInputHint() {
     return $interval(() => {
-      if($scope.userInput == '') {
+      if ($scope.userInput === '') {
         $scope.userInput = '_';
-      } else if($scope.userInput == '_') {
+      } else if ($scope.userInput === '_') {
         $scope.userInput = '';
       }
     }, 1000);
@@ -35,18 +14,35 @@ module.exports = function($scope, $http, $interval, vm) {
 
   function loadingAnimation() {
     switch($scope.loadingSymbol) {
-    case '|':
-      $scope.loadingSymbol = '/';
-      break;
-    case '/':
-      $scope.loadingSymbol = '-';
-      break;
-    case '-':
-      $scope.loadingSymbol = '\\';
-      break;
-    case '\\':
-      $scope.loadingSymbol = '|';
-      break;
+      case '|':
+        $scope.loadingSymbol = '/';
+        break;
+      case '/':
+        $scope.loadingSymbol = '-';
+        break;
+      case '-':
+        $scope.loadingSymbol = '\\';
+        break;
+      case '\\':
+        $scope.loadingSymbol = '|';
+        break;
+    }
+  }
+
+  const consoleElement = document.getElementById('consoleBody');
+  let intervalPromise = runInputHint();
+  let loadingInterval = null;
+
+  function startLoading() {
+    if (loadingInterval) {
+      loadingInterval = $interval(loadingAnimation, 80);
+    }
+  }
+
+  function stopLoading() {
+    if (loadingInterval) {
+      $interval.cancel(loadingInterval);
+      loadingInterval = null;
     }
   }
 
@@ -56,32 +52,32 @@ module.exports = function($scope, $http, $interval, vm) {
     spanReplace.appendChild(document.createTextNode(input.value));
     consoleElement.appendChild(spanReplace);
     switch($scope.userInput) {
-    case 'oslist':
-      printOsList();
-      break;
-    case 'doge':
-      print('Such command, very useful, wow.');
-      break;
-    default:
-      let osToLaunch = null;
-      $scope.osList.forEach((os) => {
-        if($scope.userInput == os.consoleTitle) {
-          osToLaunch = os;
-        }
-      });
-      if(osToLaunch) {
-        startLoading();
-        vm.start(osToLaunch, () => {
-          stopLoading();
+      case 'oslist':
+        printOsList();
+        break;
+      case 'doge':
+        print('Such command, very useful, wow.');
+        break;
+      default:
+        let osToLaunch = null;
+        $scope.osList.forEach((os) => {
+          if($scope.userInput == os.consoleTitle) {
+            osToLaunch = os;
+          }
         });
-        print('Wait for the magic to happen...');
-      } else {
-        let p = document.createElement('p');
-        let node = document.createTextNode('Sorry, I can\'t help you with that.');
-        p.appendChild(node);
-        consoleElement.appendChild(p);
-      }
-      break;
+        if(osToLaunch) {
+          startLoading();
+          vm.start(osToLaunch, () => {
+            stopLoading();
+          });
+          print('Wait for the magic to happen...');
+        } else {
+          let p = document.createElement('p');
+          let node = document.createTextNode('Sorry, I can\'t help you with that.');
+          p.appendChild(node);
+          consoleElement.appendChild(p);
+        }
+        break;
     }
     $scope.userInput = '';
     const span = document.createElement('span');

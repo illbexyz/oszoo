@@ -1,86 +1,69 @@
-const controller = require('./controller');
 const qemu = require('../virtual/qemu');
-const stampit = require('stampit');
-const RfbHandler = require('../virtual/rfb-handler');
+const rfbHandler = require('../virtual/rfb-handler');
 
 // Seconds before session exipres
 const MAX_TIMER = 600;
 
-// sessionDetails = {
-//   ip: '',
-//   timer: 0,
-//   title: '',
-//   memory: 0,
-//   screenPort: 0
-// };
+const vm = ({ socket, onInit }) => {
+  let timerInterval = undefined;
+  let isRunning = false;
+  let rfb = undefined;
+  let screenPort = 0;
+  let details = {
+    ip: undefined,
+    timer: MAX_TIMER,
+    title: '',
+    memory: 0,
+  };
 
-const vm = stampit({
-  refs: {
-    session: undefined,
-    timerInterval: undefined,
-    vmIsRunning: false,
-    rfbHandler: undefined
-  },
-  methods: {
-    initSession(details) {
-      this.session = {};
-      this.session.ip = this.socket.request.connection.remoteAddress;
-      this.session.timer = MAX_TIMER;
-      this.session.title = details.title;
-      this.session.memory = details.memory;
-    },
-
-    decrementTimer() {
-      this.session.timer--;
-      this.socket.emit('session-timer', {timer: this.session.timer});
-      if(this.session.timer <= 0) {
-        this.stop();
-        this.socket.emit('session-expired');
-      }
-    },
-
-    start(config) {
-      this.initSession({
-        title: config.title,
-        memory: config.memory
-      });
-      this.state.activeSessions.push(this.session);
-      if(this.state.availableSessions > 0) {
-        if(this.vmIsRunning)
-          this.stop();
-        qemu.start(config, this.onQemuStart.bind(this));
-      }
-    },
-
-    // Callback for the qemu start event
-    onQemuStart(err, port) {
-      this.timerInterval = setInterval(this.decrementTimer.bind(this), 1000);
-      this.session.screenPort = port;
-      const rfbPort = 5900 + port;
-      this.state.availableSessions--;
-      this.vmIsRunning = true;
-      this.rfbHandler = RfbHandler(this.socket, rfbPort);
-      this.rfbHandler.start();
-    },
-
-    stop() {
-      if(this.vmIsRunning) {
-        this.state.activeSessions.splice(
-          this.state.activeSessions.indexOf(this.session), 1
-        );
-        clearInterval(this.timerInterval);
-        this.vmIsRunning = false;
-        this.state.availableSessions++;
-        this.rfbHandler.stop();
-        qemu.stop(this.session.screenPort);
-        this.socket.emit('stop');
-      }
+  function stop() {
+    if (isRunning) {
+      clearInterval(timerInterval);
+      isRunning = false;
+      // state.availableSessions++;
+      rfb.stop();
+      qemu.stop(screenPort);
+      socket.emit('stop');
     }
   }
-});
 
-const vmController = (config) => {
-  return stampit().compose(controller(config), vm)();
+  function decrementTimer() {
+    details.timer--;
+    socket.emit('session-timer', { timer: details.timer });
+    if (details.timer <= 0) {
+      stop();
+      socket.emit('session-expired');
+    }
+  }
+
+  // Callback for the qemu start event
+  function onQemuStart(err, port) {
+    timerInterval = setInterval(decrementTimer, 1000);
+    screenPort = port;
+    const rfbPort = 5900 + port;
+    isRunning = true;
+    rfb = rfbHandler({ socket, port: rfbPort, onInit });
+    rfb.start();
+  }
+
+  function start(params) {
+    socket.emit('init');
+    console.log('vm socket started');
+    details = {
+      ...params,
+      ip: socket.request.connection.remoteAddress,
+      timer: MAX_TIMER,
+    };
+    console.log(details);
+    qemu.start(details, onQemuStart);
+  }
+
+  return {
+    start,
+    stop,
+  };
 };
+
+const vmController = ({ socket, onInit }) => Object.assign({}, vm({ socket, onInit }));
 
 module.exports = vmController;

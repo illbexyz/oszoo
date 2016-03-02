@@ -77,13 +77,13 @@ module.exports = function(grunt) {
       },
       babel: {
         files: [
-          'src/websockets/**/*.js', 
-          'src/app.js', 
-          'src/virtual/**/*.js', 
-          'src/database/**/*.js', 
-          'src/routes/**/*.js', 
-          'src/database/**/*.js', 
-          'src/bin/**/*.js'
+          'src/websockets/**/*.js',
+          'src/app.js',
+          'src/virtual/**/*.js',
+          'src/database/**/*.js',
+          'src/routes/**/*.js',
+          'src/database/**/*.js',
+          'src/bin/**/*.js',
         ],
         tasks: ['babel'],
         options: {
@@ -103,6 +103,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
 
   // Default task(s).
-  grunt.registerTask('default', ['copy', 'eslint', 'babel', 'browserify', 'watch']);
+  grunt.registerTask('default', ['copy', 'babel', 'browserify', 'watch']);
   grunt.registerTask('build', ['copy', 'eslint', 'babel', 'browserify', 'uglify']);
 };

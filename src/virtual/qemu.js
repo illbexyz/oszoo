@@ -1,77 +1,74 @@
 const spawn = require('child_process').spawn;
-const stampit = require('stampit');
 
-const qemu = stampit({
-  init: function() {
-    this.vncPorts = [];
-    this.vncActivePorts = [];
-    this.qemu = [];
-    let i = 0;
-    while(i <= 50){
-      this.vncPorts.push(i);
-      i++;
-    }
-  }, 
-  refs: {
-    vncPorts: [],
-    vncActivePorts: [],
-    qemu: []
-  },
-  methods: {
-    start: function(config, callback) {
-      let exe;
-      let port;
-      let args;
-      // TODO: remaining archs and kvm detection
-      if(config.arch == 'x86_64'){
-        exe = 'qemu-system-x86_64';
-      }
+const qemu = () => {
+  const vncPorts = [];
+  const vncActivePorts = [];
+  const qemuInstances = [];
 
-      port = this.port();
-      args = [
-        '-m', config.memory,
-        '-vnc', ':' + port
-      ];
-      if(config.diskImage) {
-        args.push('-hda');
-        args.push('img/' + config.diskImage);
-      }
-      if(config.cdrom) {
-        args.push('-cdrom');
-        args.push('iso/' + config.cdrom);
-      }
-      args.push('-snapshot');
-      this.qemu[port] = spawn(exe, args);
-      this.qemu[port].on('exit', () => {
-        this.reallocatePort(port);
-      });
-      console.log(args);
-      setTimeout(() => {
-        callback(null, port);
-      }, 1000);
-    },
+  for (let i = 0; i < 50; i++) {
+    vncPorts.push(i);
+  }
 
-    stop: function(port) {
-      console.log('Killing qemu on port' + port);
-      if(this.qemu[port]){
-        this.qemu[port].kill();
-      }
-    },
-
-    reallocatePort: function(port) {
-      let index = this.vncActivePorts.indexOf(port);
-      if(index > -1) {
-        this.vncActivePorts.splice(index, 1);
-        this.vncPorts.push(port);
-      }
-    },
-
-    port: function() {
-      let port = this.vncPorts.pop();
-      this.vncActivePorts.push(port);
-      return port;
+  function deallocatePort(port) {
+    const index = vncActivePorts.indexOf(port);
+    if (index > -1) {
+      vncActivePorts.splice(index, 1);
+      vncPorts.push(port);
     }
   }
-});
+
+  function allocatePort() {
+    const port = vncPorts.pop();
+    vncActivePorts.push(port);
+    return port;
+  }
+
+  function start({ arch, memory, diskImage, cdrom }, callback) {
+    let exe;
+    // TODO: remaining archs and kvm detection
+    switch (arch) {
+      case 'x86_64':
+        exe = 'qemu-system-x86_64';
+        break;
+      default:
+        throw new Error('No arch defined.');
+    }
+
+    const newPort = allocatePort();
+    const args = [
+      '-m', memory,
+      '-vnc', `:${newPort}`,
+    ];
+    // if (diskImage) {
+    //   args.push('-hda');
+    //   args.push(`img/${diskImage}`);
+    // }
+    if (cdrom) {
+      args.push('-cdrom');
+      args.push(`iso/${cdrom}`);
+    }
+    args.push('-snapshot');
+    qemuInstances[newPort] = spawn(exe, args);
+    qemuInstances[newPort].on('exit', () => {
+      deallocatePort(newPort);
+    });
+    console.log(args);
+    setTimeout(() => {
+      callback(null, newPort);
+    }, 1000);
+  }
+
+  function stop(port) {
+    console.log(`Killing qemu on port ${port}`);
+    if (qemuInstances[port]) {
+      qemuInstances[port].kill();
+    }
+  }
+
+  return {
+    start,
+    stop,
+  };
+};
 
 module.exports = qemu();

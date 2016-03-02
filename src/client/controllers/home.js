@@ -1,17 +1,13 @@
-//----------------------------------------------------------------------------//
-//-------------------------- Homepage controller -----------------------------//
-//----------------------------------------------------------------------------//
-
-module.exports = function($scope, $mdDialog, $mdToast, $mdSidenav, os, socket, vm) {
+module.exports = ($scope, $mdDialog, $mdToast, $mdSidenav, os, socket, vm) => {
   const WatchJS = require('watchjs');
   const watch = WatchJS.watch;
 
   const homeSocket = socket('vm');
 
   $scope.title = 'Select an OS';
-  $scope.sessionsAvailable;
-  $scope.osList;
-  $scope.currentOs;
+  // $scope.sessionsAvailable;
+  // $scope.osList;
+  // $scope.currentOs;
 
   watch(vm, 'running', () => {
     $scope.vmIsRunning = vm.running;
@@ -31,8 +27,8 @@ module.exports = function($scope, $mdDialog, $mdToast, $mdSidenav, os, socket, v
     const timerToString = (timer) => {
       let minutes = `${Math.floor(timer / 60)}`;
       let seconds = `${timer % 60}`;
-      if(minutes.length == 1) minutes = `0${minutes}`;
-      if(seconds.length == 1) seconds = `0${seconds}`;
+      if (minutes.length === 1) minutes = `0${minutes}`;
+      if (seconds.length === 1) seconds = `0${seconds}`;
       return `${minutes}:${seconds}`;
     };
 
@@ -72,8 +68,7 @@ module.exports = function($scope, $mdDialog, $mdToast, $mdSidenav, os, socket, v
       .clickOutsideToClose(true)
       .title('Boot info')
       .content($scope.currentOs.description)
-      .ariaLabel($scope.currentOs.title + ' info')
+      .ariaLabel(`${$scope.currentOs.title} info`)
       .ok('Close'));
   };
-
 };

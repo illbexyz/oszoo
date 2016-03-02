@@ -1,17 +1,11 @@
-'use strict';
-
-//----------------------------------------------------------------------------//
-//-------------------------- Vm Socket service -------------------------------//
-//----------------------------------------------------------------------------//
-
-module.exports = function(socket) {
+module.exports = function vm(socket) {
   return {
     running: false,
     os: undefined,
     vmSocket: socket('vm'),
 
     start(os, cb = () => {}) {
-      if(this.running) {
+      if (this.running) {
         this.restart(os, cb);
       } else {
         this.vmSocket.emit('start', os);
@@ -36,7 +30,7 @@ module.exports = function(socket) {
       this.stop(() => {
         this.start(os, cb);
       });
-    }
+    },
 
   };
 };

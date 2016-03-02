@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-//const favicon = require('serve-favicon');
+// const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
@@ -19,28 +19,26 @@ const User = require('./database/user');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 
-const AdminController = require('./websockets/admin');
-const VmController = require('./websockets/vm');
+const adminController = require('./websockets/admin');
+const vmController = require('./websockets/vm');
 
 const WatchJS = require('watchjs');
 const watch = WatchJS.watch;
-//const unwatch = WatchJS.unwatch;
-//const callWatchers = WatchJS.callWatchers;
+// const unwatch = WatchJS.unwatch;
+// const callWatchers = WatchJS.callWatchers;
 
-//------------------------------------------------------------------------------//
-//------------------------- Passport configuration -----------------------------//
-//------------------------------------------------------------------------------//
+// -------------------------------------------------------------------------- //
+// ------------------------ Passport configuration -------------------------- //
+// -------------------------------------------------------------------------- //
 
 passport.use(new LocalStrategy((username, password, cb) => {
   User.findByUsername(username, (user) => {
-    if(user.validPassword(password)){
+    if (user.validPassword(password)) {
       return cb(null, user);
     } else {
-      return cb(null, false, {message: 'Incorrect password'});
+      return cb(null, false, { message: 'Incorrect password' });
     }
-  }, (error) => {
-    return cb(null, false, {message: `Incorrect username: ${error}`});
-  });
+  }, (error) => cb(null, false, { message: `Incorrect username: ${error}` }));
 }));
 
 passport.serializeUser((user, cb) => {
@@ -53,38 +51,38 @@ passport.deserializeUser((name, cb) => {
   });
 });
 
-//------------------------------------------------------------------------------//
-//-------------------------------- Constants -----------------------------------//
-//------------------------------------------------------------------------------//
+// -------------------------------------------------------------------------- //
+// ------------------------------- Constants -------------------------------- //
+// -------------------------------------------------------------------------- //
 
 // Number of max sessions available
 const MAX_SESSIONS = 20;
 
-let app = express();
+const app = express();
 app.io = io;
 
-//------------------------------------------------------------------------------//
-//--------------------- Middlewares & Express configs --------------------------//
-//------------------------------------------------------------------------------//
+// -------------------------------------------------------------------------- //
+// -------------------- Middlewares & Express configs ----------------------- //
+// -------------------------------------------------------------------------- //
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 // uncomment after placing your favicon in /public
-//app.use(favicon(__dirname + '/public/favicon.ico'));
+// app.use(favicon(__dirname + '/public/favicon.ico'));
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(session({
   secret: 'keyboard cat',
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: true,
 }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cookieParser());
-//app.use(require('coffee-middleware'), {src: "//{__dirname}/public"})
+// app.use(require('coffee-middleware'), {src: "//{__dirname}/public"})
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/bower_components',
         express.static(path.join(__dirname, 'bower_components')));
@@ -94,41 +92,46 @@ app.use('/admin', admin);
 app.use('/partials', partials);
 app.use('*', routes);
 
-//------------------------------------------------------------------------------//
-//------------------------------------ Body ------------------------------------//
-//------------------------------------------------------------------------------//
+// -------------------------------------------------------------------------- //
+// ----------------------------------- Body --------------------------------- //
+// -------------------------------------------------------------------------- //
 
 // List containing infos for each session
-let activeSessions = []; //eslint-disable-line
+let activeSessions = [];
 // Current sessions available
-let availableSessions = new Number(MAX_SESSIONS); //eslint-disable-line
+let availableSessions = new Number(MAX_SESSIONS);
 
-let state = {
+const state = {
   activeSessions: [],
-  availableSessions: MAX_SESSIONS
+  availableSessions: MAX_SESSIONS,
 };
 
-let adminSocket = io.of('/admin');
+const adminSocket = io.of('/admin');
 adminSocket.on('connection', (socket) => {
-  let adminController = AdminController({socket: socket, state: state});
+  const adminContr = adminController({socket, state });
 });
 
-let vmSocket = io.of('/vm');
+const vmSocket = io.of('/vm');
 vmSocket.on('connection', (socket) => {
-  let vmController = VmController({socket: socket, state: state});
-  socket.on('start', vmController.start.bind(vmController));
-  socket.on('disconnect', vmController.stop.bind(vmController));
-  socket.on('stop', vmController.stop.bind(vmController));
+  function onInit() {
+    console.log('onInit');
+    socket.emit('init');
+  }
+  const vmcontr = vmController({ socket, state, onInit });
+  // TODO: Controllare che ci siano sessioni disponibili
+  socket.on('start', vmcontr.start);
+  socket.on('disconnect', vmcontr.stop);
+  socket.on('stop', vmcontr.stop);
 });
 
 watch(state, 'availableSessions', () => {
-  adminSocket.emit('available-sessions', {sessions: state.availableSessions});
+  adminSocket.emit('available-sessions', { sessions: state.availableSessions });
   adminSocket.emit('culo');
-  vmSocket.emit('available-sessions', {sessions: state.availableSessions});
+  vmSocket.emit('available-sessions', { sessions: state.availableSessions });
 });
 
 watch(state, 'activeSessions', () => {
-  adminSocket.emit('clients', {clients: state.activeSessions});
+  adminSocket.emit('clients', { clients: state.activeSessions });
 });
 
 process.on('uncaughtException', (err) => {
@@ -137,7 +140,7 @@ process.on('uncaughtException', (err) => {
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
-  let err = new Error('Not Found');
+  const err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
@@ -145,12 +148,12 @@ app.use((req, res, next) => {
 // error handlers
 // development error handler
 // will print stacktrace
-if(app.get('env') == 'development') {
+if (app.get('env') === 'development') {
   app.use((err, req, res, next) => { //eslint-disable-line
     res.status(err.status || 500);
     res.render('error', {
       message: err.message,
-      error: err
+      error: err,
     });
   });
 }
@@ -161,7 +164,7 @@ app.use((err, req, res, next) => { //eslint-disable-line
   res.status(err.status || 500);
   res.render('error', {
     message: err.message,
-    error: {}
+    error: {},
   });
 });
 

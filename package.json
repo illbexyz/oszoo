@@ -28,7 +28,7 @@
     "express": "~4.12.0",
     "express-session": "^1.12.1",
     "jade": "~1.9.2",
-    "jpeg": "git+https://github.com/tcr/node-jpeg.git",
+    "jpeg-js": "^0.1.1",
     "mongoose": "^4.3.0",
     "morgan": "~1.5.1",
     "passport": "^0.3.0",
@@ -42,8 +42,12 @@
     "watchjs": "0.0.0"
   },
   "devDependencies": {
+    "babel-eslint": "^5.0.0",
     "babel-preset-es2015": "^6.3.13",
+    "babel-preset-stage-0": "^6.5.0",
     "debug": "~2.1.1",
+    "eslint": "^2.2.0",
+    "eslint-config-airbnb": "^6.0.2",
     "grunt": "^0.4.5",
     "grunt-babel": "^6.0.0",
     "grunt-browserify": "^4.0.1",

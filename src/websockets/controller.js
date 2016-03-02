@@ -1,15 +1,7 @@
-const stampit = require('stampit');
+// const sessionEmitter = () => {
+//   this.socket.emit('available-sessions', { sessions: this.state.availableSessions });
+// };
 
-const sessionEmitter = stampit().init(function() {
-  this.socket.emit('available-sessions', {sessions: this.state.availableSessions});
-});
+const socketController = ({ socket }) => Object.assign({}, { socket });
 
-const controller = (config) => {
-  const refs = stampit().refs({
-    socket: config.socket,
-    state: config.state
-  });
-  return stampit().compose(sessionEmitter, refs);
-};
-
-module.exports = controller;
+module.exports = socketController;

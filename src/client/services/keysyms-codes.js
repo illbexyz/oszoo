@@ -1,5 +1,4 @@
-module.exports = function() {
-
+module.exports = function keysyms() {
   const keyCodes = {
     8: 65288,
     9: 65289,
@@ -77,22 +76,20 @@ module.exports = function() {
     121: 65479,
     144: 65407,
     145: 65300,
-    186: 59, //semicolon
-    187: 61, //equal sign
-    188: 44, //comma
-    189: 45, //dash
-    190: 46, //period
-    191: 47, //forward slash
-    192: 96, //grave accent
-    219: 91, //open bracket
-    220: 92, //back slash
-    221: 93, //close bracket
-    222: 39 //single quote
+    186: 59, // semicolon
+    187: 61, // equal sign
+    188: 44, // comma
+    189: 45, // dash
+    190: 46, // period
+    191: 47, // forward slash
+    192: 96, // grave accent
+    219: 91, // open bracket
+    220: 92, // back slash
+    221: 93, // close bracket
+    222: 39, // single quote
   };
 
-  let convert = function(code) {
-    return keyCodes[code];
-  };
+  const convert = (code) => keyCodes[code];
 
   return convert;
 };

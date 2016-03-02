@@ -6,8 +6,8 @@ const router = express.Router();
 router.use(csrf());
 
 // GET login page
-router.get('/', function(req, res, next) {
-  res.render('login', {title: 'Login', csrfToken: req.csrfToken()});
+router.get('/', (req, res, next) => {
+  res.render('login', { title: 'Login', csrfToken: req.csrfToken() });
 });
 
 // Authenticate

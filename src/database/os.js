@@ -8,7 +8,7 @@ const osSchema = mongoose.Schema({
   arch: String,
   diskImage: String,
   cdrom: String,
-  description: String
+  description: String,
 });
 
 const Os = mongoose.model('Os', osSchema);
