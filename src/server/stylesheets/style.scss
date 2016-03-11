@@ -1,0 +1,25 @@
+.flex {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+}
+
+html {
+	@extend .flex;
+	width: 100%;
+	height: 100%;
+}
+
+body {
+	@extend .flex;
+	margin: 0;
+	padding: 0;
+}
+
+#app {
+	@extend .flex;
+}
+
+.vm-container {
+	@extend .flex;
+}

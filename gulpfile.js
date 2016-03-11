@@ -1,0 +1,79 @@
+var gulp = require('gulp');
+var babel = require('gulp-babel');
+var webpack = require('webpack-stream');
+var sass = require('gulp-sass');
+var nodemon = require('gulp-nodemon');
+var runSequence = require('run-sequence');
+
+gulp.task('babel:server', function() {
+  return gulp.src('src/server/**/*.js')
+		.pipe(babel({ presets: ['es2015'] }))
+		.pipe(gulp.dest('dist/'));
+});
+
+gulp.task('webpack:client', function() {
+  return gulp.src('src/entry.js')
+    .pipe(webpack(require('./webpack.config.js')))
+    .pipe(gulp.dest('dist/public/javascripts/'));
+});
+
+gulp.task('copy', function() {
+  return gulp.src('src/server/views/**/*.*')
+    .pipe(gulp.dest('dist/views'));
+});
+
+gulp.task('sass', function() {
+  return gulp.src('src/server/stylesheets/**/*.scss')
+    .pipe(sass().on('error', sass.logError))
+    .pipe(gulp.dest('dist/public/stylesheets'));
+});
+
+gulp.task('start', function() {
+  nodemon({
+    script: 'dist/bin/www.js',
+    ext: 'js html',
+    env: { NODE_ENV: 'development' },
+  });
+})
+
+gulp.task('copy:watch', function() {
+  gulp.watch('src/server/views/**/*.*', ['copy']);
+});
+
+gulp.task('babel:server:watch', function() {
+  gulp.watch('src/server/**/*.js', ['babel:server']);
+});
+
+gulp.task('webpack:client:watch', function() {
+  gulp.watch('src/client/**/*.js', ['webpack:client']);
+});
+
+gulp.task('sass:watch', function() {
+  gulp.watch('src/server/stylesheets/**/*.scss', ['sass']);
+});
+
+gulp.task('build', [
+  'copy',
+  'babel:server',
+  'webpack:client',
+  'sass',
+]);
+
+gulp.task('watch', [
+  'copy:watch',
+  'babel:server:watch',
+  'webpack:client:watch',
+  'sass:watch',
+]);
+
+gulp.task('serve', function() {
+  runSequence([
+    'build',
+  ], [
+    'watch',
+  ], [
+    'start',
+  ]);
+});
+
+gulp.task('default', ['build']);
