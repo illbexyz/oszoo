@@ -5,14 +5,14 @@ import Dialog from 'material-ui/lib/dialog';
 
 const Header = React.createClass({
 
-  getInitialState: () => ({ open: false }),
+  getInitialState: () => ({ isDialogOpen: false }),
 
   handleOpen() {
-    this.setState({ open: true });
+    this.setState({ isDialogOpen: true });
   },
 
   handleClose() {
-    this.setState({ open: false });
+    this.setState({ isDialogOpen: false });
   },
 
   render() {
@@ -32,19 +32,21 @@ const Header = React.createClass({
     return (
       <div>
         <AppBar
-          title="OSZoo"
+          title={"OSZOO"}
+          showMenuIconButton={false}
           iconElementRight={
             <FlatButton label="About" onTouchTap={this.handleOpen} />
           }
         />
         <Dialog
-          title="Dialog With Actions"
+          title="About"
           actions={actions}
           modal={false}
-          open={this.state.open}
+          open={this.state.isDialogOpen}
           onRequestClose={this.handleClose}
         >
-          <span>The actions in this window were passed in as an array of React objects.</span>
+          <div>Developed by <a href="https://github.com/illbexyz">@illbexyz</a>.</div>
+          <div>A <a href="http://wiki.v2.cs.unibo.it/wiki/index.php/Main_Page">Virtualsquare</a> project.</div>
         </Dialog>
       </div>
     );

@@ -1,5 +1,6 @@
-const express = require('express');
-const Os = require('../database/os');
+import express from 'express';
+import Os from '../database/os';
+
 const router = express.Router();
 
 // GET OS list
@@ -62,4 +63,4 @@ router.delete('/os/:id', (req, res) => {
   });
 });
 
-module.exports = router;
+export default router;

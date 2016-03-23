@@ -1,15 +1,16 @@
-const express = require('express');
+import express from 'express';
+
 const router = express.Router();
 
-const authenticated = (req, res, next) => {
+function authenticated(req, res, next) {
   if (req.isAuthenticated()) {
     return next();
   }
-  res.redirect('/login');
-};
+  return res.redirect('/login');
+}
 
-router.get('/', authenticated, (req, res, next) => {
+router.get('/', authenticated, (req, res) => {
   res.render('admin', { title: 'Admin' });
 });
 
-module.exports = router;
+export default router;

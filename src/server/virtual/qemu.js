@@ -1,4 +1,4 @@
-const spawn = require('child_process').spawn;
+import { spawn } from 'child_process';
 
 const qemu = () => {
   const vncPorts = [];
@@ -69,4 +69,4 @@ const qemu = () => {
   };
 };
 
-module.exports = qemu();
+export default qemu();

@@ -1,8 +1,7 @@
-require('./database');
-const bcrypt = require('bcrypt');
-const mongoose = require('mongoose');
+import bcrypt from 'bcrypt';
+import mongoose, { Schema } from 'mongoose';
 
-const userSchema = mongoose.Schema({
+const userSchema = new Schema({
   username: String,
   password: String,
 });
@@ -22,4 +21,4 @@ userSchema.statics.findByUsername = (username, success) => {
     });
 };
 
-module.exports = User;
+export default User;

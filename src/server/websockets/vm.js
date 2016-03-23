@@ -1,5 +1,5 @@
-const qemu = require('../virtual/qemu');
-const rfbHandler = require('../virtual/rfb-handler');
+import qemu from '../virtual/qemu';
+import rfbHandler from '../virtual/rfb-handler';
 
 // Seconds before session exipres
 const MAX_TIMER = 600;
@@ -20,7 +20,6 @@ const vm = ({ socket, onInit }) => {
     if (isRunning) {
       clearInterval(timerInterval);
       isRunning = false;
-      // state.availableSessions++;
       rfb.stop();
       qemu.stop(screenPort);
       socket.emit('stop');
@@ -63,4 +62,4 @@ const vm = ({ socket, onInit }) => {
 
 const vmController = ({ socket }) => Object.assign({}, vm({ socket }));
 
-module.exports = vmController;
+export default vmController;

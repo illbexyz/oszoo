@@ -1,11 +1,11 @@
-const rfbConnection = require('rfb2');
-const PNG = require('pngjs').PNG;
-const Rx = require('rx');
+import rfbConnection from 'rfb2';
+import { PNG } from 'pngjs';
+import Rx from 'rx';
 import streamToArray from 'stream-to-array';
 
 // Start a new connection with the qemu process
 const rfbHandler = ({ socket, port }) => {
-  let rfb = undefined;
+  let rfb;
 
   function adjustFormat(rect) {
     return {
@@ -103,4 +103,4 @@ const rfbHandler = ({ socket, port }) => {
   };
 };
 
-module.exports = ({ socket, port, onInit }) => rfbHandler({ socket, port, onInit });
+export default rfbHandler;

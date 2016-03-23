@@ -1,7 +1,6 @@
-require('./database');
-const mongoose = require('mongoose');
+import mongoose, { Schema } from 'mongoose';
 
-const osSchema = mongoose.Schema({
+const osSchema = new Schema({
   title: String,
   consoleTitle: String,
   memory: Number,
@@ -11,6 +10,6 @@ const osSchema = mongoose.Schema({
   description: String,
 });
 
-const Os = mongoose.model('Os', osSchema);
+const os = mongoose.model('Os', osSchema);
 
-module.exports = Os;
+export default os;
