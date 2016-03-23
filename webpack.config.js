@@ -17,6 +17,7 @@ module.exports = {
         loader: 'babel-loader',
         include: [
           path.resolve(__dirname, './src/client'),
+          path.resolve(__dirname, './src/constants'),
         ],
         exclude: /node_modules/,
       },

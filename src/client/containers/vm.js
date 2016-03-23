@@ -4,10 +4,11 @@ import { sendKeydown, sendMouseMove, sendMouseDown, sendMouseUp } from '../actio
 import Vm from '../components/vm';
 
 function mapStateToProps(state) {
-  const { lastFrame, isRunning } = state.vm;
+  const { lastFrame, isRunning, size } = state.vm;
   return {
     isRunning,
     lastFrame,
+    size,
   };
 }
 

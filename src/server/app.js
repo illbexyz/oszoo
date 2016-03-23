@@ -1,57 +1,57 @@
-const express = require('express');
-const path = require('path');
-// const favicon = require('serve-favicon');
-const logger = require('morgan');
-const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
-const session = require('express-session');
+import express from 'express';
+import path from 'path';
+// import favicon from 'serve-favicon';
+import logger from 'morgan';
+import cookieParser from 'cookie-parser';
+import bodyParser from 'body-parser';
+// import session from 'express-session';
 
-const routes = require('./routes/index');
-const partials = require('./routes/partials');
-const api = require('./routes/api');
-const admin = require('./routes/admin');
-const login = require('./routes/login');
+import routes from './routes/index';
+// import partials from './routes/partials';
+import api from './routes/api';
+// import admin from './routes/admin';
+// import login from './routes/login';
 
-const io = require('socket.io')();
+import socketio from 'socket.io';
+const io = socketio();
 
-const User = require('./database/user');
+import User from './database/user';
 
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
+import passport from 'passport';
+import { Strategy } from 'passport-local';
 
-const adminController = require('./websockets/admin');
-const vmController = require('./websockets/vm');
+// import adminController from './websockets/admin';
+import vmController from './websockets/vm';
 
-const WatchJS = require('watchjs');
-const watch = WatchJS.watch;
+import { EV_START, EV_STOP, EV_SESSIONS_UPDATE } from './constants/socket-events';
 
-// -------------------------------------------------------------------------- //
-// ------------------------ Passport configuration -------------------------- //
-// -------------------------------------------------------------------------- //
 
-passport.use(new LocalStrategy((username, password, cb) => {
-  User.findByUsername(username, (user) => {
-    if (user.validPassword(password)) {
-      return cb(null, user);
-    } else {
-      return cb(null, false, { message: 'Incorrect password' });
-    }
-  }, (error) => cb(null, false, { message: `Incorrect username: ${error}` }));
-}));
+// Passport Configuration
+// passport.use(new Strategy((username, password, cb) => {
+//   User.findByUsername(username, (user) => {
+//     user.validPassword(password) ?
+//       cb(null, user)
+//       :
+//       cb(null, false, { message: 'Incorrect password' });
+//     if (user.validPassword(password)) {
+//       return cb(null, user);
+//     } else {
+//       return cb(null, false, { message: 'Incorrect password' });
+//     }
+//   }, (error) => cb(null, false, { message: `Incorrect username: ${error}` }));
+// }));
 
-passport.serializeUser((user, cb) => {
-  cb(null, user.username);
-});
+// passport.serializeUser((user, cb) => {
+//   cb(null, user.username);
+// });
 
-passport.deserializeUser((name, cb) => {
-  User.findByUsername(name, (user) => {
-    cb(null, user);
-  });
-});
+// passport.deserializeUser((name, cb) => {
+//   User.findByUsername(name, (user) => {
+//     cb(null, user);
+//   });
+// });
 
-// -------------------------------------------------------------------------- //
-// ------------------------------- Constants -------------------------------- //
-// -------------------------------------------------------------------------- //
+// Constants
 
 // Number of max sessions available
 const MAX_SESSIONS = 20;
@@ -59,9 +59,7 @@ const MAX_SESSIONS = 20;
 const app = express();
 app.io = io;
 
-// -------------------------------------------------------------------------- //
-// -------------------- Middlewares & Express configs ----------------------- //
-// -------------------------------------------------------------------------- //
+// Middlewares and express config
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -72,13 +70,13 @@ app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(session({
-  secret: 'keyboard cat',
-  resave: false,
-  saveUninitialized: true,
-}));
-app.use(passport.initialize());
-app.use(passport.session());
+// app.use(session({
+//   secret: 'keyboard cat',
+//   resave: false,
+//   saveUninitialized: true,
+// }));
+// app.use(passport.initialize());
+// app.use(passport.session());
 app.use(cookieParser());
 // app.use(require('coffee-middleware'), {src: "//{__dirname}/public"})
 app.use(express.static(path.join(__dirname, 'public')));
@@ -86,52 +84,54 @@ app.use('/bower_components',
         express.static(path.join(__dirname, 'bower_components')));
 
 app.use('/api', api);
-app.use('/login', login);
-app.use('/admin', admin);
-app.use('/partials', partials);
+// app.use('/login', login);
+// app.use('/admin', admin);
+// app.use('/partials', partials);
 app.use('*', routes);
 
-// -------------------------------------------------------------------------- //
-// ----------------------------------- Body --------------------------------- //
-// -------------------------------------------------------------------------- //
+// Body
 
 // List containing infos for each session
-let activeSessions = [];
+// let activeSessions = [];
 // Current sessions available
-let availableSessions = new Number(MAX_SESSIONS);
+let sessions = [];
+let availableSessions = MAX_SESSIONS;
 
-const state = {
-  activeSessions: [],
-  availableSessions: MAX_SESSIONS,
-};
-
-const adminSocket = io.of('/admin');
-adminSocket.on('connection', (socket) => {
-  const adminContr = adminController({ socket, state });
-});
+// const adminSocket = io.of('/admin');
+// adminSocket.on('connection', (socket) => {
+//   const adminContr = adminController({ socket, state });
+// });
 
 const vmSocket = io.of('/vm');
 vmSocket.on('connection', (socket) => {
-  function onInit() {
-    console.log('onInit');
-    socket.emit('init');
-  }
-  const vmcontr = vmController({ socket, state, onInit });
-  // TODO: Controllare che ci siano sessioni disponibili
-  socket.on('vm-start', vmcontr.start);
-  socket.on('disconnect', vmcontr.stop);
-  socket.on('vm-stop', vmcontr.stop);
-});
+  const vmcontr = vmController({ socket });
+  let vmRunning = false;
 
-// watch(state, 'availableSessions', () => {
-//   adminSocket.emit('available-sessions', { sessions: state.availableSessions });
-//   adminSocket.emit('culo');
-//   vmSocket.emit('available-sessions', { sessions: state.availableSessions });
-// });
-//
-// watch(state, 'activeSessions', () => {
-//   adminSocket.emit('clients', { clients: state.activeSessions });
-// });
+  vmSocket.emit(EV_SESSIONS_UPDATE, availableSessions);
+
+  function stopVm() {
+    if (vmRunning) {
+      vmcontr.stop();
+      vmSocket.emit(EV_SESSIONS_UPDATE, ++availableSessions);
+    }
+  }
+
+  socket.on(EV_START, (config, callback) => {
+    if (availableSessions) {
+      vmRunning = true;
+      vmcontr.start(config, callback);
+      vmSocket.emit(EV_SESSIONS_UPDATE, --availableSessions);
+    }
+  });
+
+  socket.on('disconnect', () => {
+    stopVm();
+  });
+
+  socket.on(EV_STOP, () => {
+    stopVm();
+  });
+});
 
 process.on('uncaughtException', (err) => {
   console.error(err);

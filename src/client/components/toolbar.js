@@ -1,15 +1,14 @@
 import React, { PropTypes } from 'react';
-import IconMenu from 'material-ui/lib/menus/icon-menu';
 import IconButton from 'material-ui/lib/icon-button';
-import FontIcon from 'material-ui/lib/font-icon';
-import NavigationExpandMoreIcon from 'material-ui/lib/svg-icons/navigation/expand-more';
+import Badge from 'material-ui/lib/badge';
 import MenuItem from 'material-ui/lib/menus/menu-item';
 import DropDownMenu from 'material-ui/lib/DropDownMenu';
 import RaisedButton from 'material-ui/lib/raised-button';
 import Toolbar from 'material-ui/lib/toolbar/toolbar';
 import ToolbarGroup from 'material-ui/lib/toolbar/toolbar-group';
 import ToolbarSeparator from 'material-ui/lib/toolbar/toolbar-separator';
-import ToolbarTitle from 'material-ui/lib/toolbar/toolbar-title';
+import InfoOutlineIcon from 'material-ui/lib/svg-icons/action/info-outline';
+import TimerIcon from 'material-ui/lib/svg-icons/image/timer';
 
 class VmToolbar extends React.Component {
 
@@ -17,8 +16,12 @@ class VmToolbar extends React.Component {
     selectOs: PropTypes.func.isRequired,
     osList: PropTypes.array.isRequired,
     sendStart: PropTypes.func.isRequired,
+    sendStop: PropTypes.func.isRequired,
     socket: PropTypes.object.isRequired,
     selectedOs: PropTypes.object.isRequired,
+    vmIsRunning: PropTypes.bool,
+    timer: PropTypes.number,
+    sessionsAvailable: PropTypes.number,
   };
 
   static defaultProps = {
@@ -37,41 +40,78 @@ class VmToolbar extends React.Component {
 
   handleChange(event, index, value) {
     this.setState({ value });
-    this.props.selectOs(this.props.osList[value]);
+    if (value > 0) {
+      this.props.selectOs(this.props.osList[value - 1]);
+    } else {
+      this.props.selectOs({});
+    }
   }
 
   startVm() {
-    this.props.sendStart(this.props.socket, this.props.selectedOs);
+    this.props.sendStart(this.props.selectedOs);
   }
 
   render() {
-    const osList = this.props.osList
-      .map((os, index) => <MenuItem key={index} value={index} primaryText={os.title} />);
-    if (osList.length === 0) {
-      osList.push(<MenuItem key={0} value={0} primaryText="Select an OS" />);
-    }
+    const oslist = this.props.osList
+      .map((os, index) => <MenuItem key={index + 1} value={index + 1} primaryText={os.title} />);
+
+    const vmButton = this.props.vmIsRunning ?
+      <RaisedButton
+        label="Stop"
+        disabled={!this.state.value}
+        primary={true}
+        onTouchTap={this.props.sendStop}/>
+      :
+      <RaisedButton
+        label="Start"
+        disabled={!this.state.value}
+        primary={true}
+        onTouchTap={this.startVm.bind(this)}/>;
+
+    const timeRemainingBadge = this.props.vmIsRunning ?
+      <Badge
+        badgeContent={this.props.timer}
+        secondary={true}
+        badgeStyle={{ top: 6, right: 10 }}
+        disabled={true}>
+        <IconButton
+          style={{ bottom: 18 }}
+          tooltip="Minutes Remaining">
+          <TimerIcon />
+        </IconButton>
+      </Badge>
+      :
+      <IconButton
+        style={{ bottom: 18 }}
+        tooltip="Minutes Remaining"
+        disabled={true}>
+        <TimerIcon />
+      </IconButton>;
+
     return (
       <Toolbar>
         <ToolbarGroup firstChild={true} float="left">
-          <DropDownMenu value={this.state.value} onChange={this.handleChange}>
-            {osList}
+          <DropDownMenu
+            value={this.state.value}
+            onChange={this.handleChange}>
+            <MenuItem key={0} value={0} primaryText="Select an OS" />
+            {oslist}
           </DropDownMenu>
         </ToolbarGroup>
         <ToolbarGroup float="right">
-          <ToolbarTitle text="Options" style={{ width: 90 }} />
-          <FontIcon className="muidocs-icon-custom-sort" />
-          <IconMenu
-            iconButtonElement={
-              <IconButton touch={true}>
-                <NavigationExpandMoreIcon />
-              </IconButton>
-            }
-          >
-            <MenuItem primaryText="Download" />
-            <MenuItem primaryText="More Info" />
-          </IconMenu>
+          {vmButton}
           <ToolbarSeparator />
-          <RaisedButton label="Start" primary={true} onTouchTap={this.startVm.bind(this)} />
+            <Badge
+              badgeContent={this.props.sessionsAvailable}
+              secondary={true}
+              badgeStyle={{ top: 6, right: 10 }}>
+              <IconButton
+                style={{ bottom: 18 }}
+                tooltip="Sessions available">
+                <InfoOutlineIcon />
+              </IconButton>
+            </Badge>
+            {timeRemainingBadge}
         </ToolbarGroup>
       </Toolbar>
     );

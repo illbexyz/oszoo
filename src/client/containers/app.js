@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider';
+
 import theme from '../config/theme';
 
 import Header from '../components/header';
@@ -10,6 +11,11 @@ import { fetchList } from '../actions/os-list';
 import { connectSocket } from '../actions/socket';
 
 class App extends Component {
+
+  static propTypes = {
+    osList: PropTypes.array.isRequired,
+    dispatch: PropTypes.func.isRequired,
+  };
 
   componentDidMount() {
     const { dispatch } = this.props;
@@ -29,11 +35,6 @@ class App extends Component {
     );
   }
 }
-
-App.propTypes = {
-  osList: PropTypes.array.isRequired,
-  dispatch: PropTypes.func.isRequired,
-};
 
 const mapStateToProps = (state) => {
   const osList = state.osList.items || [];

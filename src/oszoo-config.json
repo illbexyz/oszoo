@@ -1,0 +1,13 @@
+{
+  "os": [
+    {
+      "title": "Finnix 111",
+      "consoleTitle": "finnix-111",
+      "memory": "256",
+      "arch": "x86_64",
+      "diskImage": "finnix-111.img",
+      "cdrom": "finnix-111.iso",
+      "description": "Finnix 111 bootable disk",
+    },
+  ]
+}

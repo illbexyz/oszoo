@@ -10,11 +10,14 @@ const style = {
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
+  alignItems: 'center',
+  padding: 16,
 };
 
 export default class Vm extends Component {
 
   static propTypes = {
+    size: PropTypes.object,
     lastFrame: PropTypes.object,
     sendKeydown: PropTypes.func.isRequired,
     sendMouseMove: PropTypes.func.isRequired,
@@ -23,83 +26,129 @@ export default class Vm extends Component {
     isRunning: PropTypes.bool.isRequired,
   };
 
+  constructor(props) {
+    super(props);
+    this.onKeyDown = this.keyDownListener.bind(this);
+    this.onMouseMove = this.mouseMoveListener.bind(this);
+    this.onMouseUp = this.mouseUpListener.bind(this);
+    this.onMouseDown = this.mouseDownListener.bind(this);
+  }
+
   componentDidMount() {
     this.canvas = document.querySelector('.vm-screen');
     this.ctx = this.canvas.getContext('2d');
-    this.firstFrame = 0;
-    document.addEventListener(
-      'keydown',
-      event => {
-        if (this.props.isRunning) {
-          this.props.sendKeydown(keysymsConvert(event.keyCode));
-        }
+    this.canvas.requestPointerLock = this.canvas.requestPointerLock
+      || this.canvas.mozRequestPointerLock
+      || this.canvas.webkitRequestPointerLock;
+
+    document.exitPointerLock = document.exitPointerLock
+      || document.mozExitPointerLock
+      || document.webkitExitPointerLock;
+    document.addEventListener('pointerlockchange', this.lockChangeAlert.bind(this), false);
+    document.addEventListener('mozpointerlockchange', this.lockChangeAlert.bind(this), false);
+    document.addEventListener('webkitpointerlockchange', this.lockChangeAlert.bind(this), false);
+    this.canvas.addEventListener('dblclick', () => {
+      if (this.canvas.requestFullScreen) {
+        this.canvas.requestFullScreen();
+      } else if (this.canvas.webkitRequestFullScreen) {
+        this.canvas.webkitRequestFullScreen();
+      } else if (this.canvas.mozRequestFullScreen) {
+        this.canvas.mozRequestFullScreen();
       }
-    );
-    this.canvas.addEventListener(
-      'mousemove',
-      event => {
-        if (this.props.isRunning) {
-          this.props.sendMouseMove({
-            x: event.clientX,
-            y: event.clientY,
-          });
-        }
-      }
-    );
-    this.canvas.addEventListener(
-      'mousedown',
-      () => this.props.sendMouseDown()
-    );
-    this.canvas.addEventListener(
-      'mouseup',
-      () => this.props.sendMouseUp()
-    );
+    });
+    this.canvas.onclick = () => {
+      this.canvas.requestPointerLock();
+    };
   }
 
-  canvasNeedsToBeResized(width, height) {
-    if (width === 640 && height === 480
-      || width === 800 && height === 600
-      || width === 1024 && height === 768
-      || width === 1280 && height === 720) {
-      return true;
+  componentWillReceiveProps(newProps) {
+    const currentWidth = this.props.size.width;
+    const currentHeight = this.props.size.height;
+    const newWidth = newProps.size.width;
+    const newHeight = newProps.size.height;
+    if (!newProps.isRunning && this.props.isRunning) {
+      this.clearCanvas();
     }
-    return false;
-  }
-
-  resizeCanvas(width, height) {
-    this.canvas.width = width;
-    this.canvas.height = height;
+    if (newWidth !== currentWidth
+    || newHeight !== currentHeight) {
+      if (this.canvas) {
+        if (newWidth < currentWidth) {
+          this.ctx.clearRect(newWidth, 0, currentWidth - newWidth, currentHeight);
+        }
+        if (newHeight < currentHeight) {
+          this.ctx.clearRect(newHeight, 0, currentHeight - newHeight, currentHeight);
+        }
+      }
+    }
+    if (newProps.lastFrame !== this.props.lastFrame) {
+      this.updateFrame(newProps.lastFrame);
+    }
   }
 
   updateFrame(data) {
     const image = new Image();
-    const uInt8Array = new Uint8Array(data.image);
-    let i = uInt8Array.length;
-    const binaryString = [i];
-    while (i--) {
-      binaryString[i] = String.fromCharCode(uInt8Array[i]);
-    }
-    const bdata = binaryString.join('');
-    const base64 = window.btoa(bdata);
-    if (this.canvasNeedsToBeResized(data.width, data.height)) {
-      this.resizeCanvas(data.width, data.height);
-    }
-    image.src = `data:image/jpeg;base64,${base64}`;
-    if (this.firstFrame < 2) {
-      this.firstFrame++;
-    }
+    const base64 = data.image;
+    image.src = `data:image/png;base64,${base64}`;
     image.onload = () => {
       this.ctx.drawImage(image, data.x, data.y, data.width, data.height);
     };
   }
 
-  render() {
-    if (this.props.lastFrame) {
-      this.updateFrame(this.props.lastFrame);
+  clearCanvas() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  }
+
+  keyDownListener(e) {
+    if (this.props.isRunning) {
+      if (e.keyCode === 8 || e.keyCode === 37
+        || e.keyCode === 38 || e.keyCode === 39
+        || e.keyCode === 40) {
+        e.preventDefault();
+      }
+      this.props.sendKeydown(keysymsConvert(e.keyCode));
     }
+  }
+
+  mouseMoveListener(event) {
+    if (this.props.isRunning) {
+      this.props.sendMouseMove({
+        x: event.clientX,
+        y: event.clientY,
+      });
+    }
+  }
+
+  mouseDownListener() {
+    this.props.sendMouseDown();
+  }
+
+  mouseUpListener() {
+    this.props.sendMouseUp();
+  }
+
+  lockChangeAlert() {
+    if (document.pointerLockElement === this.canvas
+        || document.mozPointerLockElement === this.canvas
+        || document.webkitPointerLockElement === this.canvas) {
+      document.addEventListener('keydown', this.onKeyDown);
+      this.canvas.addEventListener('mousemove', this.onMouseMove);
+      this.canvas.addEventListener('mousedown', this.onMouseDown);
+      this.canvas.addEventListener('mouseup', this.onMouseUp);
+    } else {
+      document.removeEventListener('keydown', this.onKeyDown);
+      this.canvas.removeEventListener('mousemove', this.onMouseMove);
+      this.canvas.removeEventListener('mousedown', this.onMouseDown);
+      this.canvas.removeEventListener('mouseup', this.onMouseUp);
+    }
+  }
+
+  render() {
     return (
       <Paper style={style} zDepth={1}>
-        <canvas className="vm-screen">
+        <canvas
+          className="vm-screen"
+          width={this.props.size.width}
+          height={this.props.size.height} >
         </canvas>
       </Paper>
     );

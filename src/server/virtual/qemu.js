@@ -49,13 +49,11 @@ const qemu = () => {
     }
     args.push('-snapshot');
     qemuInstances[newPort] = spawn(exe, args);
+    console.log(args);
     qemuInstances[newPort].on('exit', () => {
       deallocatePort(newPort);
     });
-    console.log(args);
-    setTimeout(() => {
-      callback(null, newPort);
-    }, 1000);
+    callback(null, newPort);
   }
 
   function stop(port) {

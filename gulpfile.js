@@ -6,13 +6,16 @@ var nodemon = require('gulp-nodemon');
 var runSequence = require('run-sequence');
 
 gulp.task('babel:server', function() {
-  return gulp.src('src/server/**/*.js')
+  gulp.src('src/server/**/*.js')
 		.pipe(babel({ presets: ['es2015'] }))
 		.pipe(gulp.dest('dist/'));
+  return gulp.src('src/constants/**/*.js')
+    .pipe(babel({ presets: ['es2015'] }))
+    .pipe(gulp.dest('dist/constants'));
 });
 
 gulp.task('webpack:client', function() {
-  return gulp.src('src/entry.js')
+  return gulp.src('src/client/index.js')
     .pipe(webpack(require('./webpack.config.js')))
     .pipe(gulp.dest('dist/public/javascripts/'));
 });
@@ -23,7 +26,7 @@ gulp.task('copy', function() {
 });
 
 gulp.task('sass', function() {
-  return gulp.src('src/server/stylesheets/**/*.scss')
+  return gulp.src('src/stylesheets/**/*.scss')
     .pipe(sass().on('error', sass.logError))
     .pipe(gulp.dest('dist/public/stylesheets'));
 });
@@ -49,7 +52,7 @@ gulp.task('webpack:client:watch', function() {
 });
 
 gulp.task('sass:watch', function() {
-  gulp.watch('src/server/stylesheets/**/*.scss', ['sass']);
+  gulp.watch('src/stylesheets/**/*.scss', ['sass']);
 });
 
 gulp.task('build', [

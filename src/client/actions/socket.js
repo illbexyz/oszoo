@@ -1,6 +1,8 @@
-import { socketUrl } from '../constants/misc';
+import { socketUrl } from '../../constants/misc';
 
 import socketIO from 'socket.io-client';
+
+import { sessionsAvailableSubscribe } from './vm';
 
 export const CONNECT_SOCKET = 'CONNECT_SOCKET';
 export const CONNECTED_SOCKET = 'CONNECTED_SOCKET';
@@ -31,6 +33,7 @@ export function connectSocket() {
     const socket = socketIO(socketUrl);
     socket.on('connect', () => {
       dispatch(connected(socket));
+      dispatch(sessionsAvailableSubscribe());
     });
     socket.on('disconnect', () => {
       dispatch(disconnected());

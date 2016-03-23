@@ -47,13 +47,11 @@ const vm = ({ socket, onInit }) => {
   }
 
   function start(params) {
-    console.log('vm socket started');
     details = {
       ...params,
       ip: socket.request.connection.remoteAddress,
       timer: MAX_TIMER,
     };
-    console.log(details);
     qemu.start(details, onQemuStart);
   }
 
@@ -63,6 +61,6 @@ const vm = ({ socket, onInit }) => {
   };
 };
 
-const vmController = ({ socket, onInit }) => Object.assign({}, vm({ socket, onInit }));
+const vmController = ({ socket }) => Object.assign({}, vm({ socket }));
 
 module.exports = vmController;

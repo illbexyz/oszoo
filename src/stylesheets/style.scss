@@ -23,3 +23,10 @@ body {
 .vm-container {
 	@extend .flex;
 }
+
+.vm-screen {
+	width: 80%;
+	height: 90%;
+	background-color: black;
+	border-radius: 10px;
+}

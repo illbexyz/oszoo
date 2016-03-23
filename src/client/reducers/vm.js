@@ -7,6 +7,8 @@ import {
   VM_MOUSE_MOVE,
   VM_MOUSE_DOWN,
   VM_MOUSE_UP,
+  VM_RESIZE,
+  VM_SESSIONS_UPDATE,
 } from '../actions/vm';
 
 const vmReducer = (state = {
@@ -14,7 +16,13 @@ const vmReducer = (state = {
   isRunning: false,
   timer: 0,
   os: {},
-  lastFrame: {},
+  lastFrame: {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+    image: '',
+  },
   mouse: {
     x: 0,
     y: 0,
@@ -23,6 +31,11 @@ const vmReducer = (state = {
   keyboard: {
     isKeyDown: false,
   },
+  size: {
+    width: 1280,
+    height: 720,
+  },
+  sessionsAvailable: 0,
 }, action) => {
   switch (action.type) {
     case VM_START:
@@ -49,6 +62,11 @@ const vmReducer = (state = {
       return {
         ...state,
         timer: action.timer,
+      };
+    case VM_RESIZE:
+      return {
+        ...state,
+        size: action.size,
       };
     case VM_KEYDOWN:
       return {
@@ -90,6 +108,11 @@ const vmReducer = (state = {
           ...state.mouse,
           isButton1Down: false,
         },
+      };
+    case VM_SESSIONS_UPDATE:
+      return {
+        ...state,
+        sessionsAvailable: action.sessions,
       };
     default:
       return state;
