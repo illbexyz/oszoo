@@ -54,30 +54,36 @@ app.use('/bower_components',
 app.use('/api', api);
 app.use('*', routes);
 
-let sessions = [];
+// let sessions = [];
 let availableSessions = MAX_SESSIONS;
 
 const vmSocket = io.of('/vm');
 vmSocket.on('connection', (socket) => {
   const vmcontr = vmController({ socket });
+
   let vmRunning = false;
 
   vmSocket.emit(EV_SESSIONS_UPDATE, availableSessions);
 
-  function stopVm() {
-    if (vmRunning) {
-      vmcontr.stop();
-      vmSocket.emit(EV_SESSIONS_UPDATE, ++availableSessions);
-    }
-  }
-
   socket.on(EV_START, (config, callback) => {
-    if (availableSessions) {
+    if (!vmRunning) {
+      vmcontr.emitter.once('stop', () => {
+        vmSocket.emit(EV_SESSIONS_UPDATE, ++availableSessions);
+      });
       vmRunning = true;
-      vmcontr.start(config, callback);
-      vmSocket.emit(EV_SESSIONS_UPDATE, --availableSessions);
+      if (availableSessions) {
+        vmcontr.start(config, callback)
+          .then(() => vmSocket.emit(EV_SESSIONS_UPDATE, --availableSessions));
+      }
     }
   });
+
+  function stopVm() {
+    if (vmRunning) {
+      vmRunning = false;
+      vmcontr.stop();
+    }
+  }
 
   socket.on('disconnect', () => {
     stopVm();

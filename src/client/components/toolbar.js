@@ -20,6 +20,7 @@ class VmToolbar extends React.Component {
     socket: PropTypes.object.isRequired,
     selectedOs: PropTypes.object.isRequired,
     vmIsRunning: PropTypes.bool,
+    waitingFirstFrame: PropTypes.bool,
     timer: PropTypes.number,
     sessionsAvailable: PropTypes.number,
   };
@@ -55,7 +56,7 @@ class VmToolbar extends React.Component {
     const oslist = this.props.osList
       .map((os, index) => <MenuItem key={index + 1} value={index + 1} primaryText={os.title} />);
 
-    const vmButton = this.props.vmIsRunning ?
+    const vmButton = this.props.vmIsRunning || this.props.waitingFirstFrame ?
       <RaisedButton
         label="Stop"
         disabled={!this.state.value}
@@ -101,17 +102,17 @@ class VmToolbar extends React.Component {
         <ToolbarGroup float="right">
           {vmButton}
           <ToolbarSeparator />
-            <Badge
-              badgeContent={this.props.sessionsAvailable}
-              secondary={true}
-              badgeStyle={{ top: 6, right: 10 }}>
-              <IconButton
-                style={{ bottom: 18 }}
-                tooltip="Sessions available">
-                <InfoOutlineIcon />
-              </IconButton>
-            </Badge>
-            {timeRemainingBadge}
+          <Badge
+            badgeContent={this.props.sessionsAvailable}
+            secondary={true}
+            badgeStyle={{ top: 6, right: 10 }}>
+            <IconButton
+              style={{ bottom: 18 }}
+              tooltip="Sessions available">
+              <InfoOutlineIcon />
+            </IconButton>
+          </Badge>
+          {timeRemainingBadge}
         </ToolbarGroup>
       </Toolbar>
     );

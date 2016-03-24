@@ -1,5 +1,7 @@
 import fetch from 'isomorphic-fetch';
 
+import { osListUrl } from '../../constants/misc';
+
 export const REQUEST_OSLIST = 'REQUEST_OSLIST';
 export const RECEIVED_OSLIST = 'RECEIVED_OSLIST';
 export const SELECT_OS = 'SELECT_OS';
@@ -25,7 +27,7 @@ export function selectOs(os) {
 export function fetchList() {
   return dispatch => {
     dispatch(requestList());
-    return fetch('http://localhost/api/os')
+    return fetch(osListUrl)
       .then(response => response.json())
       .then(json => dispatch(receiveList(json)));
   };

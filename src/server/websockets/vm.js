@@ -1,10 +1,11 @@
 import qemu from '../virtual/qemu';
 import rfbHandler from '../virtual/rfb-handler';
+import { EventEmitter } from 'events';
 
 // Seconds before session exipres
-const MAX_TIMER = 600;
+const MAX_TIMER = 5;
 
-const vm = ({ socket, onInit }) => {
+const vm = ({ socket, emitter }) => {
   let timerInterval = undefined;
   let isRunning = false;
   let rfb = undefined;
@@ -22,8 +23,9 @@ const vm = ({ socket, onInit }) => {
       isRunning = false;
       rfb.stop();
       qemu.stop(screenPort);
-      socket.emit('stop');
     }
+    socket.emit('vm-stop');
+    emitter.emit('stop');
   }
 
   function decrementTimer() {
@@ -41,25 +43,31 @@ const vm = ({ socket, onInit }) => {
     screenPort = port;
     const rfbPort = 5900 + port;
     isRunning = true;
-    rfb = rfbHandler({ socket, port: rfbPort, onInit });
+    rfb = rfbHandler({ socket, port: rfbPort });
     rfb.start();
   }
 
   function start(params) {
-    details = {
-      ...params,
-      ip: socket.request.connection.remoteAddress,
-      timer: MAX_TIMER,
-    };
-    qemu.start(details, onQemuStart);
+    return new Promise(resolve => {
+      details = {
+        ...params,
+        ip: socket.request.connection.remoteAddress,
+        timer: MAX_TIMER,
+      };
+      qemu.start(details, onQemuStart);
+      resolve();
+    });
   }
 
   return {
     start,
     stop,
+    emitter,
   };
 };
 
-const vmController = ({ socket }) => Object.assign({}, vm({ socket }));
+const emitter = Object.assign({}, EventEmitter.prototype);
+
+const vmController = ({ socket }) => vm({ socket, emitter });
 
 export default vmController;

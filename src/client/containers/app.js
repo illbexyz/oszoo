@@ -1,12 +1,14 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider';
+import CircularProgress from 'material-ui/lib/circular-progress';
 
 import theme from '../config/theme';
 
 import Header from '../components/header';
-import VmToolbar from '../containers/vm-toolbar';
-import Vm from '../containers/vm';
+import VmToolbar from './vm-toolbar';
+import Vm from './vm';
+import Hint from '../components/hint';
 import { fetchList } from '../actions/os-list';
 import { connectSocket } from '../actions/socket';
 
@@ -14,7 +16,9 @@ class App extends Component {
 
   static propTypes = {
     osList: PropTypes.array.isRequired,
+    isRunning: PropTypes.bool.isRequired,
     dispatch: PropTypes.func.isRequired,
+    waitingFirstFrame: PropTypes.bool.isRequired,
   };
 
   componentDidMount() {
@@ -24,12 +28,17 @@ class App extends Component {
   }
 
   render() {
+    const hint = (
+      <div className="hint-container">
+        {this.props.waitingFirstFrame ? <CircularProgress/> : <Hint/>}
+      </div>
+    );
     return (
       <MuiThemeProvider muiTheme={theme}>
         <div className="vm-container">
           <Header/>
           <VmToolbar osList={this.props.osList}/>
-          <Vm/>
+          {this.props.isRunning ? <Vm/> : hint}
         </div>
       </MuiThemeProvider>
     );
@@ -37,9 +46,13 @@ class App extends Component {
 }
 
 const mapStateToProps = (state) => {
-  const osList = state.osList.items || [];
+  const osList = state.osList.items;
+  const isRunning = state.vm.isRunning;
+  const waitingFirstFrame = state.vm.waitingFirstFrame;
   return {
+    isRunning,
     osList,
+    waitingFirstFrame,
   };
 };
 

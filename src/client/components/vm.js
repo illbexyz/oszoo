@@ -144,13 +144,11 @@ export default class Vm extends Component {
 
   render() {
     return (
-      <Paper style={style} zDepth={1}>
-        <canvas
-          className="vm-screen"
-          width={this.props.size.width}
-          height={this.props.size.height} >
-        </canvas>
-      </Paper>
+      <canvas
+        className="vm-screen"
+        width={this.props.size.width}
+        height={this.props.size.height} >
+      </canvas>
     );
   }
 }

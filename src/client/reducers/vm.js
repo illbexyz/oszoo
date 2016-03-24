@@ -32,8 +32,8 @@ const vmReducer = (state = {
     isKeyDown: false,
   },
   size: {
-    width: 1280,
-    height: 720,
+    width: 0,
+    height: 0,
   },
   sessionsAvailable: 0,
 }, action) => {
@@ -48,6 +48,8 @@ const vmReducer = (state = {
       return {
         ...state,
         isRunning: false,
+        waitingFirstFrame: false,
+        lastFrame: {},
         os: {},
         timer: 0,
       };

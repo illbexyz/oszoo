@@ -10,6 +10,7 @@ function mapStateToProps(state) {
     socket: state.socketDetails.socket,
     selectedOs: state.osList.selectedOs,
     vmIsRunning: state.vm.isRunning,
+    waitingFirstFrame: state.vm.waitingFirstFrame,
     timer: state.vm.timer,
     sessionsAvailable: state.vm.sessionsAvailable,
   };

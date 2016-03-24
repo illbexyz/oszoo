@@ -7,10 +7,10 @@ var runSequence = require('run-sequence');
 
 gulp.task('babel:server', function() {
   gulp.src('src/server/**/*.js')
-		.pipe(babel({ presets: ['es2015'] }))
+		.pipe(babel({ presets: ['es2015', 'stage-0'] }))
 		.pipe(gulp.dest('dist/'));
   return gulp.src('src/constants/**/*.js')
-    .pipe(babel({ presets: ['es2015'] }))
+    .pipe(babel({ presets: ['es2015', 'stage-0'] }))
     .pipe(gulp.dest('dist/constants'));
 });
 

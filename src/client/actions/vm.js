@@ -16,10 +16,6 @@ export const VM_MOUSE_UP = 'VM_MOUSE_UP';
 export const VM_RESIZE = 'VM_RESIZE';
 export const VM_SESSIONS_UPDATE = 'VM_SESSIONS_UPDATE';
 
-let sessionTimerSubscription = undefined;
-let frameSubscription = undefined;
-let resizeSubscription = undefined;
-
 function start() {
   return { type: VM_START };
 }
@@ -148,14 +144,21 @@ export function sendStart(params) {
   return (dispatch, getState) => {
     const socket = getState().socketDetails.socket;
     socket.emit(EV_START, params);
-    sessionTimerSubscription = socket.on(EV_TIMER, update => {
+    const sessionTimerSubscription = socket.on(EV_TIMER, update => {
       dispatch(timer(update.timer));
     });
-    frameSubscription = socket.on(EV_FRAME, f => {
+    const frameSubscription = socket.on(EV_FRAME, f => {
       dispatch(frame(f));
     });
-    resizeSubscription = socket.on(EV_RESIZE, rect => {
+    const resizeSubscription = socket.on(EV_RESIZE, rect => {
       dispatch(resize(rect));
+    });
+    const stopSubscription = socket.on(EV_STOP, () => {
+      socket.removeListener(EV_STOP, stopSubscription);
+      socket.removeListener(EV_FRAME, frameSubscription);
+      socket.removeListener(EV_TIMER, sessionTimerSubscription);
+      socket.removeListener(EV_RESIZE, resizeSubscription);
+      dispatch(stop());
     });
     dispatch(start());
   };
@@ -165,9 +168,5 @@ export function sendStop() {
   return (dispatch, getState) => {
     const socket = getState().socketDetails.socket;
     socket.emit(EV_STOP);
-    socket.removeListener(EV_FRAME, frameSubscription);
-    socket.removeListener(EV_TIMER, sessionTimerSubscription);
-    socket.removeListener(EV_RESIZE, resizeSubscription);
-    dispatch(stop());
   };
 }

@@ -29,8 +29,19 @@ body {
 }
 
 .vm-screen {
-	width: 80%;
-	height: 90%;
-	background-color: black;
-	border-radius: 10px;
+	flex: 1;
+}
+
+.hint-container {
+	@extend .flex;
+	flex: 1;
+	align-items: center;
+	justify-content: center;
+}
+
+.hint {
+	text-align: center;
+	font-size: 44px;
+	font-weight: bold;
+	color: #A3A3A3;
 }
