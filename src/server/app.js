@@ -67,10 +67,10 @@ vmSocket.on('connection', (socket) => {
 
   socket.on(EV_START, (config, callback) => {
     if (!vmRunning) {
+      vmRunning = true;
       vmcontr.emitter.once('stop', () => {
         vmSocket.emit(EV_SESSIONS_UPDATE, ++availableSessions);
       });
-      vmRunning = true;
       if (availableSessions) {
         vmcontr.start(config, callback)
           .then(() => vmSocket.emit(EV_SESSIONS_UPDATE, --availableSessions));
@@ -85,13 +85,9 @@ vmSocket.on('connection', (socket) => {
     }
   }
 
-  socket.on('disconnect', () => {
-    stopVm();
-  });
+  socket.on('disconnect', stopVm);
 
-  socket.on(EV_STOP, () => {
-    stopVm();
-  });
+  socket.on(EV_STOP, stopVm);
 });
 
 process.on('uncaughtException', (err) => {

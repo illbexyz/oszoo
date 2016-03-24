@@ -1,4 +1,14 @@
 {
+  "oss": {
+    "finnix-111": {
+      "title": "Finnix 111",
+      "memory": "256",
+      "arch": "x86_64",
+      "diskImage": "finnix-111.img",
+      "cdrom": "finnix-111.iso",
+      "description": "Finnix 111 bootable disk"
+    }
+  },
   "os": [
     {
       "title": "Finnix 111",
@@ -7,7 +17,7 @@
       "arch": "x86_64",
       "diskImage": "finnix-111.img",
       "cdrom": "finnix-111.iso",
-      "description": "Finnix 111 bootable disk",
-    },
+      "description": "Finnix 111 bootable disk"
+    }
   ]
 }

@@ -21,8 +21,10 @@ gulp.task('webpack:client', function() {
 });
 
 gulp.task('copy', function() {
-  return gulp.src('src/server/views/**/*.*')
+  gulp.src('src/server/views/**/*.*')
     .pipe(gulp.dest('dist/views'));
+  gulp.src('src/oszoo-config.json')
+    .pipe(gulp.dest('dist/'));
 });
 
 gulp.task('sass', function() {
@@ -41,6 +43,7 @@ gulp.task('start', function() {
 
 gulp.task('copy:watch', function() {
   gulp.watch('src/server/views/**/*.*', ['copy']);
+  gulp.watch('src/oszoo-config.json', ['copy']);
 });
 
 gulp.task('babel:server:watch', function() {
