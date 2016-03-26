@@ -9,9 +9,12 @@ gulp.task('babel:server', function() {
   gulp.src('src/server/**/*.js')
 		.pipe(babel({ presets: ['es2015', 'stage-0'] }))
 		.pipe(gulp.dest('dist/'));
-  return gulp.src('src/constants/**/*.js')
+  gulp.src('src/constants/**/*.js')
     .pipe(babel({ presets: ['es2015', 'stage-0'] }))
     .pipe(gulp.dest('dist/constants'));
+  return gulp.src('src/config/**/*.js')
+    .pipe(babel({ presets: ['es2015', 'stage-0'] }))
+    .pipe(gulp.dest('dist/config'));
 });
 
 gulp.task('webpack:client', function() {
@@ -23,8 +26,10 @@ gulp.task('webpack:client', function() {
 gulp.task('copy', function() {
   gulp.src('src/server/views/**/*.*')
     .pipe(gulp.dest('dist/views'));
-  gulp.src('src/oszoo-config.json')
-    .pipe(gulp.dest('dist/'));
+  gulp.src('src/config/config.json')
+    .pipe(gulp.dest('dist/config/'));
+  gulp.src('src/stylesheets/animate.min.css')
+    .pipe(gulp.dest('dist/public/stylesheets/'));
 });
 
 gulp.task('sass', function() {
@@ -43,11 +48,13 @@ gulp.task('start', function() {
 
 gulp.task('copy:watch', function() {
   gulp.watch('src/server/views/**/*.*', ['copy']);
-  gulp.watch('src/oszoo-config.json', ['copy']);
+  gulp.watch('src/config/config.json', ['copy']);
 });
 
 gulp.task('babel:server:watch', function() {
   gulp.watch('src/server/**/*.js', ['babel:server']);
+  gulp.watch('src/constants/**/*.js', ['babel:server']);
+  gulp.watch('src/config/**/*.js', ['babel:server']);
 });
 
 gulp.task('webpack:client:watch', function() {

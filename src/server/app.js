@@ -14,12 +14,13 @@ import socketio from 'socket.io';
 const io = socketio();
 
 // import adminController from './websockets/admin';
-import vmController from './websockets/vm';
+import vmManager from './virtual/vm-manager';
 
-import { EV_START, EV_STOP, EV_SESSIONS_UPDATE } from './constants/socket-events';
-
-// Number of max sessions available
-const MAX_SESSIONS = 20;
+import {
+  EV_START, EV_STOP, EV_SESSIONS_UPDATE,
+  EV_TIMER, EV_FRAME, EV_RESIZE,
+  EV_MOUSEMOVE, EV_KEYDOWN,
+} from './constants/socket-events';
 
 const app = express();
 app.io = io;
@@ -54,36 +55,36 @@ app.use('/bower_components',
 app.use('/api', api);
 app.use('*', routes);
 
-// let sessions = [];
-let availableSessions = MAX_SESSIONS;
-
 const vmSocket = io.of('/vm');
 vmSocket.on('connection', (socket) => {
-  const vmcontr = vmController({ socket });
+  function handleEvents(vm, client) {
+    vm.on(EV_STOP, reason => client.emit(EV_STOP, reason));
+    vm.on(EV_TIMER, timer => client.emit(EV_TIMER, timer));
+    vm.on(EV_FRAME, frame => client.emit(EV_FRAME, frame));
+    vm.on(EV_RESIZE, rect => client.emit(EV_RESIZE, rect));
+    client.on(EV_KEYDOWN, keydown => vm.emit(EV_KEYDOWN, keydown));
+    client.on(EV_MOUSEMOVE, mousemove => vm.emit(EV_MOUSEMOVE, mousemove));
+  }
 
-  let vmRunning = false;
-
-  vmSocket.emit(EV_SESSIONS_UPDATE, availableSessions);
-
-  socket.on(EV_START, (config, callback) => {
-    if (!vmRunning) {
-      vmRunning = true;
-      vmcontr.emitter.once('stop', () => {
-        vmSocket.emit(EV_SESSIONS_UPDATE, ++availableSessions);
-      });
-      if (availableSessions) {
-        vmcontr.start(config, callback)
-          .then(() => vmSocket.emit(EV_SESSIONS_UPDATE, --availableSessions));
-      }
-    }
-  });
+  function removeEvents(client) {
+    client.removeAllListeners(EV_STOP);
+    client.removeAllListeners(EV_KEYDOWN);
+    client.removeAllListeners(EV_MOUSEMOVE);
+  }
 
   function stopVm() {
-    if (vmRunning) {
-      vmRunning = false;
-      vmcontr.stop();
-    }
+    vmManager.stop();
+    removeEvents(socket);
+    vmSocket.emit(EV_SESSIONS_UPDATE, vmManager.getAvailableSessions());
   }
+
+  socket.emit(EV_SESSIONS_UPDATE, vmManager.getAvailableSessions());
+
+  socket.on(EV_START, os => {
+    const vMachine = vmManager.start(os);
+    handleEvents(vMachine.emitter, socket);
+    vmSocket.emit(EV_SESSIONS_UPDATE, vmManager.getAvailableSessions());
+  });
 
   socket.on('disconnect', stopVm);
 

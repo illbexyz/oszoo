@@ -1,10 +1,14 @@
 import rfbConnection from 'rfb2';
-import { PNG } from 'pngjs';
 import Rx from 'rx';
 import streamToArray from 'stream-to-array';
+import { EventEmitter } from 'events';
+import { PNG } from 'pngjs';
+import {
+  EV_KEYDOWN, EV_MOUSEMOVE,
+  EV_RESIZE, EV_FRAME,
+} from '../constants/socket-events';
 
-// Start a new connection with the qemu process
-const rfbHandler = ({ socket, port }) => {
+const handler = ({ port, emitter }) => {
   let rfb;
 
   function adjustFormat(rect) {
@@ -35,7 +39,7 @@ const rfbHandler = ({ socket, port }) => {
   }
 
   function streamToString(pngStream) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       streamToArray(pngStream.image)
         .then(parts => {
           const buffers = [];
@@ -52,22 +56,20 @@ const rfbHandler = ({ socket, port }) => {
   }
 
   function sendFrameToClient(frame) {
-    socket.emit('frame', frame);
+    emitter.emit(EV_FRAME, frame);
   }
 
   function start() {
-    socket.emit('init');
-
     rfb = rfbConnection.createConnection({
       host: '127.0.0.1',
       port,
     });
 
     rfb.on('connect', () => {
-      socket.on('mouse', (data) => {
+      emitter.on(EV_MOUSEMOVE, data => {
         rfb.pointerEvent(data.x, data.y, data.isButton1Down);
       });
-      socket.on('keydown', (data) => {
+      emitter.on(EV_KEYDOWN, data => {
         rfb.keyEvent(data.key, data.keydown);
       });
       Rx.Observable.fromEvent(rfb, 'rect')
@@ -76,10 +78,10 @@ const rfbHandler = ({ socket, port }) => {
         .flatMap(streamToString)
         .subscribe(sendFrameToClient);
     });
-    rfb.on('resize', (rect) => {
-      socket.emit('resize', rect);
+    rfb.on('resize', rect => {
+      emitter.emit(EV_RESIZE, rect);
     });
-    rfb.on('error', (error) => {
+    rfb.on('error', error => {
       if (error.code === 'ECONNREFUSED') {
         setTimeout(() => {
           start();
@@ -92,15 +94,20 @@ const rfbHandler = ({ socket, port }) => {
 
   // Stop the current connection and cleanup event listeners
   function stop() {
-    socket.removeAllListeners('keydown');
-    socket.removeAllListeners('mouse');
+    emitter.removeAllListeners(EV_KEYDOWN);
+    emitter.removeAllListeners(EV_MOUSEMOVE);
     rfb.end();
   }
 
   return {
     start,
     stop,
+    emitter,
   };
 };
+
+const emitter = Object.assign({}, EventEmitter.prototype);
+
+const rfbHandler = (port) => handler({ port, emitter });
 
 export default rfbHandler;

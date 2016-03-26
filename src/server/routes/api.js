@@ -1,33 +1,39 @@
 import express from 'express';
-import fs from 'fs';
-import path from 'path';
+import Os from '../database/os';
 
-const router = express.Router(); // eslint-disable-line
-
-const configPath = path.join(__dirname, '../', 'oszoo-config.json');
-
-function readConfig() {
-  return new Promise((resolve, reject) => {
-    fs.readFile(configPath, (err, data) => {
-      if (err) reject(err);
-      else resolve(JSON.parse(data));
-    });
-  });
-}
+const router = express.Router();
 
 // GET OS list
-router.get('/os', (req, res, next) => { // eslint-disable-line
-  readConfig()
-    .then(response => response.os)
+router.get('/os', (req, res) => {
+  Os.find()
     .then(os => res.json(os))
-    .catch(error => res.status(404).send(error));
+    .catch(err => res.status(400).send(`Error retriving the oslist: ${err}`));
 });
 
 // GET OS by id
-router.get('/os/:id', (req, res, next) => { // eslint-disable-line
-  readConfig()
-    .then(response => response.oss[req.params.id])
-    .then(os => os ? res.json(os) : res.status(404).send('Os not found'));
+router.get('/os/:id', (req, res) => {
+  Os.findById(req.params.id)
+    .then(os => res.json(os))
+    .catch(err => res.status(400).send(`Error retriving an os: ${err}`));
+});
+
+router.post('/os', (req, res) => {
+  const os = new Os(req.body.os);
+  os.save()
+    .then((savedOs) => res.json(savedOs))
+    .catch((err) => res.status(400).send(`Error creating an os ${err}`));
+});
+
+router.put('/os/:id', (req, res) => {
+  Os.findByIdAndUpdate(req.params.id, req.body.os)
+    .then(os => res.json(os))
+    .catch(err => res.status(400).send(`Error modifying an os ${err}`));
+});
+
+router.delete('/os/:id', (req, res) => {
+  Os.findByIdAndRemove(req.params.id)
+    .then(result => res.json(result.body))
+    .catch(err => res.status(400).send(`Error deleting an os ${err}`));
 });
 
 export default router;
