@@ -57,6 +57,7 @@ app.use('*', routes);
 
 const vmSocket = io.of('/vm');
 vmSocket.on('connection', (socket) => {
+  let port;
   function handleEvents(vm, client) {
     vm.on(EV_STOP, reason => client.emit(EV_STOP, reason));
     vm.on(EV_TIMER, timer => client.emit(EV_TIMER, timer));
@@ -67,13 +68,12 @@ vmSocket.on('connection', (socket) => {
   }
 
   function removeEvents(client) {
-    client.removeAllListeners(EV_STOP);
     client.removeAllListeners(EV_KEYDOWN);
     client.removeAllListeners(EV_MOUSEMOVE);
   }
 
   function stopVm() {
-    vmManager.stop();
+    vmManager.stop(port);
     removeEvents(socket);
     vmSocket.emit(EV_SESSIONS_UPDATE, vmManager.getAvailableSessions());
   }
@@ -81,8 +81,9 @@ vmSocket.on('connection', (socket) => {
   socket.emit(EV_SESSIONS_UPDATE, vmManager.getAvailableSessions());
 
   socket.on(EV_START, os => {
-    const vMachine = vmManager.start(os);
-    handleEvents(vMachine.emitter, socket);
+    const vm = vmManager.start(os);
+    port = vm.state.port;
+    handleEvents(vm.emitter, socket);
     vmSocket.emit(EV_SESSIONS_UPDATE, vmManager.getAvailableSessions());
   });
 

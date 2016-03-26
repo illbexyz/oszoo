@@ -12,17 +12,19 @@ import {
   x8664Executable, VM_MAX_SESSIONS, VM_MAX_TIME,
 } from '../config/config';
 
-const vm = ({ emitter }) => {
-  const qemu = qemuFactory({ x8664Executable, VM_MAX_SESSIONS });
+const qemu = qemuFactory({ x8664Executable, VM_MAX_SESSIONS });
+
+const vm = (emitter) => {
   let timerInterval = undefined;
   let rfb = undefined;
 
-  let vmState = {
+  /*
     isRunning: false,
-    port: 0,
+    port: undefined,
     timer: VM_MAX_TIME,
     os: {},
-  };
+  */
+  let state = {};
 
   function handleEvents(rfbEmitter, clientEmitter) {
     rfbEmitter.on(EV_FRAME, frame => clientEmitter.emit(EV_FRAME, frame));
@@ -37,20 +39,20 @@ const vm = ({ emitter }) => {
   }
 
   function stop() {
-    if (vmState.isRunning) {
-      vmState.isRunning = false;
+    if (state.isRunning) {
+      state.isRunning = false;
       clearInterval(timerInterval);
       rfb.stop();
-      qemu.stop(vmState.port);
+      qemu.stop(state.port);
     }
     removeEvents(emitter);
     emitter.emit(EV_STOP);
   }
 
   function decrementTimer() {
-    vmState.timer--;
-    emitter.emit(EV_TIMER, { timer: vmState.timer });
-    if (vmState.timer <= 0) {
+    state.timer--;
+    emitter.emit(EV_TIMER, { timer: state.timer });
+    if (state.timer <= 0) {
       stop();
       emitter.emit(EV_STOP, {
         reason: RS_SESSION_EXPIRED,
@@ -61,8 +63,8 @@ const vm = ({ emitter }) => {
   function start(os) {
     const port = qemu.start(os);
     timerInterval = setInterval(decrementTimer, 1000);
-    vmState = {
-      ...vmState,
+    state = {
+      ...state,
       isRunning: true,
       timer: VM_MAX_TIME,
       os,
@@ -71,7 +73,7 @@ const vm = ({ emitter }) => {
     rfb = rfbHandler(port + 5900);
     rfb.start();
     handleEvents(rfb.emitter, emitter);
-    return vmState;
+    return state;
   }
 
   return {
@@ -81,8 +83,6 @@ const vm = ({ emitter }) => {
   };
 };
 
-const emitter = Object.assign({}, EventEmitter.prototype);
-
-const vmController = () => vm({ emitter });
+const vmController = () => vm(Object.assign({}, EventEmitter.prototype));
 
 export default vmController;

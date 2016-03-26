@@ -106,8 +106,6 @@ const handler = ({ port, emitter }) => {
   };
 };
 
-const emitter = Object.assign({}, EventEmitter.prototype);
-
-const rfbHandler = (port) => handler({ port, emitter });
+const rfbHandler = (port) => handler({ port, emitter: Object.assign({}, EventEmitter.prototype) });
 
 export default rfbHandler;

@@ -8,12 +8,14 @@ const vmManager = () => {
   function start(os) {
     const vMachine = vm();
     const vmState = vMachine.start(os);
-    sessions[vMachine.port] = {
-      state: vmState,
+    sessions[vmState.port] = {
       vm: vMachine,
     };
     availableSessions--;
-    return vMachine;
+    return {
+      state: vmState,
+      emitter: vMachine.emitter,
+    };
   }
 
   function stop(port) {

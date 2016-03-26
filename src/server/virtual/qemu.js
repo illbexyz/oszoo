@@ -1,24 +1,20 @@
 import { spawn } from 'child_process';
 
 const qemu = ({ x8664Executable, VM_MAX_SESSIONS }) => {
-  const vncPorts = [];
+  const vncFreePorts = Array.from(Array(VM_MAX_SESSIONS).keys());
   const vncActivePorts = [];
   const qemuInstances = [];
-
-  for (let i = 0; i < VM_MAX_SESSIONS; i++) {
-    vncPorts.push(i);
-  }
 
   function deallocatePort(port) {
     const index = vncActivePorts.indexOf(port);
     if (index > -1) {
       vncActivePorts.splice(index, 1);
-      vncPorts.push(port);
+      vncFreePorts.unshift(port);
     }
   }
 
   function allocatePort() {
-    const port = vncPorts.shift();
+    const port = vncFreePorts.shift();
     vncActivePorts.push(port);
     return port;
   }
@@ -39,18 +35,17 @@ const qemu = ({ x8664Executable, VM_MAX_SESSIONS }) => {
       '-m', memory,
       '-vnc', `:${newPort}`,
     ];
-    // if (diskImage) {
-    //   args.push('-hda');
-    //   args.push(`img/${diskImage}`);
-    // }
+    if (diskImage) {
+      args.push('-hda');
+      args.push(`img/${diskImage}`);
+    }
     if (cdrom) {
       args.push('-cdrom');
       args.push(`dist/iso/${cdrom}`);
     }
     args.push('-snapshot');
     qemuInstances[newPort] = spawn(exe, args);
-    console.log(exe, args);
-    console.log(`Starting qemu on port ${newPort}`);
+    console.log(`Starting port ${newPort}`);
     qemuInstances[newPort].on('exit', () => {
       deallocatePort(newPort);
     });
@@ -58,7 +53,7 @@ const qemu = ({ x8664Executable, VM_MAX_SESSIONS }) => {
   }
 
   function stop(port) {
-    console.log(`Stopping qemu on port ${port}`);
+    console.log(`Stopping port ${port}`);
     if (qemuInstances[port]) {
       qemuInstances[port].kill();
     }
