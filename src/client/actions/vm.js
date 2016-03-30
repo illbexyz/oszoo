@@ -107,6 +107,7 @@ export function sendKeyup(key) {
 function sendMouse(state) {
   const socket = state.socketDetails.socket;
   const { mouse } = state.vm;
+  console.log(mouse);
   socket.emit(EV_MOUSEMOVE, mouse);
 }
 

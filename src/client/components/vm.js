@@ -112,8 +112,8 @@ export default class Vm extends Component {
   mouseMoveListener(event) {
     if (this.props.isRunning) {
       this.props.sendMouseMove({
-        x: event.clientX,
-        y: event.clientY,
+        x: event.movementX,
+        y: event.movementY,
       });
     }
   }

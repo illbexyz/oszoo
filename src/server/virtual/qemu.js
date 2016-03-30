@@ -35,10 +35,10 @@ const qemu = ({ x8664Executable, VM_MAX_SESSIONS }) => {
       '-m', memory,
       '-vnc', `:${newPort}`,
     ];
-    if (diskImage) {
-      args.push('-hda');
-      args.push(`img/${diskImage}`);
-    }
+    // if (diskImage) {
+    //   args.push('-hda');
+    //   args.push(`img/${diskImage}`);
+    // }
     if (cdrom) {
       args.push('-cdrom');
       args.push(`dist/iso/${cdrom}`);

@@ -18,6 +18,15 @@
       "diskImage": "finnix-111.img",
       "cdrom": "finnix-111.iso",
       "description": "Finnix 111 bootable disk"
+    },
+    {
+      "title": "Grub repair disk",
+      "consoleTitle": "grub-repair",
+      "memory": "256",
+      "arch": "x86_64",
+      "diskImage": "grub-repair.img",
+      "cdrom": "grub-repair.iso",
+      "description": "Finnix 111 bootable disk"
     }
   ]
 }

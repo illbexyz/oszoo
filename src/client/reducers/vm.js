@@ -11,6 +11,13 @@ import {
   VM_SESSIONS_UPDATE,
 } from '../actions/vm';
 
+function mousePosition(current, move, minLimit, maxLimit) {
+  let res = current + move;
+  if (res < minLimit) res = minLimit;
+  else if (res > maxLimit) res = maxLimit;
+  return res;
+}
+
 const vmReducer = (state = {
   waitingFirstFrame: false,
   isRunning: false,
@@ -69,6 +76,11 @@ const vmReducer = (state = {
       return {
         ...state,
         size: action.size,
+        mouse: {
+          ...state.mouse,
+          x: action.size.width / 2,
+          y: action.size.height / 2,
+        }
       };
     case VM_KEYDOWN:
       return {
@@ -91,8 +103,8 @@ const vmReducer = (state = {
         ...state,
         mouse: {
           ...state.mouse,
-          x: action.position.x,
-          y: action.position.y,
+          x: mousePosition(state.mouse.x, action.position.x, 0, state.size.width),
+          y: mousePosition(state.mouse.y, action.position.y, 0, state.size.height),
         },
       };
     case VM_MOUSE_DOWN:
