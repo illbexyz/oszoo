@@ -18,8 +18,7 @@
       "diskImage": "finnix-111.img",
       "cdrom": "finnix-111.iso",
       "description": "Finnix 111 bootable disk"
-    },
-    {
+    }, {
       "title": "Grub repair disk",
       "consoleTitle": "grub-repair",
       "memory": "256",
@@ -27,6 +26,13 @@
       "diskImage": "grub-repair.img",
       "cdrom": "grub-repair.iso",
       "description": "Finnix 111 bootable disk"
+    }, {
+      "title": "Debian Squeeze",
+      "consoleTitle": "squeeze",
+      "memory": "512",
+      "arch": "x86_64",
+      "diskImage": "squeeze.qcow",
+      "description": "Debian Squeeze"
     }
   ]
 }

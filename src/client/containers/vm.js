@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { sendKeydown, sendMouseMove, sendMouseDown, sendMouseUp } from '../actions/vm';
+import { sendKeydown, sendKeyup, sendMouseMove, sendMouseDown, sendMouseUp } from '../actions/vm';
 
 import Vm from '../components/vm';
 
@@ -15,6 +15,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps() {
   return {
     sendKeydown,
+    sendKeyup,
     sendMouseMove,
     sendMouseDown,
     sendMouseUp,

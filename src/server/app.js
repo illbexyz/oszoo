@@ -94,7 +94,7 @@ vmSocket.on('connection', (socket) => {
 });
 
 process.on('uncaughtException', (err) => {
-  console.error(err);
+  console.error(err.stack);
 });
 
 // catch 404 and forward to error handler

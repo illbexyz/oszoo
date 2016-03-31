@@ -7,7 +7,7 @@ export default function configureStore(initialState) {
   const store = createStore(
     rootReducer,
     initialState,
-    applyMiddleware(thunkMiddleware)
+    applyMiddleware(thunkMiddleware, createLogger())
   );
   return store;
 }

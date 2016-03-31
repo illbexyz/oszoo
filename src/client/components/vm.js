@@ -20,6 +20,7 @@ export default class Vm extends Component {
     size: PropTypes.object,
     lastFrame: PropTypes.object,
     sendKeydown: PropTypes.func.isRequired,
+    sendKeyup: PropTypes.func.isRequired,
     sendMouseMove: PropTypes.func.isRequired,
     sendMouseDown: PropTypes.func.isRequired,
     sendMouseUp: PropTypes.func.isRequired,
@@ -28,6 +29,7 @@ export default class Vm extends Component {
 
   constructor(props) {
     super(props);
+    this.onKeyUp = this.keyUpListener.bind(this);
     this.onKeyDown = this.keyDownListener.bind(this);
     this.onMouseMove = this.mouseMoveListener.bind(this);
     this.onMouseUp = this.mouseUpListener.bind(this);
@@ -109,6 +111,17 @@ export default class Vm extends Component {
     }
   }
 
+  keyUpListener(e) {
+    if (this.props.isRunning) {
+      if (e.keyCode === 8 || e.keyCode === 37
+        || e.keyCode === 38 || e.keyCode === 39
+        || e.keyCode === 40) {
+        e.preventDefault();
+      }
+      this.props.sendKeyup(keysymsConvert(e.keyCode))
+    }
+  }
+
   mouseMoveListener(event) {
     if (this.props.isRunning) {
       this.props.sendMouseMove({
@@ -131,11 +144,13 @@ export default class Vm extends Component {
         || document.mozPointerLockElement === this.canvas
         || document.webkitPointerLockElement === this.canvas) {
       document.addEventListener('keydown', this.onKeyDown);
+      document.addEventListener('keyup', this.onKeyUp);
       this.canvas.addEventListener('mousemove', this.onMouseMove);
       this.canvas.addEventListener('mousedown', this.onMouseDown);
       this.canvas.addEventListener('mouseup', this.onMouseUp);
     } else {
       document.removeEventListener('keydown', this.onKeyDown);
+      document.removeEventListener('keyup', this.onKeyUp);
       this.canvas.removeEventListener('mousemove', this.onMouseMove);
       this.canvas.removeEventListener('mousedown', this.onMouseDown);
       this.canvas.removeEventListener('mouseup', this.onMouseUp);

@@ -12,13 +12,17 @@ const handler = ({ port, emitter }) => {
   let rfb;
 
   function adjustFormat(rect) {
-    return {
-      x: rect.x,
-      y: rect.y,
-      width: rect.width,
-      height: rect.height,
-      image: rect.data,
-    };
+    if (rect.encoding === rfbConnection.encodings.raw) {
+      return {
+        x: rect.x,
+        y: rect.y,
+        width: rect.width,
+        height: rect.height,
+        image: rect.data,
+      };
+    } else {
+      return null;
+    }
   }
 
   function packPNG(image) {
@@ -32,31 +36,27 @@ const handler = ({ port, emitter }) => {
         png.data[idx + 3] = 0xff;
       }
     }
-    return {
-      ...image,
-      image: png.pack(),
-    };
+    return png.pack();
   }
 
   function streamToString(pngStream) {
     return new Promise(resolve => {
-      streamToArray(pngStream.image)
+      streamToArray(pngStream)
         .then(parts => {
           const buffers = [];
           for (let i = 0; i < parts.length; i++) {
             const part = parts[i];
             buffers.push((part instanceof Buffer) ? part : new Buffer(part));
           }
-          resolve({
-            ...pngStream,
-            image: Buffer.concat(buffers).toString('base64'),
-          });
+          resolve(Buffer.concat(buffers).toString('base64'));
         });
     });
   }
 
   function sendFrameToClient(frame) {
-    emitter.emit(EV_FRAME, frame);
+    if (frame) {
+      emitter.emit(EV_FRAME, frame);
+    }
   }
 
   function start() {
@@ -70,13 +70,29 @@ const handler = ({ port, emitter }) => {
         rfb.pointerEvent(data.x, data.y, data.isButton1Down);
       });
       emitter.on(EV_KEYDOWN, data => {
+        console.log(`keydown ${data.key} ${data.keydown}`);
         rfb.keyEvent(data.key, data.keydown);
       });
-      Rx.Observable.fromEvent(rfb, 'rect')
-        .map(adjustFormat)
-        .map(packPNG)
-        .flatMap(streamToString)
-        .subscribe(sendFrameToClient);
+
+      rfb.on('rect', rect => {
+        const r = adjustFormat(rect);
+        if (r) {
+          const imageStream = packPNG(r);
+          streamToString(imageStream)
+            .then(imgBase64 => {
+              sendFrameToClient({
+                ...r,
+                image: imgBase64,
+              });
+            });
+        }
+      });
+      // Rx.Observable.fromEvent(rfb, 'rect')
+      //   .map(adjustFormat)
+      //   .map(packPNG)
+      //   .flatMap(streamToString)
+      //   .catch(err => console.error(err))
+      //   .subscribe(sendFrameToClient, err => console.error(err));
     });
     rfb.on('resize', rect => {
       emitter.emit(EV_RESIZE, rect);
