@@ -66,8 +66,8 @@ class VmToolbar extends React.Component {
       :
       <RaisedButton
         label="Start"
+        secondary
         disabled={!this.state.value}
-        primary
         onTouchTap={this.startVm.bind(this)}/>;
 
     const timeRemainingBadge = this.props.vmIsRunning ?
