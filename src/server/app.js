@@ -1,4 +1,4 @@
-import "babel-polyfill";
+import 'babel-polyfill';
 import express from 'express';
 import path from 'path';
 // import favicon from 'serve-favicon';

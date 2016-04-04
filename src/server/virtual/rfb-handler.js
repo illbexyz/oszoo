@@ -1,5 +1,4 @@
 import rfbConnection from 'rfb2';
-import Rx from 'rx';
 import streamToArray from 'stream-to-array';
 import { EventEmitter } from 'events';
 import { PNG } from 'pngjs';
@@ -12,8 +11,9 @@ const handler = ({ port, emitter }) => {
   let rfb;
 
   function adjustFormat(rect) {
+    let r = {};
     if (rect.encoding === rfbConnection.encodings.raw) {
-      return {
+      r = {
         x: rect.x,
         y: rect.y,
         width: rect.width,
@@ -21,8 +21,9 @@ const handler = ({ port, emitter }) => {
         image: rect.data,
       };
     } else {
-      return null;
+      r = null;
     }
+    return r;
   }
 
   function packPNG(image) {
@@ -70,7 +71,6 @@ const handler = ({ port, emitter }) => {
         rfb.pointerEvent(data.x, data.y, data.isButton1Down);
       });
       emitter.on(EV_KEYDOWN, data => {
-        console.log(`keydown ${data.key} ${data.keydown}`);
         rfb.keyEvent(data.key, data.keydown);
       });
 
@@ -87,12 +87,6 @@ const handler = ({ port, emitter }) => {
             });
         }
       });
-      // Rx.Observable.fromEvent(rfb, 'rect')
-      //   .map(adjustFormat)
-      //   .map(packPNG)
-      //   .flatMap(streamToString)
-      //   .catch(err => console.error(err))
-      //   .subscribe(sendFrameToClient, err => console.error(err));
     });
     rfb.on('resize', rect => {
       emitter.emit(EV_RESIZE, rect);

@@ -60,41 +60,46 @@ class VmToolbar extends React.Component {
       <RaisedButton
         label="Stop"
         disabled={!this.state.value}
-        primary={true}
-        onTouchTap={this.props.sendStop}/>
+        primary
+        onTouchTap={this.props.sendStop}
+      />
       :
       <RaisedButton
         label="Start"
         disabled={!this.state.value}
-        primary={true}
+        primary
         onTouchTap={this.startVm.bind(this)}/>;
 
     const timeRemainingBadge = this.props.vmIsRunning ?
       <Badge
         badgeContent={this.props.timer}
-        secondary={true}
+        secondary
         badgeStyle={{ top: 6, right: 10 }}
-        disabled={true}>
+        disabled
+      >
         <IconButton
           style={{ bottom: 18 }}
-          tooltip="Minutes Remaining">
+          tooltip="Minutes Remaining"
+        >
           <TimerIcon />
         </IconButton>
       </Badge>
       :
       <IconButton
-        style={{ bottom: 18 }}
+        style={{ top: 6 }}
         tooltip="Minutes Remaining"
-        disabled={true}>
+        disabled
+      >
         <TimerIcon />
       </IconButton>;
 
     return (
       <Toolbar>
-        <ToolbarGroup firstChild={true} float="left">
+        <ToolbarGroup firstChild float="left">
           <DropDownMenu
             value={this.state.value}
-            onChange={this.handleChange}>
+            onChange={this.handleChange}
+          >
             <MenuItem key={0} value={0} primaryText="Select an OS" />
             {oslist}
           </DropDownMenu>
@@ -104,11 +109,13 @@ class VmToolbar extends React.Component {
           <ToolbarSeparator />
           <Badge
             badgeContent={this.props.sessionsAvailable}
-            secondary={true}
-            badgeStyle={{ top: 6, right: 10 }}>
+            secondary
+            badgeStyle={{ top: 6, right: 10 }}
+          >
             <IconButton
               style={{ bottom: 18 }}
-              tooltip="Sessions available">
+              tooltip="Sessions available"
+            >
               <InfoOutlineIcon />
             </IconButton>
           </Badge>
