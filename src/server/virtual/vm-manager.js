@@ -2,26 +2,28 @@ import vm from './vm';
 import { VM_MAX_SESSIONS } from '../config/config';
 
 const vmManager = () => {
-  const sessions = {};
+  const sessions = new Map();
   let availableSessions = VM_MAX_SESSIONS;
 
   function start(os) {
-    const vMachine = vm();
-    const vmState = vMachine.start(os);
-    sessions[vmState.port] = {
-      vm: vMachine,
-    };
-    availableSessions--;
-    return {
-      state: vmState,
-      emitter: vMachine.emitter,
-    };
+    if (availableSessions) {
+      const vMachine = vm();
+      const vmState = vMachine.start(os);
+      sessions.set(vmState.port, { vm: vMachine });
+      availableSessions--;
+      return {
+        state: vmState,
+        emitter: vMachine.emitter,
+      };
+    }
   }
 
   function stop(port) {
-    sessions[port].vm.stop();
-    sessions[port] = {};
-    availableSessions++;
+    if (sessions.has(port)) {
+      sessions.get(port).vm.stop();
+      sessions.delete(port);
+      availableSessions++;
+    }
   }
 
   function getAvailableSessions() {

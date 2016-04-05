@@ -71,6 +71,8 @@ vmSocket.on('connection', (socket) => {
   function removeEvents(client) {
     client.removeAllListeners(EV_KEYDOWN);
     client.removeAllListeners(EV_MOUSEMOVE);
+    client.removeAllListeners('disconnect');
+    client.removeAllListeners(EV_STOP);
   }
 
   function stopVm() {
@@ -86,11 +88,9 @@ vmSocket.on('connection', (socket) => {
     port = vm.state.port;
     handleEvents(vm.emitter, socket);
     vmSocket.emit(EV_SESSIONS_UPDATE, vmManager.getAvailableSessions());
+    socket.once('disconnect', stopVm);
+    socket.once(EV_STOP, stopVm);
   });
-
-  socket.on('disconnect', stopVm);
-
-  socket.on(EV_STOP, stopVm);
 });
 
 process.on('uncaughtException', (err) => {

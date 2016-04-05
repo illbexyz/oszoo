@@ -56,18 +56,18 @@ class VmToolbar extends React.Component {
     const oslist = this.props.osList
       .map((os, index) => <MenuItem key={index + 1} value={index + 1} primaryText={os.title} />);
 
-    const vmButton = this.props.vmIsRunning || this.props.waitingFirstFrame ?
+    const vmButton = (this.props.vmIsRunning || this.props.waitingFirstFrame) ?
       <RaisedButton
         label="Stop"
         disabled={!this.state.value}
-        primary
+        secondary
         onTouchTap={this.props.sendStop}
       />
       :
       <RaisedButton
         label="Start"
         secondary
-        disabled={!this.state.value}
+        disabled={!this.state.value || !this.props.sessionsAvailable}
         onTouchTap={this.startVm.bind(this)}/>;
 
     const timeRemainingBadge = this.props.vmIsRunning ?

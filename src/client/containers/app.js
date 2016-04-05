@@ -19,6 +19,7 @@ class App extends Component {
     isRunning: PropTypes.bool.isRequired,
     dispatch: PropTypes.func.isRequired,
     waitingFirstFrame: PropTypes.bool.isRequired,
+    sessionsAvailable: PropTypes.number.isRequired,
   };
 
   componentDidMount() {
@@ -30,15 +31,17 @@ class App extends Component {
   render() {
     const hint = (
       <div className="hint-container">
-        {this.props.waitingFirstFrame ? <CircularProgress/> : <Hint/>}
+        {this.props.waitingFirstFrame ?
+          <CircularProgress /> : <Hint sessionsAvailable={this.props.sessionsAvailable} />
+        }
       </div>
     );
     return (
       <MuiThemeProvider muiTheme={theme}>
         <div className="vm-container">
-          <Header/>
-          <VmToolbar osList={this.props.osList}/>
-          {this.props.isRunning ? <Vm/> : hint}
+          <Header />
+          <VmToolbar osList={this.props.osList} />
+          {this.props.isRunning ? <Vm /> : hint}
         </div>
       </MuiThemeProvider>
     );
@@ -47,12 +50,12 @@ class App extends Component {
 
 const mapStateToProps = (state) => {
   const osList = state.osList.items;
-  const isRunning = state.vm.isRunning;
-  const waitingFirstFrame = state.vm.waitingFirstFrame;
+  const { isRunning, waitingFirstFrame, sessionsAvailable } = state.vm;
   return {
     isRunning,
     osList,
     waitingFirstFrame,
+    sessionsAvailable,
   };
 };
 

@@ -1,5 +1,5 @@
 {
   "kvm": false,
-  "maxSessions": 20,
+  "maxSessions": 1,
   "maxTime": 600
 }
