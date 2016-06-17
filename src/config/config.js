@@ -1,7 +1,7 @@
 const config = {
   kvm: false,
   maxSessions: 2,
-  maxTime: 6,
+  maxTime: 600,
   baseUrl: 'http://localhost',
   httpPort: 8080,
   osDirectory: './os',
