@@ -1,4 +1,4 @@
-import { socketUrl } from '../../constants/misc';
+import { socketUrl } from '../../config/config';
 
 import socketIO from 'socket.io-client';
 

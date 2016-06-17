@@ -18,6 +18,7 @@ module.exports = {
         include: [
           path.resolve(__dirname, './src/client'),
           path.resolve(__dirname, './src/constants'),
+          path.resolve(__dirname, './src/config'),
         ],
         exclude: /node_modules/,
       },

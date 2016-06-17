@@ -20,8 +20,8 @@ function start() {
   return { type: VM_START };
 }
 
-function stop() {
-  return { type: VM_STOP };
+function stop(reason) {
+  return { type: VM_STOP, reason };
 }
 
 function frame(f) {
@@ -154,12 +154,12 @@ export function sendStart(params) {
     const resizeSubscription = socket.on(EV_RESIZE, rect => {
       dispatch(resize(rect));
     });
-    const stopSubscription = socket.on(EV_STOP, () => {
+    const stopSubscription = socket.on(EV_STOP, reason => {
       socket.removeListener(EV_STOP, stopSubscription);
       socket.removeListener(EV_FRAME, frameSubscription);
       socket.removeListener(EV_TIMER, sessionTimerSubscription);
       socket.removeListener(EV_RESIZE, resizeSubscription);
-      dispatch(stop());
+      dispatch(stop(reason));
     });
     dispatch(start());
   };

@@ -15,7 +15,7 @@ import socketio from 'socket.io';
 const io = socketio();
 
 // import adminController from './websockets/admin';
-import vmManager from './virtual/vm-manager';
+import vmManager from './lib/vm-manager';
 
 import {
   EV_START, EV_STOP, EV_SESSIONS_UPDATE,
@@ -59,6 +59,7 @@ app.use('*', routes);
 const vmSocket = io.of('/vm');
 vmSocket.on('connection', (socket) => {
   let port;
+
   function handleEvents(vm, client) {
     vm.on(EV_STOP, reason => client.emit(EV_STOP, reason));
     vm.on(EV_TIMER, timer => client.emit(EV_TIMER, timer));

@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 
-import qemuFactory from '../virtual/qemu';
-import rfbHandler from '../virtual/rfb-handler';
+import qemuFactory from '../lib/qemu';
+import rfbHandler from '../lib/rfb-handler';
 
 import {
   EV_STOP, EV_TIMER, RS_SESSION_EXPIRED,

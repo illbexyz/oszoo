@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 
-import { osListUrl } from '../../constants/misc';
+import { osListUrl } from '../../config/config';
 
 export const REQUEST_OSLIST = 'REQUEST_OSLIST';
 export const RECEIVED_OSLIST = 'RECEIVED_OSLIST';

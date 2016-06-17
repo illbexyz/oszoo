@@ -21,10 +21,12 @@ const qemu = ({ x8664Executable, VM_MAX_SESSIONS }) => {
 
   function start({ arch, memory, diskImage, cdrom }) {
     let exe;
-    // TODO: remaining archs
     switch (arch) {
       case 'x86_64':
         exe = x8664Executable;
+        break;
+      case 'arm':
+        exe = 'qemu-system-arm';
         break;
       default:
         throw new Error('No arch defined.');

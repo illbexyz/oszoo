@@ -6,15 +6,15 @@ var nodemon = require('gulp-nodemon');
 var runSequence = require('run-sequence');
 
 gulp.task('babel:server', function() {
+  gulp.src('src/config/**/*.js')
+    .pipe(babel({ presets: ['es2015', 'stage-0'] }))
+    .pipe(gulp.dest('dist/config'));
   gulp.src('src/server/**/*.js')
 		.pipe(babel({ presets: ['es2015', 'stage-0'] }))
 		.pipe(gulp.dest('dist/'));
-  gulp.src('src/constants/**/*.js')
+  return gulp.src('src/constants/**/*.js')
     .pipe(babel({ presets: ['es2015', 'stage-0'] }))
     .pipe(gulp.dest('dist/constants'));
-  return gulp.src('src/config/**/*.js')
-    .pipe(babel({ presets: ['es2015', 'stage-0'] }))
-    .pipe(gulp.dest('dist/config'));
 });
 
 gulp.task('webpack:client', function() {
@@ -59,6 +59,8 @@ gulp.task('babel:server:watch', function() {
 
 gulp.task('webpack:client:watch', function() {
   gulp.watch('src/client/**/*.js', ['webpack:client']);
+  gulp.watch('src/config/**/*.js', ['webpack:client']);
+  gulp.watch('src/constants/**/*.js', ['webpack:client']);
 });
 
 gulp.task('sass:watch', function() {

@@ -5,7 +5,7 @@ const hint = (props) => {
   const text = props.sessionsAvailable ?
     'Select an os from the dropdown list above'
     :
-    'No sessions available now, wait a bit. :(';
+    'No sessions available now, wait a bit :(';
   return (
     <ReactCSSTransitionGroup
       transitionAppear
@@ -15,7 +15,7 @@ const hint = (props) => {
         appear: 'animated',
         enterActive: 'fadeInDown',
         appearActive: 'fadeInDown',
-        leaveActive: 'fadeOutUp',
+        leaveActive: 'fadeOut',
       }}
       transitionEnterTimeout={1000}
       transitionLeaveTimeout={1000}

@@ -11,6 +11,8 @@ import {
   VM_SESSIONS_UPDATE,
 } from '../actions/vm';
 
+import { RS_SESSION_EXPIRED } from '../../constants/socket-events';
+
 function mousePosition(current, move, minLimit, maxLimit) {
   let res = current + move;
   if (res < minLimit) res = minLimit;
@@ -18,9 +20,28 @@ function mousePosition(current, move, minLimit, maxLimit) {
   return res;
 }
 
+function stop(state, action) {
+  let newState = {
+    ...state,
+    isRunning: false,
+    waitingFirstFrame: false,
+    lastFrame: {},
+    os: {},
+    timer: 0,
+  };
+  if (action.reason === RS_SESSION_EXPIRED) {
+    newState = {
+      ...newState,
+      sessionExpired: true,
+    };
+  }
+  return newState;
+}
+
 const vmReducer = (state = {
   waitingFirstFrame: false,
   isRunning: false,
+  sessionExpired: false,
   timer: 0,
   os: {},
   lastFrame: {
@@ -52,14 +73,7 @@ const vmReducer = (state = {
         waitingFirstFrame: true,
       };
     case VM_STOP:
-      return {
-        ...state,
-        isRunning: false,
-        waitingFirstFrame: false,
-        lastFrame: {},
-        os: {},
-        timer: 0,
-      };
+      return stop(state, action);
     case VM_RECEIVED_FRAME:
       return {
         ...state,

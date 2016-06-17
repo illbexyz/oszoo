@@ -1,27 +1,22 @@
-import fs from 'fs';
-import path from 'path';
+const config = {
+  kvm: false,
+  maxSessions: 2,
+  maxTime: 6,
+  baseUrl: 'http://localhost',
+  httpPort: 8080,
+  osDirectory: './os',
+};
 
-const configPath = path.join(__dirname, 'config.json');
-
-export function readConfig() {
-  return new Promise((resolve, reject) => {
-    fs.readFile(configPath, (err, data) => {
-      if (err) reject(err);
-      else resolve(JSON.parse(data));
-    });
-  });
-}
-
-function readConfigSync() {
-  const cfg = fs.readFileSync(configPath);
-  return JSON.parse(cfg);
-}
-
-const config = readConfigSync();
 
 export const x8664Executable =
   config.kvm ? 'kvm' : 'qemu-system-x86_64';
 
 export const VM_MAX_SESSIONS = config.maxSessions;
-
 export const VM_MAX_TIME = config.maxTime;
+
+export const baseUrl = `${config.baseUrl}:${config.httpPort}`;
+export const socketUrl = `${baseUrl}/vm`;
+export const apiUrl = `${baseUrl}/api`;
+export const osListUrl = `${apiUrl}/os`;
+
+export const httpPort = config.httpPort;

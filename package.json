@@ -10,12 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/albyxyz/oszoo.git"
+    "url": "https://github.com/illbexyz/oszoo.git"
   },
   "scripts": {
     "start": "gulp && node dist/bin/www.js",
     "build": "gulp",
-    "test": "babel-node src/**/*/__tests__/*.js | faucet"
+    "test": "babel-node src/**/*/__tests__/*.js | faucet",
+    "updateDB": "npm run clearDB && babel-node src/scripts/add_os.js",
+    "clearDB": "babel-node src/scripts/clear_db.js"
   },
   "dependencies": {
     "bcrypt": "^0.8.5",
